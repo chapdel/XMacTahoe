@@ -1,0 +1,22 @@
+#!/bin/bash
+# Aligne Kvantum (style des applications Qt) et GTK sur la variante du thème
+# global XMacTahoe active (clair ou sombre). Lancé automatiquement par
+# xmactahoe-variant.path quand ~/.config/kdedefaults/package change.
+PKG=$(cat "$HOME/.config/kdedefaults/package" 2>/dev/null)
+case "$PKG" in
+  XMacTahoe.Light) KV=XMacTahoe;     GTKDARK=false; GS=prefer-light ;;
+  XMacTahoe.Dark)  KV=XMacTahoeDark; GTKDARK=true;  GS=prefer-dark ;;
+  *) exit 0 ;;
+esac
+CUR=$(sed -n 's/^theme=//p' "$HOME/.config/Kvantum/kvantum.kvconfig" 2>/dev/null)
+if [ "$CUR" != "$KV" ]; then
+  printf '[General]\ntheme=%s\n' "$KV" > "$HOME/.config/Kvantum/kvantum.kvconfig"
+fi
+for v in gtk-3.0 gtk-4.0; do
+  f="$HOME/.config/$v/settings.ini"; [ -f "$f" ] || continue
+  grep -q '^gtk-application-prefer-dark-theme=' "$f" \
+    && sed -i "s/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=$GTKDARK/" "$f" \
+    || printf 'gtk-application-prefer-dark-theme=%s\n' "$GTKDARK" >> "$f"
+done
+command -v gsettings >/dev/null && gsettings set org.gnome.desktop.interface color-scheme "$GS" 2>/dev/null
+logger -t xmactahoe "variante $PKG : Kvantum=$KV GTK dark=$GTKDARK"

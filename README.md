@@ -20,6 +20,9 @@ Le widget AppGrid vit **invisible** (icône transparente) à l'extrémité droit
 
 Ils sont câblés par `extra/kde-desktop-repair`, copié dans `~/.local/bin`. Si un jour ils ne répondent plus (widget recréé, thème réappliqué) : `kde-desktop-repair` (ou `--check` pour diagnostiquer).
 
+## Bascule clair / sombre
+Le bouton clair/sombre du widget Flex Hub (ou `plasma-apply-lookandfeel -a XMacTahoe.Light|Dark`) change le thème global. Comme Plasma ne pilote pas Kvantum, `extra/xmactahoe-sync-variant` (déclenché par l'unité systemd utilisateur `xmactahoe-variant.path`) aligne aussitôt Kvantum et GTK sur la variante active. Les applications Qt déjà ouvertes (Dolphin, Spectacle...) prennent le nouveau style à leur prochain lancement.
+
 ## Contenu
 | Composant | Nom |
 |---|---|

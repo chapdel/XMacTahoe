@@ -31,6 +31,10 @@ kbuildsycoca6 --noincremental >/dev/null 2>&1 || true
 for v in gtk-3.0 gtk-4.0; do [ -f "$D/extra/gtk/$v-settings.ini" ] && { mkdir -p "$HOME/.config/$v"; cp "$D/extra/gtk/$v-settings.ini" "$HOME/.config/$v/settings.ini"; }; done
 # script de réparation des raccourcis AppGrid / barre du haut
 mkdir -p "$HOME/.local/bin"; cp "$D/extra/kde-desktop-repair" "$HOME/.local/bin/kde-desktop-repair"; chmod +x "$HOME/.local/bin/kde-desktop-repair"
+# synchronisation Kvantum/GTK à chaque bascule clair/sombre (Flex Hub, plasma-apply-lookandfeel)
+cp "$D/extra/xmactahoe-sync-variant" "$HOME/.local/bin/"; chmod +x "$HOME/.local/bin/xmactahoe-sync-variant"
+mkdir -p "$HOME/.config/systemd/user"; cp "$D"/extra/systemd/xmactahoe-variant.* "$HOME/.config/systemd/user/"
+systemctl --user daemon-reload 2>/dev/null; systemctl --user enable --now xmactahoe-variant.path 2>/dev/null || true
 # dépendances système (non fournies dans ~/.local)
 command -v kvantummanager >/dev/null 2>&1 || echo "⚠ Kvantum manquant : sudo dnf install kvantum"
 if ! rpm -q plasma-applet-appgrid >/dev/null 2>&1; then
@@ -46,6 +50,7 @@ if [ "$APPLY" = 1 ]; then
   rm -f "$HOME/.cache"/plasma_theme_XMacTahoe-*.kcache "$HOME/.cache/ksvg-elements" "$HOME/.cache/icon-cache.kcache"
   echo "→ Application du thème global $LNF ${LAYOUT:+(avec disposition des panneaux)} ..."
   plasma-apply-lookandfeel -a "$LNF" $LAYOUT
+  "$HOME/.local/bin/xmactahoe-sync-variant"
   echo "→ Redémarrage de plasmashell ..."
   systemctl --user restart plasma-plasmashell.service 2>/dev/null || (kquitapp6 plasmashell; sleep 1; plasmashell --replace >/dev/null 2>&1 &)
   echo "→ Raccourcis AppGrid (Meta = grille, Alt+Space = compact) ..."

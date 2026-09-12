@@ -1,0 +1,6 @@
+[Unit]
+Description=XMacTahoe : aligne Kvantum et GTK sur la variante active
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/xmactahoe-sync-variant

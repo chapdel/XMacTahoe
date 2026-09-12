@@ -1,0 +1,9 @@
+[Unit]
+Description=XMacTahoe : surveille la bascule clair/sombre du thème global
+
+[Path]
+PathChanged=%h/.config/kdedefaults/package
+Unit=xmactahoe-variant.service
+
+[Install]
+WantedBy=default.target
