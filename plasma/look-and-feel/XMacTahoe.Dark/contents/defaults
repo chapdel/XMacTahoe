@@ -1,0 +1,45 @@
+[kdeglobals][General]
+ColorScheme=XMacTahoeDark
+font=Inter Variable,10,-1,5,50,0,0,0,0,0
+fixed=JetBrains Mono,10,-1,5,50,0,0,0,0,0
+smallestReadableFont=Inter Variable,10,-1,5,50,0,0,0,0,0
+toolBarFont=Inter Variable,10,-1,5,50,0,0,0,0,0
+menuFont=Inter Variable,10,-1,5,50,0,0,0,0,0
+
+[kdeglobals][WM]
+activeFont=Inter Variable,10,-1,5,57,0,0,0,0,0
+
+[kdeglobals][Icons]
+Theme=XMacTahoe-Night
+
+[kdeglobals][KDE]
+widgetStyle=kvantum
+
+[kcminputrc][Mouse]
+cursorTheme=XMacTahoe-cursors
+
+[kwinrc][WindowSwitcher]
+LayoutName=org.kde.breeze.desktop
+
+[kwinrc][DesktopSwitcher]
+LayoutName=org.kde.breeze.desktop
+
+[kwinrc][org.kde.kdecoration2]
+ButtonsOnLeft=XAI
+ButtonsOnRight=
+BorderSize=Normal
+library=org.kde.kwin.aurorae
+theme=__aurorae__svg__XMacTahoe-Night
+
+[plasmarc][Theme]
+name=XMacTahoe-Dark
+
+[Wallpaper]
+Image=XMacTahoe
+
+[ksplashrc][KSplash]
+Engine=KSplashQML
+Theme=XMacTahoe.Splash
+
+[plasmashellrc][Updates]
+performed=layouts/kde.plasma.desktop-layout.js

@@ -1,0 +1,255 @@
+#!/usr/bin/env python3
+"""Repare/verifie la configuration de bureau KDE Plasma 6 (Wayland) de ce poste.
+
+1. Raccourcis AppGrid
+     Meta       -> grille complete  (plasmashell "activate widget <id>")
+     Alt+Space  -> mode compact     (dev.xarbit.appgrid "appgrid_open_compact")
+   Redetecte l'applet AppGrid par son type, quel que soit son id, et la recree
+   dans le dock du bas si elle a disparu (les deux raccourcis exigent un widget
+   vivant : c'est le plugin qui enregistre son action a l'instanciation).  Purge les entrees "activate widget N" orphelines.
+
+2. Barre du haut
+     pleine largeur, bord a bord (floating=0, lengthMode=fill, offset=0)
+
+Ces deux reglages sont detruits ensemble si l'on reapplique un theme global
+en cochant "disposition du bureau" (Apple.Tahoe.*, MacSequoia.* en embarquent
+une, et aucune ne recree AppGrid).
+
+Usage:  kde-desktop-repair [--check] [--no-backup]
+        --check      diagnostique seulement, ne modifie rien
+        --no-backup  ne pas sauvegarder les fichiers de config
+"""
+import os
+import re
+import shutil
+import subprocess
+import sys
+from datetime import datetime
+
+META = 16777250          # touche Meta seule
+ALT_SPACE = 134217760    # Alt+Space
+PLUGIN = "dev.xarbit.appgrid"
+SO = "/usr/lib64/qt6/plugins/plasma/applets/dev.xarbit.appgrid.so"
+COMPACT_ID = [PLUGIN, "appgrid_open_compact",
+              "AppGrid Launcher Center", "Open in Compact Mode"]
+
+CFG = os.path.expanduser("~/.config")
+BACKUP_ROOT = os.path.expanduser("~/.local/share/appgrid-shortcuts")
+FILES = ["kglobalshortcutsrc", "plasma-org.kde.plasma.desktop-appletsrc",
+         "plasmashellrc"]
+
+CHECK = "--check" in sys.argv
+NO_BACKUP = "--no-backup" in sys.argv
+rc = 0
+
+GREEN, RED, YELL, OFF = "\033[32m", "\033[31m", "\033[33m", "\033[0m"
+if not sys.stdout.isatty():
+    GREEN = RED = YELL = OFF = ""
+
+
+def ok(m):   print(f"  {GREEN}OK{OFF}    {m}")
+def warn(m): print(f"  {YELL}ATTN{OFF}  {m}")
+def bad(m):  print(f"  {RED}ECHEC{OFF} {m}")
+def step(m): print(f"\n{m}")
+
+
+def run(cmd):
+    return subprocess.run(cmd, capture_output=True, text=True)
+
+
+def kga(method, *args):
+    return run(["busctl", "--user", "call", "org.kde.kglobalaccel", "/kglobalaccel",
+                "org.kde.KGlobalAccel", method, *args])
+
+
+def pscript(js):
+    r = run(["busctl", "--user", "call", "org.kde.plasmashell", "/PlasmaShell",
+             "org.kde.PlasmaShell", "evaluateScript", "s", js])
+    return r.stdout + r.stderr
+
+
+def holder(keycode):
+    out = kga("getGlobalShortcutsByKey", "i", str(keycode)).stdout
+    m = re.search(r'a\(ssssssaiai\)\s+\d+\s+"([^"]*)"', out)
+    return m.group(1) if m else None
+
+
+# --- preconditions ---------------------------------------------------------
+step("Verifications prealables")
+if not os.path.exists(SO):
+    bad(f"plugin AppGrid absent ({SO})")
+    print("        installez-le :  sudo dnf install plasma-applet-appgrid")
+    sys.exit(1)
+ok("plugin AppGrid present")
+
+if run(["busctl", "--user", "status", "org.kde.plasmashell"]).returncode != 0:
+    bad("plasmashell ne repond pas sur D-Bus")
+    sys.exit(1)
+ok("plasmashell repond")
+
+# --- sauvegarde ------------------------------------------------------------
+if not CHECK and not NO_BACKUP:
+    step("Sauvegarde")
+    dest = os.path.join(BACKUP_ROOT, datetime.now().strftime("backup-%Y%m%d-%H%M%S"))
+    os.makedirs(dest, exist_ok=True)
+    for f in FILES:
+        src = os.path.join(CFG, f)
+        if os.path.exists(src):
+            shutil.copy2(src, dest)
+    ok(f"copie dans {dest}")
+    olds = sorted(d for d in os.listdir(BACKUP_ROOT) if d.startswith("backup-"))
+    for d in olds[:-10]:
+        shutil.rmtree(os.path.join(BACKUP_ROOT, d), ignore_errors=True)
+
+# ===========================================================================
+# 1. RACCOURCIS APPGRID
+# ===========================================================================
+step("[1/2] Applet AppGrid")
+js_find = '''
+var live = [], found = -1;
+var cs = desktops().concat(panels());
+for (var i = 0; i < cs.length; i++) {
+  var c = cs[i], ids = c.widgetIds;
+  for (var j = 0; j < ids.length; j++) {
+    live.push(ids[j]);
+    var w = c.widgetById(ids[j]);
+    if (w && w.type === "%s" && found < 0) found = ids[j];
+  }
+}
+print("LIVE=" + live.join(","));
+print("FOUND=" + found);
+''' % PLUGIN
+out = pscript(js_find)
+live = re.search(r"LIVE=([0-9,]*)", out)
+found = re.search(r"FOUND=(-?\d+)", out)
+live_ids = set(live.group(1).split(",")) if live and live.group(1) else set()
+applet_id = int(found.group(1)) if found else -1
+
+if applet_id > 0:
+    ok(f"applet AppGrid trouvee (id {applet_id})")
+elif CHECK:
+    bad("aucune applet AppGrid vivante -- relancez sans --check pour la recreer")
+    rc = 1
+else:
+    warn("aucune applet AppGrid -- recreation (invisible) dans la barre du haut")
+    out = pscript('''
+      var ps = panels(), target = null;
+      for (var i = 0; i < ps.length; i++) {          // la barre du haut (toujours visible :
+        if (ps[i].location === "top") { target = ps[i]; break; }   // pas de dock qui se revele sur Meta)
+      }
+      if (!target && ps.length > 0) target = ps[0];  // repli : premier panneau
+      if (target) {
+        var w = target.addWidget("%s");
+        if (w) { w.currentConfigGroup = ["General"]; w.writeConfig("icon", "xmactahoe-transparent"); }
+        print("NEW=" + (w ? w.id : -1) + " PANEL=" + target.id +
+              " LOC=" + target.location);
+      } else print("NEW=-1 PANEL=- LOC=-");
+    ''' % PLUGIN)
+    m = re.search(r"NEW=(-?\d+)", out)
+    applet_id = int(m.group(1)) if m else -1
+    where = re.search(r"PANEL=(\d+) LOC=([a-z]+)", out)
+    if applet_id > 0:
+        loc = f" dans le panneau {where.group(1)} ({where.group(2)})" if where else ""
+        ok(f"applet creee (id {applet_id}){loc}")
+        live_ids.add(str(applet_id))
+    else:
+        bad("creation impossible (aucun panneau ?)")
+        sys.exit(1)
+
+infos = run(["busctl", "--user", "call", "org.kde.kglobalaccel",
+             "/component/plasmashell", "org.kde.kglobalaccel.Component",
+             "allShortcutInfos"]).stdout
+stale = sorted({n for n in re.findall(r'"activate widget (\d+)"', infos)
+                if n not in live_ids})
+if not stale:
+    ok("aucune entree 'activate widget' orpheline")
+elif CHECK:
+    warn(f"orphelines a supprimer : {', '.join(stale)}")
+else:
+    for n in stale:
+        run(["busctl", "--user", "call", "org.kde.kglobalaccel", "/kglobalaccel",
+             "org.kde.KGlobalAccel", "unregister", "ss",
+             "plasmashell", f"activate widget {n}"])
+        ok(f"orpheline supprimee : activate widget {n}")
+
+if not CHECK and applet_id > 0:
+    kga("setForeignShortcut", "asai", "4", *COMPACT_ID, "1", str(ALT_SPACE))
+    pscript('''
+      var cs = desktops().concat(panels());
+      for (var i = 0; i < cs.length; i++) {
+        var w = cs[i].widgetById(%d);
+        if (w) { w.globalShortcut = "Meta"; }
+      }
+    ''' % applet_id)
+
+h_meta, h_alt = holder(META), holder(ALT_SPACE)
+if applet_id > 0 and h_meta == f"activate widget {applet_id}":
+    ok(f"Meta       -> {h_meta}  (grille complete)")
+else:
+    bad(f"Meta       -> {h_meta or 'LIBRE'}  (attendu: activate widget {applet_id})")
+    rc = 1
+if h_alt == "appgrid_open_compact":
+    ok(f"Alt+Space  -> {h_alt}  (mode compact)")
+else:
+    bad(f"Alt+Space  -> {h_alt or 'LIBRE'}  (attendu: appgrid_open_compact)")
+    rc = 1
+
+# ===========================================================================
+# 2. BARRE DU HAUT
+# ===========================================================================
+step("[2/2] Barre du haut (pleine largeur)")
+js_panel = '''
+var ps = panels();
+for (var i = 0; i < ps.length; i++) {
+  if (ps[i].location === "top") {
+    var p = ps[i];
+    print("TOP id=" + p.id + " floating=" + p.floating +
+          " lengthMode=" + p.lengthMode + " offset=" + p.offset +
+          " min=" + p.minimumLength + " max=" + p.maximumLength);
+    break;
+  }
+}
+'''
+m = re.search(r'TOP id=(\d+) floating=(\w+) lengthMode=(\w+) offset=(-?\d+)'
+              r' min=(\d+) max=(\d+)', pscript(js_panel))
+if not m:
+    warn("aucun panneau en haut de l'ecran -- rien a verifier")
+else:
+    pid, floating, lmode, offset = int(m.group(1)), m.group(2), m.group(3), int(m.group(4))
+    bad_geo = (floating != "false" or lmode != "fill" or offset != 0)
+    if not bad_geo:
+        ok(f"panneau {pid} : floating={floating} lengthMode={lmode} offset={offset}")
+    elif CHECK:
+        warn(f"panneau {pid} a corriger : floating={floating} "
+             f"lengthMode={lmode} offset={offset}")
+        rc = 1
+    else:
+        pscript('''
+          var ps = panels();
+          for (var i = 0; i < ps.length; i++) {
+            if (ps[i].location === "top") {
+              ps[i].floating = false;
+              ps[i].lengthMode = "fill";
+              ps[i].offset = 0;
+              break;
+            }
+          }
+        ''')
+        m2 = re.search(r'floating=(\w+) lengthMode=(\w+) offset=(-?\d+)',
+                       pscript(js_panel))
+        if m2 and m2.group(1) == "false" and m2.group(2) == "fill" and m2.group(3) == "0":
+            ok(f"panneau {pid} remis en pleine largeur (bord a bord)")
+        else:
+            bad(f"panneau {pid} : correction non appliquee")
+            rc = 1
+
+print()
+if CHECK:
+    print(f"{YELL if rc else GREEN}Diagnostic termine"
+          f"{' -- corrections necessaires' if rc else ' -- rien a faire'}.{OFF}")
+elif rc == 0:
+    print(f"{GREEN}Configuration de bureau operationnelle.{OFF}")
+    print("  (plasmashell ecrit les fichiers de config avec quelques secondes de retard)")
+else:
+    print(f"{RED}Certains reglages ne sont pas en place.{OFF}")
+sys.exit(rc)

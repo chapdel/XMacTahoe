@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="208" height="52" viewBox="0 0 208 52">
+  <defs><style type="text/css" id="current-color-scheme">.ColorScheme-Text{color:#dedede;}.ColorScheme-Background{color:#242424;}</style></defs>
+  <g id="22-22-notification-inactive" class="ColorScheme-Text" transform="translate(0,0)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+  </g>
+  <g id="notification-inactive" class="ColorScheme-Text" transform="translate(26,0)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+  </g>
+  <g id="22-22-notification-empty" class="ColorScheme-Text" transform="translate(52,0)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+  </g>
+  <g id="notification-empty" class="ColorScheme-Text" transform="translate(78,0)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+  </g>
+  <g id="22-22-notification-active" class="ColorScheme-Text" transform="translate(104,0)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+    <circle class="ColorScheme-Background" cx="16.8" cy="5.2" r="4.0" fill="currentColor"/>
+    <circle class="ColorScheme-Text" cx="16.8" cy="5.2" r="2.7" fill="currentColor"/>
+  </g>
+  <g id="notification-active" class="ColorScheme-Text" transform="translate(130,0)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+    <circle class="ColorScheme-Background" cx="16.8" cy="5.2" r="4.0" fill="currentColor"/>
+    <circle class="ColorScheme-Text" cx="16.8" cy="5.2" r="2.7" fill="currentColor"/>
+  </g>
+  <g id="22-22-notification-disabled" class="ColorScheme-Text" transform="translate(156,0)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Background" d="M4 4 L18 18" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M4 4 L18 18" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="notification-disabled" class="ColorScheme-Text" transform="translate(182,0)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Background" d="M4 4 L18 18" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M4 4 L18 18" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="22-22-notification-progress-active" class="ColorScheme-Text" transform="translate(0,26)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+    <circle class="ColorScheme-Background" cx="16.8" cy="5.2" r="4.0" fill="currentColor"/>
+    <circle class="ColorScheme-Text" cx="16.8" cy="5.2" r="2.7" fill="currentColor"/>
+  </g>
+  <g id="notification-progress-active" class="ColorScheme-Text" transform="translate(26,26)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+    <circle class="ColorScheme-Background" cx="16.8" cy="5.2" r="4.0" fill="currentColor"/>
+    <circle class="ColorScheme-Text" cx="16.8" cy="5.2" r="2.7" fill="currentColor"/>
+  </g>
+  <g id="22-22-notification-progress-inactive" class="ColorScheme-Text" transform="translate(52,26)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+  </g>
+  <g id="notification-progress-inactive" class="ColorScheme-Text" transform="translate(78,26)">
+    <rect x="0" y="0" width="22" height="22" fill="none"/>
+    <path class="ColorScheme-Text" d="M11 2.6 c-3.1 0-5.6 2.5-5.6 5.6 v4.3 c0 0.4-0.15 0.8-0.4 1.1 L3.6 15.2 c-0.4 0.5-0.05 1.2 0.6 1.2 h13.6 c0.65 0 1-0.7 0.6-1.2 l-1.4-1.6 c-0.25-0.3-0.4-0.7-0.4-1.1 V8.2 C16.6 5.1 14.1 2.6 11 2.6 Z" fill="currentColor" stroke-linejoin="round"/>
+    <path class="ColorScheme-Text" d="M8.8 17.8 a2.2 2.2 0 0 0 4.4 0 Z" fill="currentColor" stroke-linejoin="round"/>
+  </g>
+</svg>

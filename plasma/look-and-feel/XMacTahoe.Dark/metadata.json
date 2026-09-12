@@ -1,0 +1,13 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [ { "Name": "Chapdel" } ],
+        "Category": "",
+        "Description": "Thème global XMacTahoe (macOS-like), autonome (base Apple Tahoe de zayronxio, corrigée)",
+        "Id": "XMacTahoe.Dark",
+        "License": "GPLv3+",
+        "Name": "XMacTahoe Dark",
+        "Version": "1.0"
+    },
+    "X-Plasma-APIVersion": "2"
+}
