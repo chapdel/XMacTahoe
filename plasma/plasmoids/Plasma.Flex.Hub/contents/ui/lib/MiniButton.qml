@@ -13,6 +13,7 @@ Column {
     property bool exeDual: false
     property bool isMask: true
     property bool isSensor: false
+    property bool active: false
     property int sizeIcon: Plasmoid.configuration.sizeGeneralIcons
 
     property bool enableTitle: Plasmoid.configuration.labelsToggles
@@ -32,10 +33,13 @@ Column {
 
     Kirigami.Icon {
         id: logo
+        // XMacTahoe: state pill behind the icon (blue when active)
+        Rectangle { z: -1; anchors.centerIn: parent; width: parent.width + 14; height: width; radius: width / 2
+                    color: root.active ? "#0a84ff" : Qt.rgba(1, 1, 1, 0.16) }
         width: sizeIcon// Kirigami.Units.iconSizes.medium
         height: width
         source: itemIcon
-        color: Kirigami.Theme.textColor
+        color: root.active ? "white" : Kirigami.Theme.textColor
         isMask: parent.isMask
         //visible: !headerText
         anchors.top:  parent.top

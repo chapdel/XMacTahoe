@@ -78,6 +78,13 @@ Item {
                 value: control.valueSlider
                 to: control.maxSlider
                 snapMode: Slider.SnapAlways
+                // XMacTahoe: Tahoe-style pill slider (white fill, no handle)
+                background: Rectangle {
+                    x: slider.leftPadding; y: slider.topPadding + slider.availableHeight / 2 - height / 2
+                    width: slider.availableWidth; height: 22; radius: 11; color: Qt.rgba(1, 1, 1, 0.22)
+                    Rectangle { width: Math.max(22, slider.visualPosition * parent.width); height: parent.height; radius: 11; color: "#ffffff" }
+                }
+                handle: Item { }
                 enabled: mouseAreaActive
                 onMoved: {
                     control.realValueSlider = value

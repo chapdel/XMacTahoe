@@ -19,6 +19,7 @@ Item {
             activeSub: false
             smallMode: false
             isMaskIcon: true
+            backgroundColor: Funcs.checkInhibition() ? "#0a84ff" : Qt.rgba(1, 1, 1, 0.16) // XMacTahoe
             title: textConstants.fullDnd
             itemIcon: Funcs.checkInhibition() ? "notifications-disabled" : "notifications"
             onIconClicked: Funcs.toggleDnd

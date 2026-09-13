@@ -16,6 +16,7 @@ Item {
             width: parent.width
             height: parent.height
             title: i18n("Night Shift")
+            active: nightLight
             itemIcon: nightLight ? "redshift-status-on" : "redshift-status-off"
             onIconClicked: {
                 Plasmoid.configuration.nightMode = !nightLight
