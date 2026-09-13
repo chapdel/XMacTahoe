@@ -98,7 +98,7 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 ## Everyday command
 
-`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `firefox`, `flatpak`, `rules`, `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center gets three quick buttons: Glass, Auto appearance, Reduce motion.
+`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `firefox`, `flatpak`, `rules`, `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
 
 `xmactahoe doctor` checks the whole installation (theme layers, Kvantum/GTK alignment, files, units, rounded corners, shortcuts) and `--fix` repairs what it can. The installer saves a restore point of your Plasma configuration before its first run; `xmactahoe restore` (or `./uninstall.sh --restore`) puts it back exactly.
 

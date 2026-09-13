@@ -15,7 +15,7 @@ Item {
         Lib.MiniButton {
             width: parent.width
             height: parent.height
-            title: !nightLight ? "On" : "Off"
+            title: i18n("Night Shift")
             itemIcon: nightLight ? "redshift-status-on" : "redshift-status-off"
             onIconClicked: {
                 Plasmoid.configuration.nightMode = !nightLight

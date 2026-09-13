@@ -36,7 +36,7 @@ Item {
             bashExe: true
             cmd: command
             exeDual: true
-            title: isDark ? i18n("Dark") : i18n("Light")
+            title: i18n("Appearance")
             itemIcon: "edit-select-invert"
             onIconClicked: {
                 isDark = !isDark

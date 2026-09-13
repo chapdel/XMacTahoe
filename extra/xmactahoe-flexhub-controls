@@ -1,5 +1,6 @@
 #!/bin/bash
-# Adds three quick controls to the Flex Hub control center: glass, auto appearance, reduce motion.
+# Flex Hub control center, macOS Tahoe-like: connectivity card, Focus, appearance/screenshot, brightness, sound,
+# now playing, then a row of toggles (Night Shift + three XMacTahoe quick controls: glass, auto appearance, reduce motion).
 X="$HOME/.local/bin/xmactahoe"
 gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript "
 var names=['Glass','Auto appearance','Reduce motion'], icons=['view-preview','weather-clear','media-playback-pause'],
@@ -8,10 +9,14 @@ for (var i=0;i<panelIds.length;i++){ var ws=panelById(panelIds[i]).widgets(); fo
   w.currentConfigGroup=['General'];
   function L(k){ var v=w.readConfig(k)+''; return v? v.split(','):[]; }
   var cn=L('customControlNames'); if (cn.indexOf('Glass')>=0) { print('already'); continue; }
-  var ys=L('yElements').map(Number); var row=(ys.length? Math.max.apply(null,ys):0)+2;
-  var gh=parseInt(w.readConfig('gridHeight')||'4'); if (gh<row+1) w.writeConfig('gridHeight', String(row+1));
+  // Tahoe grid: 16 connectivity 2x2 | 11 focus 2x1 | 13 appearance | 14 screenshot | 6 brightness 4x1 | 7 sound 4x1 | 2 now playing 4x1 | 8 night shift
+  w.writeConfig('elements','16,11,13,14,6,7,2,8'); w.writeConfig('xElements','0,2,2,3,0,0,0,0'); w.writeConfig('yElements','0,0,1,1,2,3,4,5');
+  w.writeConfig('gridWidth','4'); w.writeConfig('gridHeight','6'); w.writeConfig('labelsToggles','true');
+  w.writeConfig('enabledCustomColor','true'); w.writeConfig('customCardColor','#ffffff'); w.writeConfig('opacityCardCustom','14'); w.writeConfig('radiusCardCustom','28'); w.writeConfig('shadowOpacity','0');
+  w.currentConfigGroup=[]; w.writeConfig('popupHeight','620'); w.writeConfig('popupWidth','360'); w.currentConfigGroup=['General'];
+  var row=5;
   var lists={customControlNames:cn, customControlWidths:L('customControlWidths'), customControlHeights:L('customControlHeights'), customControlIcons:L('customControlIcons'), customControlEnabledIcons:L('customControlEnabledIcons'), customControlIdSensor:L('customControlIdSensor'), customControlSubTitle:L('customControlSubTitle'), customControlEnabledButton:L('customControlEnabledButton'), customControlIsPercentage:L('customControlIsPercentage'), customControlCommand:L('customControlCommand'), listCustomControls:L('listCustomControls'), listControlsX:L('listControlsX'), listControlsY:L('listControlsY')};
-  for (var k=0;k<3;k++){ lists.customControlNames.push(names[k]); lists.customControlWidths.push('1'); lists.customControlHeights.push('1'); lists.customControlIcons.push(icons[k]); lists.customControlEnabledIcons.push('true'); lists.customControlIdSensor.push(''); lists.customControlSubTitle.push(''); lists.customControlEnabledButton.push('true'); lists.customControlIsPercentage.push('false'); lists.customControlCommand.push(cmds[k]); lists.listCustomControls.push(names[k]); lists.listControlsX.push(String(k)); lists.listControlsY.push(String(row)); }
+  for (var k=0;k<3;k++){ lists.customControlNames.push(names[k]); lists.customControlWidths.push('1'); lists.customControlHeights.push('1'); lists.customControlIcons.push(icons[k]); lists.customControlEnabledIcons.push('true'); lists.customControlIdSensor.push(''); lists.customControlSubTitle.push(''); lists.customControlEnabledButton.push('true'); lists.customControlIsPercentage.push('false'); lists.customControlCommand.push(cmds[k]); lists.listCustomControls.push(names[k]); lists.listControlsX.push(String(k+1)); lists.listControlsY.push(String(row)); }
   for (var key in lists) w.writeConfig(key, lists[key].join(','));
   w.reloadConfig(); print('flexhub controls added at row '+row);
 }}" 2>&1 | tail -1

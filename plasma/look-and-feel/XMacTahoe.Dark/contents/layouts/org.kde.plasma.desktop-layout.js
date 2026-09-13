@@ -34,7 +34,8 @@ var layout = {
                 {
                     "config": {
                         "/": {
-                            "popupWidth": "400"
+                            "popupHeight": "289",
+                            "popupWidth": "210"
                         },
                         "/Advanced": {
                             "forceQuitSettings": "gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.killWindow",
@@ -96,23 +97,38 @@ var layout = {
                 {
                     "config": {
                         "/": {
-                            "popupHeight": "438",
+                            "popupHeight": "519",
                             "popupWidth": "333"
                         },
                         "/General": {
                             "customCardColor": "#ffffff",
+                            "customControlCommand": "/home/chapdel/.local/bin/xmactahoe glass toggle,/home/chapdel/.local/bin/xmactahoe auto toggle,/home/chapdel/.local/bin/xmactahoe motion toggle",
+                            "customControlEnabledButton": "true,true,true",
+                            "customControlEnabledIcons": "true,true,true",
+                            "customControlHeights": "1,1,1",
+                            "customControlIcons": "view-preview,weather-clear,media-playback-pause",
+                            "customControlIdSensor": ",,",
+                            "customControlIsPercentage": "false,false,false",
+                            "customControlNames": "Glass,Auto appearance,Reduce motion",
+                            "customControlSubTitle": ",,",
+                            "customControlWidths": "1,1,1",
                             "darkTheme": "XMacTahoe.Dark",
-                            "elements": "9,0,6,7,13,14,5,10,8",
+                            "elements": "16,11,13,14,6,7,2,8",
                             "enabledCustomColor": "true",
-                            "labelsToggles": "false",
+                            "gridHeight": "6",
+                            "gridWidth": "4",
+                            "labelsToggles": "true",
                             "lightTheme": "XMacTahoe.Light",
+                            "listControlsX": "1,2,3",
+                            "listControlsY": "5,5,5",
+                            "listCustomControls": "Glass,Auto appearance,Reduce motion",
                             "opacityCardCustom": "14",
                             "radiusCardCustom": "28",
                             "selected_theme": "custom",
                             "shadowOpacity": "0",
                             "usePlasmaDesing": "false",
-                            "xElements": "0,2,0,0,0,3,1,0,2",
-                            "yElements": "0,0,2,3,4,4,4,1,4"
+                            "xElements": "0,2,2,3,0,0,0,0",
+                            "yElements": "0,0,1,1,2,3,4,5"
                         }
                     },
                     "plugin": "Plasma.Flex.Hub"
@@ -171,7 +187,7 @@ var layout = {
                         },
                         "/General": {
                             "icon": "xmactahoe-transparent",
-                            "recentApps": "gparted.desktop,org.kde.discover.desktop,io.github.shiftey.Desktop.desktop,org.kde.partitionmanager.desktop,org.mozilla.firefox.desktop"
+                            "recentApps": "claude-desktop-unofficial.desktop,gparted.desktop,org.kde.discover.desktop,io.github.shiftey.Desktop.desktop,org.kde.partitionmanager.desktop"
                         }
                     },
                     "plugin": "dev.xarbit.appgrid"

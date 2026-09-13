@@ -1,3 +1,10 @@
+## 1.8.0 — 2026-09-13
+
+- Control center (Flex Hub) laid out like macOS Tahoe: connectivity card, Focus, Appearance/Screenshot, brightness, sound, Now Playing, toggles row with labels; night light toggle named Night Shift.
+- Softer KWin contrast (0.5 intensity, natural saturation) and lighter popups (42 %) so the glass reads as glass.
+
+Upgrading: `xmactahoe update`.
+
 ## 1.7.0 — 2026-09-13
 
 - Kate and KWrite now follow the light/dark switch (Xcode-like XMacTahoe themes).
