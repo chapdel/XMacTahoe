@@ -31,6 +31,7 @@ if [ -d "$HOME/.themes/$GTKTHEME/gtk-4.0" ]; then
   mkdir -p "$HOME/.config/gtk-4.0"; rm -rf "$HOME/.config/gtk-4.0/assets" "$HOME/.config/gtk-4.0/windows-assets"
   cp -a "$HOME/.themes/$GTKTHEME/gtk-4.0/." "$HOME/.config/gtk-4.0/"
 fi
+command -v flatpak >/dev/null && flatpak override --user --env=GTK_THEME="$GTKTHEME" 2>/dev/null
 if command -v gsettings >/dev/null; then
   gsettings set org.gnome.desktop.interface color-scheme "$GS" 2>/dev/null
   gsettings set org.gnome.desktop.interface gtk-theme "$GTKTHEME" 2>/dev/null

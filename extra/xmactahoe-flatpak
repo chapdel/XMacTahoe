@@ -1,0 +1,6 @@
+#!/bin/bash
+# Lets Flatpak apps see the XMacTahoe GTK theme, icons, cursors and libadwaita config (user overrides).
+command -v flatpak >/dev/null || { echo "flatpak not installed"; exit 0; }
+V=$(cat "$HOME/.config/kdedefaults/package" 2>/dev/null); [ "$V" = XMacTahoe.Light ] && GT=MacTahoe-Light || GT=MacTahoe-Dark
+flatpak override --user --filesystem=xdg-config/gtk-3.0:ro --filesystem=xdg-config/gtk-4.0:ro --filesystem="$HOME/.themes:ro" --filesystem="$HOME/.local/share/icons:ro" --filesystem="$HOME/.icons:ro" --env=GTK_THEME="$GT" --env=XCURSOR_THEME=XMacTahoe-cursors 2>/dev/null
+echo "✓ Flatpak overrides set (GTK_THEME=$GT, themes/icons/cursors visible). Restart running Flatpak apps."

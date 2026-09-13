@@ -1,0 +1,41 @@
+#!/bin/bash
+# XMacTahoe command line. Usage: xmactahoe <command> [args]
+#   light | dark            switch the global theme variant
+#   accent NAME             blue purple pink red orange yellow green graphite
+#   glass on|off|toggle     blur and translucency
+#   motion on|off|toggle    animations (off = instant, for modest machines / accessibility)
+#   auto on|off|now|toggle  automatic light/dark appearance (sunrise/sunset)
+#   dynamic on|off|now      eight-slot dynamic wallpaper following the sun
+#   wallpaper NAME          XMacTahoe | XMacTahoe-Liuice
+#   firefox | flatpak | rules   apply the Firefox theme / Flatpak overrides / KWin window rules
+#   doctor [--fix]          check (and repair) the installation
+#   update                  fetch the latest release and re-install
+#   restore | uninstall     restore the pre-install Plasma config / remove XMacTahoe
+set -uo pipefail
+PKG=$(cat "$HOME/.config/xmactahoe/package-dir" 2>/dev/null); [ -d "${PKG:-/nonexistent}" ] || PKG="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+E="$PKG/extra"; cmd="${1:-help}"; shift || true
+case "$cmd" in
+  light|dark) plasma-apply-lookandfeel -a "XMacTahoe.$( [ "$cmd" = light ] && echo Light || echo Dark )" ;;
+  accent)   "$E/xmactahoe-accent" "${1:-blue}" ;;
+  glass)    a="${1:-toggle}"; [ "$a" = toggle ] && { [ "$(kreadconfig6 --file kwinrc --group Plugins --key blurEnabled)" = false ] && a=on || a=off; }; "$E/xmactahoe-glass" "$a" ;;
+  motion)   "$E/xmactahoe-motion" "${1:-toggle}" ;;
+  auto)     a="${1:-toggle}"; case "$a" in
+              on)  cp "$E"/systemd/xmactahoe-appearance.* "$HOME/.config/systemd/user/"; systemctl --user daemon-reload; systemctl --user enable --now xmactahoe-appearance.timer; "$E/xmactahoe-auto-appearance" --now; echo "auto appearance on" ;;
+              off) systemctl --user disable --now xmactahoe-appearance.timer 2>/dev/null; echo "auto appearance off" ;;
+              now) "$E/xmactahoe-auto-appearance" --now ;;
+              toggle) systemctl --user is-active -q xmactahoe-appearance.timer && "$0" auto off || "$0" auto on ;; esac ;;
+  dynamic)  a="${1:-now}"; case "$a" in
+              on)  cp "$E"/systemd/xmactahoe-wallpaper.* "$HOME/.config/systemd/user/"; systemctl --user daemon-reload; systemctl --user enable --now xmactahoe-wallpaper.timer; "$E/xmactahoe-dynamic-wallpaper"; echo "dynamic wallpaper on" ;;
+              off) systemctl --user disable --now xmactahoe-wallpaper.timer 2>/dev/null; plasma-apply-wallpaperimage "$HOME/.local/share/wallpapers/XMacTahoe" >/dev/null 2>&1; echo "dynamic wallpaper off" ;;
+              now) "$E/xmactahoe-dynamic-wallpaper" ;; esac ;;
+  wallpaper) plasma-apply-wallpaperimage "$HOME/.local/share/wallpapers/${1:-XMacTahoe}" ;;
+  firefox)  "$E/xmactahoe-firefox" ;;
+  flatpak)  "$E/xmactahoe-flatpak" ;;
+  rules)    "$E/xmactahoe-window-rules" ;;
+  doctor)   "$E/xmactahoe-doctor" "$@" ;;
+  update)   "$PKG/install.sh" --update "$@" ;;
+  restore)  "$PKG/uninstall.sh" --restore ;;
+  uninstall) "$PKG/uninstall.sh" "$@" ;;
+  version)  cat "$PKG/VERSION" ;;
+  *) sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//' ;;
+esac

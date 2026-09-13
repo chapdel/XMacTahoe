@@ -96,6 +96,22 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 - **GTK apps use the KDE file dialogs** (`GTK_USE_PORTAL=1` via `extra/environment.d`, effective at next login).
 - **Dolphin** defaults are only copied when no `dolphinrc` exists yet.
 
+## Everyday command
+
+`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `firefox`, `flatpak`, `rules`, `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center gets three quick buttons: Glass, Auto appearance, Reduce motion.
+
+`xmactahoe doctor` checks the whole installation (theme layers, Kvantum/GTK alignment, files, units, rounded corners, shortcuts) and `--fix` repairs what it can. The installer saves a restore point of your Plasma configuration before its first run; `xmactahoe restore` (or `./uninstall.sh --restore`) puts it back exactly.
+
+## Applications that draw their own frames
+
+- **Firefox**: vinceliuice's MacTahoe userChrome theme is applied to every profile (`xmactahoe firefox`; a default profile is created if Firefox was never started).
+- **Flatpak**: user overrides expose the GTK theme, icons, cursors and libadwaita config to sandboxed apps (`xmactahoe flatpak`, updated on each light/dark switch). No Kvantum runtime exists yet for the KDE 6.10/6.11 platforms, so Qt Flatpaks keep their own style.
+- **Electron and CSD apps**: KWin window rules force the theme's decoration on Chrome, Spotify, Typora, GitHub Desktop, WhatsApp clients, Telegram, Zed, Cursor, Postman, Claude, VS Code and Obsidian (`xmactahoe rules`).
+
+## Dynamic wallpaper
+
+`xmactahoe dynamic on` enables a timer that picks one of eight frames (deep night, late night, dawn, morning, midday, afternoon, sunset, dusk) generated from vinceliuice's day/night pair, relative to your sunrise and sunset.
+
 ## Automatic appearance
 
 `./install.sh --auto-appearance` enables a user timer that switches to XMacTahoe.Light after sunrise and back to XMacTahoe.Dark after sunset, like the macOS "Auto" setting. The location comes from `~/.config/xmactahoe/location` (`latitude longitude`) or, failing that, from KWin Night Light's auto-detected coordinates. Only the ten minutes after each event trigger a switch, so a manual toggle in Flex Hub is respected until the next sunrise or sunset. `extra/xmactahoe-auto-appearance --now` applies the expected variant immediately.
@@ -132,6 +148,8 @@ Konsole ships a `macOS` profile with the `XMacTahoe` (dark) and `XMacTahoe-Light
 - Release: `git tag vX.Y.Z && tar --exclude='XMacTahoe/.git' -czf ../XMacTahoe-vX.Y.Z.tar.gz XMacTahoe && gh release create vX.Y.Z ../XMacTahoe-vX.Y.Z.tar.gz`.
 
 ## Changelog
+
+- **1.6.0** — `xmactahoe` command and `doctor`, restore point + `--restore`, Flex Hub quick controls, Firefox MacTahoe theme, Flatpak overrides, KWin rules for Electron apps, eight-slot dynamic wallpaper, reduce-motion toggle, GitHub Pages site and issue templates.
 
 - **1.5.0** — real previews and light/dark GIF, `--update`, automatic appearance timer, Quick Look service menu, redesigned splash, Konsole light palette + Kate Xcode-like themes, `--no-glass` / `xmactahoe-glass`.
 

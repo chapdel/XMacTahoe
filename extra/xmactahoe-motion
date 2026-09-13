@@ -1,0 +1,6 @@
+#!/bin/bash
+# Reduce motion: off = instant animations and no magic lamp; on = normal. Usage: xmactahoe-motion on|off|toggle
+a="${1:-toggle}"; cur=$(kreadconfig6 --file kdeglobals --group KDE --key AnimationDurationFactor); [ "$a" = toggle ] && { [ "$cur" = 0 ] && a=on || a=off; }
+if [ "$a" = off ]; then kwriteconfig6 --file kdeglobals --group KDE --key AnimationDurationFactor 0; kwriteconfig6 --file kwinrc --group Plugins --key magiclampEnabled false; echo "motion reduced (instant animations)"
+else kwriteconfig6 --file kdeglobals --group KDE --key AnimationDurationFactor --delete; kwriteconfig6 --file kwinrc --group Plugins --key magiclampEnabled true; echo "motion normal"; fi
+gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1

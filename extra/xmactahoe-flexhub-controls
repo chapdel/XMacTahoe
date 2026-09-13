@@ -1,0 +1,17 @@
+#!/bin/bash
+# Adds three quick controls to the Flex Hub control center: glass, auto appearance, reduce motion.
+X="$HOME/.local/bin/xmactahoe"
+gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript "
+var names=['Glass','Auto appearance','Reduce motion'], icons=['view-preview','weather-clear','media-playback-pause'],
+    cmds=['$X glass toggle','$X auto toggle','$X motion toggle'];
+for (var i=0;i<panelIds.length;i++){ var ws=panelById(panelIds[i]).widgets(); for (var j=0;j<ws.length;j++){ var w=ws[j]; if (w.type!='Plasma.Flex.Hub') continue;
+  w.currentConfigGroup=['General'];
+  function L(k){ var v=w.readConfig(k)+''; return v? v.split(','):[]; }
+  var cn=L('customControlNames'); if (cn.indexOf('Glass')>=0) { print('already'); continue; }
+  var ys=L('yElements').map(Number); var row=(ys.length? Math.max.apply(null,ys):0)+2;
+  var gh=parseInt(w.readConfig('gridHeight')||'4'); if (gh<row+1) w.writeConfig('gridHeight', String(row+1));
+  var lists={customControlNames:cn, customControlWidths:L('customControlWidths'), customControlHeights:L('customControlHeights'), customControlIcons:L('customControlIcons'), customControlEnabledIcons:L('customControlEnabledIcons'), customControlIdSensor:L('customControlIdSensor'), customControlSubTitle:L('customControlSubTitle'), customControlEnabledButton:L('customControlEnabledButton'), customControlIsPercentage:L('customControlIsPercentage'), customControlCommand:L('customControlCommand'), listCustomControls:L('listCustomControls'), listControlsX:L('listControlsX'), listControlsY:L('listControlsY')};
+  for (var k=0;k<3;k++){ lists.customControlNames.push(names[k]); lists.customControlWidths.push('1'); lists.customControlHeights.push('1'); lists.customControlIcons.push(icons[k]); lists.customControlEnabledIcons.push('true'); lists.customControlIdSensor.push(''); lists.customControlSubTitle.push(''); lists.customControlEnabledButton.push('true'); lists.customControlIsPercentage.push('false'); lists.customControlCommand.push(cmds[k]); lists.listCustomControls.push(names[k]); lists.listControlsX.push(String(k)); lists.listControlsY.push(String(row)); }
+  for (var key in lists) w.writeConfig(key, lists[key].join(','));
+  w.reloadConfig(); print('flexhub controls added at row '+row);
+}}" 2>&1 | tail -1

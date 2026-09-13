@@ -1,0 +1,19 @@
+name: Bug report
+description: Something looks wrong or the installer failed
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes: { label: XMacTahoe version, description: "cat VERSION, or the release tag", placeholder: "1.6.0" }
+    validations: { required: true }
+  - type: input
+    id: system
+    attributes: { label: Distribution and Plasma version, placeholder: "Fedora 44, Plasma 6.7.5, Wayland" }
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes: { label: What happened, description: "What you did, what you saw, what you expected. Screenshots help." }
+    validations: { required: true }
+  - type: textarea
+    id: doctor
+    attributes: { label: Output of `xmactahoe doctor` and `python3 tools/check-package.py`, render: shell }

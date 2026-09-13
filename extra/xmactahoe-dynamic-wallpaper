@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+"""Eight-slot dynamic wallpaper following the sun (macOS Tahoe style). Picks the frame for the current time,
+relative to sunrise/sunset from the same location logic as xmactahoe-auto-appearance, and applies it.
+Run by xmactahoe-wallpaper.timer every 15 minutes."""
+import os, sys, datetime, subprocess, importlib.util
+here = os.path.dirname(os.path.abspath(__file__))
+spec = importlib.util.spec_from_file_location('aa', os.path.join(here, 'xmactahoe-auto-appearance')); src = open(spec.origin).read()
+ns = {}; exec(src.split('loc = location()')[0], ns)   # reuse location() and sun_events()
+pkg = open(os.path.expanduser('~/.config/xmactahoe/package-dir')).read().strip() if os.path.exists(os.path.expanduser('~/.config/xmactahoe/package-dir')) else os.path.dirname(here)
+frames = os.path.join(pkg, 'wallpapers', 'XMacTahoe-Dynamic', 'frames')
+now = datetime.datetime.now().astimezone(); loc = ns['location']()
+rise, set_ = (ns['sun_events'](*loc, now.date()) if loc else (None, None))
+if not rise or not set_:
+    rise = now.replace(hour=6, minute=30); set_ = now.replace(hour=19, minute=0)
+h = lambda dt: dt.hour + dt.minute / 60
+t, r, s = h(now), h(rise), h(set_)
+if t < r - 1.5: slot = 0 if t < r - 4 else 1
+elif t < r + 0.75: slot = 2
+elif t < r + 3: slot = 3
+elif t < s - 3: slot = 4
+elif t < s - 0.75: slot = 5
+elif t < s + 0.5: slot = 6
+elif t < s + 2: slot = 7
+else: slot = 0
+f = os.path.join(frames, f'slot-{slot}.jpg')
+state = os.path.expanduser('~/.config/xmactahoe/dynamic-slot')
+if os.path.exists(state) and open(state).read().strip() == str(slot) and '--force' not in sys.argv: sys.exit(0)
+subprocess.run(['plasma-apply-wallpaperimage', f], capture_output=True)
+os.makedirs(os.path.dirname(state), exist_ok=True); open(state, 'w').write(str(slot)); print('wallpaper slot', slot)

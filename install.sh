@@ -17,6 +17,10 @@ D="$(cd "$(dirname "$0")" && pwd)"
 VARIANT=dark; LAYOUT=""; APPLY=1; ROUND=1; ACCENT=""; WALL=""; ROOT=0; prev=""; GLASS=1; AUTOAPP=0; UPDATE=0
 for a in "$@"; do case "$prev" in --accent) ACCENT="$a"; prev=""; continue;; --wallpaper) WALL="$a"; prev=""; continue;; esac; case "$a" in --accent|--wallpaper) prev="$a";; --root) ROOT=1;; --no-glass) GLASS=0;; --auto-appearance) AUTOAPP=1;; --update) UPDATE=1;; --light) VARIANT=light;; --layout) LAYOUT="--resetLayout";; --no-apply) APPLY=0;; --no-round-corners) ROUND=0;; esac; done
 LS="$HOME/.local/share"
+# restore point of the Plasma config before the first install (uninstall.sh --restore puts it back)
+RP="$LS/xmactahoe/restore"
+if [ ! -d "$RP" ]; then mkdir -p "$RP"; for f in kdeglobals kwinrc kwinrulesrc plasmarc plasmashellrc plasma-org.kde.plasma.desktop-appletsrc kscreenlockerrc plasmanotifyrc kglobalshortcutsrc konsolerc dolphinrc; do [ -f "$HOME/.config/$f" ] && cp "$HOME/.config/$f" "$RP/"; done; for d in kdedefaults gtk-3.0 gtk-4.0 Kvantum; do [ -d "$HOME/.config/$d" ] && cp -r "$HOME/.config/$d" "$RP/"; done; echo "→ Restore point saved in $RP"; fi
+mkdir -p "$HOME/.config/xmactahoe"; echo "$D" > "$HOME/.config/xmactahoe/package-dir"
 if [ "$UPDATE" = 1 ]; then
   CUR=$(cat "$D/VERSION" 2>/dev/null || echo 0); LATEST=$(curl -fsSL https://api.github.com/repos/chapdel/XMacTahoe/releases/latest | sed -n 's/.*"tag_name": *"v\([^"]*\)".*/\1/p')
   [ -z "$LATEST" ] && { echo "⚠ cannot reach GitHub"; exit 1; }
@@ -57,6 +61,8 @@ cp -a "$D"/extra/applications/. "$LS/applications/"
 cp "$LS/icons/XMacTahoe-Night/128x128/apps/xmactahoe-transparent.svg" "$LS/icons/hicolor/scalable/apps/" 2>/dev/null || true
 kbuildsycoca6 --noincremental >/dev/null 2>&1 || true
 for v in gtk-3.0 gtk-4.0; do [ -f "$D/extra/gtk/$v-settings.ini" ] && { mkdir -p "$HOME/.config/$v"; cp "$D/extra/gtk/$v-settings.ini" "$HOME/.config/$v/settings.ini"; }; done
+# xmactahoe command + helper scripts
+cp "$D/bin/xmactahoe" "$D/extra/xmactahoe-doctor" "$D/extra/xmactahoe-motion" "$D/extra/xmactahoe-dynamic-wallpaper" "$HOME/.local/bin/"; chmod +x "$HOME/.local/bin/xmactahoe" "$HOME/.local/bin/xmactahoe-doctor" "$HOME/.local/bin/xmactahoe-motion" "$HOME/.local/bin/xmactahoe-dynamic-wallpaper"
 # Quick Look (Dolphin context menu) + viewer script
 mkdir -p "$LS/kio/servicemenus"; cp "$D/extra/servicemenus/xmactahoe-quicklook.desktop" "$LS/kio/servicemenus/"; chmod +x "$LS/kio/servicemenus/xmactahoe-quicklook.desktop"
 cp "$D/extra/xmactahoe-quicklook" "$HOME/.local/bin/"; chmod +x "$HOME/.local/bin/xmactahoe-quicklook"
@@ -92,6 +98,8 @@ if [ "$APPLY" = 1 ]; then
   if [ -n "$WALL" ]; then plasma-apply-wallpaperimage "$LS/wallpapers/$WALL" >/dev/null 2>&1 || true; kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image "$WALL"; fi
   echo "→ Rounded window corners (KWin effect) ..."
   [ "$ROUND" = 1 ] && "$D/extra/xmactahoe-round-corners"
+  echo "→ Firefox theme, Flatpak overrides, KWin window rules, Flex Hub controls ..."
+  "$D/extra/xmactahoe-firefox" >/dev/null 2>&1; "$D/extra/xmactahoe-flatpak" >/dev/null 2>&1; "$D/extra/xmactahoe-window-rules" >/dev/null 2>&1; "$D/extra/xmactahoe-flexhub-controls" >/dev/null 2>&1
   echo "→ AppGrid shortcuts (Meta = grid, Alt+Space = compact) ..."
   sleep 10; "$HOME/.local/bin/kde-desktop-repair" --no-backup || echo "⚠ run later: kde-desktop-repair"
 fi
@@ -100,4 +108,4 @@ if [ "$ROOT" = 1 ]; then
   sudo "$D/extra/xmactahoe-system-install" && sudo "$D/extra/xmactahoe-boot-install" || echo "⚠ root steps failed or were cancelled"
 fi
 echo "ℹ Root steps (or ./install.sh --root): sudo $D/extra/xmactahoe-system-install (all users + login screen), sudo $D/extra/xmactahoe-boot-install (Plymouth)."
-echo "✓ Done. To switch variants: plasma-apply-lookandfeel -a XMacTahoe.Dark | XMacTahoe.Light"
+echo "✓ Done. Everyday commands: xmactahoe light|dark|accent|glass|motion|auto|dynamic|doctor|update|restore"

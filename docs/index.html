@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>XMacTahoe</title>
+<style>:root{color-scheme:light dark}body{margin:0;font:16px/1.55 Inter,system-ui,sans-serif;background:#0d0d10;color:#eee}main{max-width:1040px;margin:0 auto;padding:48px 24px}h1{font-size:44px;margin:0 0 8px;letter-spacing:-.02em}p.lead{font-size:20px;color:#bbb;margin:0 0 32px}img,video{max-width:100%;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6)}.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin:32px 0}.card{background:#17171c;border:1px solid #2a2a32;border-radius:14px;padding:18px}.card h3{margin:0 0 6px;font-size:17px}.card p{margin:0;color:#aaa;font-size:15px}pre{background:#17171c;border:1px solid #2a2a32;border-radius:10px;padding:14px;overflow:auto}a{color:#6fb1ff}.btn{display:inline-block;background:#0a84ff;color:#fff;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:600;margin:8px 8px 8px 0}footer{color:#777;font-size:14px;margin-top:48px}</style></head>
+<body><main>
+<h1>XMacTahoe</h1><p class="lead">A self-contained macOS Tahoe-style global theme for KDE Plasma 6. One command installs everything; one command removes it.</p>
+<a class="btn" href="https://github.com/chapdel/XMacTahoe/releases/latest">Download the latest release</a> <a class="btn" style="background:#2a2a32" href="https://github.com/chapdel/XMacTahoe">GitHub</a>
+<p><img src="preview-dark.png" alt="XMacTahoe dark desktop"></p>
+<div class="grid">
+<div class="card"><h3>Glass menu bar and dock</h3><p>Nearly transparent 24 px bar with blur and contrast, floating dock, SF Symbols-style tray glyphs.</p></div>
+<div class="card"><h3>Rounded corners everywhere</h3><p>Every window, maximized ones included, through the KDE Rounded Corners effect.</p></div>
+<div class="card"><h3>Real light/dark switching</h3><p>Plasma, Kvantum, GTK, libadwaita, icons and terminal follow one toggle. Optional sunrise/sunset mode and eight-slot dynamic wallpaper.</p></div>
+<div class="card"><h3>Whole desktop</h3><p>Apple menu, control center, Tahoe lock screen, splash and Plymouth boot, Finder-like Dolphin, Terminal.app-like Konsole, Xcode-like Kate, Firefox theme, Flatpak overrides.</p></div>
+<div class="card"><h3>Safe to try</h3><p>Restore point before install, <code>xmactahoe doctor</code>, package checker with CI, full uninstaller.</p></div>
+<div class="card"><h3>Configurable</h3><p>Accent colors, alternative wallpapers, glass and motion toggles, <code>--update</code>.</p></div>
+</div>
+<p><img src="light-dark.gif" alt="Light and dark variants"></p>
+<h2>Install (Fedora 44 / Plasma 6.7)</h2>
+<pre>tar -xzf XMacTahoe-vX.Y.Z.tar.gz &amp;&amp; cd XMacTahoe
+./install.sh --layout        # everything, panels included
+./install.sh --root          # optional: all users, login screen, Plymouth</pre>
+<p>Everyday: <code>xmactahoe light|dark|accent purple|glass off|auto on|dynamic on|doctor|update|restore</code></p>
+<p><img src="preview-light.png" alt="XMacTahoe light desktop"></p>
+<footer>Built on Apple Tahoe / Mkos Big Sur (zayronxio), MacTahoe / WhiteSur (vinceliuice), KDE Rounded Corners (matinlotfali), AppGrid (Scujas). GPL-3.0.</footer>
+</main></body></html>

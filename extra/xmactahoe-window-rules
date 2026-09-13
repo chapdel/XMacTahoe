@@ -1,0 +1,14 @@
+#!/bin/bash
+# KWin window rules: force the theme's decoration (traffic lights) on known Electron / CSD apps.
+RC="$HOME/.config/kwinrulesrc"; i=0; ids=()
+for cls in google-chrome spotify typora "GitHub Desktop" com.ktechpit.whatsie org.telegram.desktop dev.zed.Zed cursor Postman com.anthropic.Claude code obsidian; do
+  i=$((i+1)); id="xmactahoe-$i"; ids+=("$id")
+  kwriteconfig6 --file kwinrulesrc --group "$id" --key Description "XMacTahoe decoration: $cls"
+  kwriteconfig6 --file kwinrulesrc --group "$id" --key wmclass "$cls"; kwriteconfig6 --file kwinrulesrc --group "$id" --key wmclassmatch 2
+  kwriteconfig6 --file kwinrulesrc --group "$id" --key noborder false; kwriteconfig6 --file kwinrulesrc --group "$id" --key noborderrule 2
+done
+existing=$(kreadconfig6 --file kwinrulesrc --group General --key rules); keep=$(echo "$existing" | tr ',' '\n' | grep -v '^xmactahoe-' | grep -v '^$' | paste -sd, -)
+all=$(printf '%s,' "${ids[@]}"); all="${keep:+$keep,}${all%,}"
+kwriteconfig6 --file kwinrulesrc --group General --key rules "$all"; kwriteconfig6 --file kwinrulesrc --group General --key count "$(echo "$all" | tr ',' '\n' | grep -c .)"
+gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
+echo "✓ ${#ids[@]} window rules applied (server-side decoration forced on Electron/CSD apps)"

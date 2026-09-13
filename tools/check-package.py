@@ -7,13 +7,13 @@ errors = []
 def err(m): errors.append(m); print('FAIL', m)
 def ok(m): print('ok  ', m)
 # 1. shell syntax
-for sh in ['install.sh', 'uninstall.sh', 'extra/xmactahoe-round-corners', 'extra/xmactahoe-sync-variant', 'extra/xmactahoe-boot-install', 'extra/xmactahoe-accent', 'extra/xmactahoe-system-install']:
+for sh in ['install.sh', 'uninstall.sh', 'extra/xmactahoe-round-corners', 'extra/xmactahoe-sync-variant', 'extra/xmactahoe-boot-install', 'extra/xmactahoe-accent', 'extra/xmactahoe-system-install', 'extra/xmactahoe-glass', 'extra/xmactahoe-firefox', 'extra/xmactahoe-flatpak', 'extra/xmactahoe-window-rules', 'extra/xmactahoe-motion', 'extra/xmactahoe-doctor', 'extra/xmactahoe-flexhub-controls', 'extra/xmactahoe-quicklook', 'bin/xmactahoe']:
     p = f'{B}/{sh}'
     if not os.path.exists(p): continue
     r = subprocess.run(['bash', '-n', p], capture_output=True, text=True)
     (ok if r.returncode == 0 else err)(f'bash -n {sh}' + ('' if r.returncode == 0 else ': ' + r.stderr.strip()))
 # 2. python syntax
-for py in glob.glob(f'{B}/tools/*.py') + [f'{B}/extra/kde-desktop-repair']:
+for py in glob.glob(f'{B}/tools/*.py') + [f'{B}/extra/kde-desktop-repair', f'{B}/extra/xmactahoe-auto-appearance', f'{B}/extra/xmactahoe-dynamic-wallpaper']:
     r = subprocess.run([sys.executable, '-m', 'py_compile', py], capture_output=True, text=True)
     (ok if r.returncode == 0 else err)(f'py_compile {os.path.relpath(py, B)}')
 # 3. every defaults entry points to something that exists in the package

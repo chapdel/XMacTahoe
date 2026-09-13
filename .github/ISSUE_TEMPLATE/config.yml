@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Feature idea
+    url: https://github.com/chapdel/XMacTahoe/discussions
+    about: Ideas and questions are welcome in Discussions
