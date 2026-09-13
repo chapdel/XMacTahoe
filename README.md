@@ -20,6 +20,9 @@ Le widget AppGrid vit **invisible** (icône transparente) à l'extrémité droit
 
 Ils sont câblés par `extra/kde-desktop-repair`, copié dans `~/.local/bin`. Si un jour ils ne répondent plus (widget recréé, thème réappliqué) : `kde-desktop-repair` (ou `--check` pour diagnostiquer).
 
+## Coins arrondis des fenêtres (façon Tahoe)
+Plasma n'arrondit nativement que le haut des fenêtres. Le paquet installe et configure l'effet KWin **KDE Rounded Corners** (matinlotfali, COPR `matinlotfali/KDE-Rounded-Corners`, paquet `kwin-effect-roundcorners`) : rayon 18 px sur toutes les fenêtres, y compris maximisées, contour blanc discret, pas d'arrondi en plein écran. Réglages dans `extra/kwinrc-round-corners.conf`, appliqués par `extra/xmactahoe-round-corners` (relançable seul). `./install.sh --no-round-corners` pour s'en passer. Interface graphique : Configuration du système → Effets de bureau → Rounded Corners.
+
 ## Bascule clair / sombre
 Le bouton clair/sombre du widget Flex Hub (ou `plasma-apply-lookandfeel -a XMacTahoe.Light|Dark`) change le thème global. Comme Plasma ne pilote pas Kvantum, `extra/xmactahoe-sync-variant` (déclenché par l'unité systemd utilisateur `xmactahoe-variant.path`) aligne aussitôt Kvantum et GTK sur la variante active. Les applications Qt déjà ouvertes (Dolphin, Spectacle...) prennent le nouveau style à leur prochain lancement.
 

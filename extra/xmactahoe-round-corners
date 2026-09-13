@@ -1,0 +1,23 @@
+#!/bin/bash
+# Applique les coins arrondis façon macOS Tahoe (effet KWin "KDE Rounded Corners").
+# Installe le paquet si besoin (COPR matinlotfali/KDE-Rounded-Corners, sudo demandé),
+# écrit les réglages dans kwinrc et (re)charge l'effet à chaud.
+D="$(cd "$(dirname "$0")" && pwd)"
+if ! rpm -q kwin-effect-roundcorners >/dev/null 2>&1; then
+  echo "→ Installation de kwin-effect-roundcorners (COPR matinlotfali/KDE-Rounded-Corners)"
+  sudo dnf copr enable -y matinlotfali/KDE-Rounded-Corners && sudo dnf install -y kwin-effect-roundcorners \
+    || { echo "⚠ Installation impossible : coins arrondis non appliqués."; exit 1; }
+fi
+# réglages : chaque ligne clé=valeur du fichier .conf, par groupe
+group=""
+while IFS= read -r line; do
+  case "$line" in
+    \[*\]) group="${line#[}"; group="${group%]}" ;;
+    *=*) [ -n "$group" ] && kwriteconfig6 --file kwinrc --group "$group" --key "${line%%=*}" "${line#*=}" ;;
+  esac
+done < "$D/kwinrc-round-corners.conf"
+# rechargement complet : un simple reconfigure ne suffit pas à relire la config
+gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.kde.kwin.Effects.unloadEffect kwin4_effect_shapecorners >/dev/null 2>&1
+sleep 1
+gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.kde.kwin.Effects.loadEffect kwin4_effect_shapecorners >/dev/null 2>&1
+echo "✓ Coins arrondis actifs (rayon $(kreadconfig6 --file kwinrc --group Round-Corners --key Size) px)"

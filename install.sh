@@ -1,14 +1,15 @@
 #!/bin/bash
 # Installation du thème global "XMacTahoe" (KDE Plasma 6).
-# Usage : ./install.sh [--light] [--layout] [--no-apply]
+# Usage : ./install.sh [--light] [--layout] [--no-apply] [--no-round-corners]
 # Raccourcis : Meta = grille AppGrid, Alt+Space = AppGrid compact (câblés par extra/kde-desktop-repair)
 #   --light     applique la variante claire (sombre par défaut)
 #   --layout    réinitialise aussi la disposition des panneaux (barre du haut + dock)
 #   --no-apply  installe les fichiers sans changer le thème actif
+#   --no-round-corners  ne pas installer/activer l'effet KWin de coins arrondis
 set -euo pipefail
 D="$(cd "$(dirname "$0")" && pwd)"
-VARIANT=dark; LAYOUT=""; APPLY=1
-for a in "$@"; do case "$a" in --light) VARIANT=light;; --layout) LAYOUT="--resetLayout";; --no-apply) APPLY=0;; esac; done
+VARIANT=dark; LAYOUT=""; APPLY=1; ROUND=1
+for a in "$@"; do case "$a" in --light) VARIANT=light;; --layout) LAYOUT="--resetLayout";; --no-apply) APPLY=0;; --no-round-corners) ROUND=0;; esac; done
 LS="$HOME/.local/share"
 mkdir -p "$LS"/{plasma/desktoptheme,plasma/look-and-feel,plasma/plasmoids,color-schemes,icons,aurorae/themes,wallpapers,fonts} "$HOME/.config/Kvantum" "$HOME/.icons"
 echo "→ Copie des composants dans ~/.local/share ..."
@@ -53,6 +54,8 @@ if [ "$APPLY" = 1 ]; then
   "$HOME/.local/bin/xmactahoe-sync-variant"
   echo "→ Redémarrage de plasmashell ..."
   systemctl --user restart plasma-plasmashell.service 2>/dev/null || (kquitapp6 plasmashell; sleep 1; plasmashell --replace >/dev/null 2>&1 &)
+  echo "→ Coins arrondis des fenêtres (effet KWin) ..."
+  [ "$ROUND" = 1 ] && "$D/extra/xmactahoe-round-corners"
   echo "→ Raccourcis AppGrid (Meta = grille, Alt+Space = compact) ..."
   sleep 10; "$HOME/.local/bin/kde-desktop-repair" --no-backup || echo "⚠ relance plus tard : kde-desktop-repair"
 fi
