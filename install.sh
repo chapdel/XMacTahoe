@@ -24,6 +24,15 @@ cp -a "$D"/wallpapers/.            "$LS/wallpapers/"
 cp -a "$D"/fonts/.                 "$LS/fonts/"
 cp -a "$D"/Kvantum/.               "$HOME/.config/Kvantum/"
 fc-cache -f >/dev/null 2>&1 || true
+# thèmes GTK MacTahoe (GTK 2/3/4, libadwaita via xmactahoe-sync-variant)
+mkdir -p "$HOME/.themes"; cp -a "$D"/gtk/themes/. "$HOME/.themes/"
+# Dolphin façon Finder, Konsole façon Terminal.app (n'écrase pas une config Dolphin existante)
+[ -f "$HOME/.config/dolphinrc" ] || cp "$D/extra/apps/dolphinrc" "$HOME/.config/dolphinrc"
+mkdir -p "$HOME/.local/share/konsole"; cp "$D"/extra/apps/macOS.profile "$D"/extra/apps/XMacTahoe.colorscheme "$HOME/.local/share/konsole/"
+kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile macOS.profile
+# écran de verrouillage : fond XMacTahoe
+kwriteconfig6 --file kscreenlockerrc --group Greeter --key WallpaperPlugin org.kde.image
+kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image XMacTahoe
 # lanceur AppGrid du dock (.desktop) + icône transparente de repli
 mkdir -p "$LS/applications" "$LS/icons/hicolor/scalable/apps"
 cp -a "$D"/extra/applications/. "$LS/applications/"

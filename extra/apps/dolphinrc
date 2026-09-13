@@ -1,0 +1,18 @@
+[General]
+BrowseThroughArchives=true
+ShowFullPath=true
+ShowSpaceInfo=true
+Version=202
+ViewPropsTimestamp=2026,8,5,23,15,0
+
+Places Icons Auto-resize=false
+Places Icons Static Size=16
+
+[MainWindow]
+MenuBar=Disabled
+
+[PlacesPanel]
+IconSize=16
+
+[UiSettings]
+ColorScheme=KvFlatLight

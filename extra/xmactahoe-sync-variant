@@ -4,8 +4,8 @@
 # xmactahoe-variant.path quand ~/.config/kdedefaults/package change.
 PKG=$(cat "$HOME/.config/kdedefaults/package" 2>/dev/null)
 case "$PKG" in
-  XMacTahoe.Light) KV=XMacTahoe;     GTKDARK=false; GS=prefer-light ;;
-  XMacTahoe.Dark)  KV=XMacTahoeDark; GTKDARK=true;  GS=prefer-dark ;;
+  XMacTahoe.Light) KV=XMacTahoe;     GTKDARK=false; GS=prefer-light; GTKTHEME=MacTahoe-Light; ICONS=XMacTahoe-Day ;;
+  XMacTahoe.Dark)  KV=XMacTahoeDark; GTKDARK=true;  GS=prefer-dark;  GTKTHEME=MacTahoe-Dark;  ICONS=XMacTahoe-Night ;;
   *) exit 0 ;;
 esac
 CUR=$(sed -n 's/^theme=//p' "$HOME/.config/Kvantum/kvantum.kvconfig" 2>/dev/null)
@@ -18,5 +18,20 @@ for v in gtk-3.0 gtk-4.0; do
     && sed -i "s/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=$GTKDARK/" "$f" \
     || printf 'gtk-application-prefer-dark-theme=%s\n' "$GTKDARK" >> "$f"
 done
-command -v gsettings >/dev/null && gsettings set org.gnome.desktop.interface color-scheme "$GS" 2>/dev/null
-logger -t xmactahoe "variante $PKG : Kvantum=$KV GTK dark=$GTKDARK"
+for v in gtk-3.0 gtk-4.0; do
+  f="$HOME/.config/$v/settings.ini"; [ -f "$f" ] || { mkdir -p "$HOME/.config/$v"; printf '[Settings]\n' > "$f"; }
+  for kv in "gtk-theme-name=$GTKTHEME" "gtk-icon-theme-name=$ICONS"; do
+    grep -q "^${kv%%=*}=" "$f" && sed -i "s/^${kv%%=*}=.*/$kv/" "$f" || echo "$kv" >> "$f"
+  done
+done
+# libadwaita (GTK 4) : le thème est copié dans ~/.config/gtk-4.0
+if [ -d "$HOME/.themes/$GTKTHEME/gtk-4.0" ]; then
+  mkdir -p "$HOME/.config/gtk-4.0"; rm -rf "$HOME/.config/gtk-4.0/assets" "$HOME/.config/gtk-4.0/windows-assets"
+  cp -a "$HOME/.themes/$GTKTHEME/gtk-4.0/." "$HOME/.config/gtk-4.0/"
+fi
+if command -v gsettings >/dev/null; then
+  gsettings set org.gnome.desktop.interface color-scheme "$GS" 2>/dev/null
+  gsettings set org.gnome.desktop.interface gtk-theme "$GTKTHEME" 2>/dev/null
+  gsettings set org.gnome.desktop.interface icon-theme "$ICONS" 2>/dev/null
+fi
+logger -t xmactahoe "variante $PKG : Kvantum=$KV GTK=$GTKTHEME icônes=$ICONS"

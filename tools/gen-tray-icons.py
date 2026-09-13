@@ -141,7 +141,9 @@ def glyph_for(fname):
 def write_pack(root, dark=True):
     default, bg = ("#ffffff", "#242424") if dark else ("#333333", "#f5f5f5")
     n = 0
-    for sub, size in (('16x16/panel', 16), ('22x22/panel', 22), ('22x22@2x/panel', 22), ('24x24/panel', 24)):
+    for sub, size in (('16x16/panel', 16), ('22x22/panel', 22), ('22x22@2x/panel', 22), ('24x24/panel', 24),
+                      ('status/16', 16), ('status/22', 22), ('status/24', 24), ('status/32', 32), ('status/symbolic', 16),
+                      ('status@2x/16', 16), ('status@2x/22', 22), ('status@2x/24', 24), ('status@2x/32', 32)):
         d = os.path.join(root, sub)
         if not os.path.isdir(d): continue
         names = set(os.listdir(d))
@@ -153,6 +155,8 @@ def write_pack(root, dark=True):
                   'preferences-system-bluetooth-activated.svg', 'preferences-system-bluetooth-inactive.svg', 'brightness-high.svg', 'brightness-low.svg',
                   'klipper-symbolic.svg', 'edit-paste-symbolic.svg', 'network-wireless-symbolic.svg', 'network-wireless-off.svg',
                   'org.telegram.desktop-symbolic.svg', 'org.telegram.desktop-mute-symbolic.svg', 'org.telegram.desktop-attention-symbolic.svg'}
+        if sub.endswith('symbolic'):
+            names |= {n[:-4] + '-symbolic.svg' for n in list(names) if n.endswith('.svg') and not n.endswith('-symbolic.svg')}
         for fn in sorted(names):
             if not fn.endswith('.svg'): continue
             g = glyph_for(fn.replace('preferences-system-bluetooth', 'bluetooth-x').replace('brightness-', 'display-brightness-')

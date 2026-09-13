@@ -26,20 +26,30 @@ Plasma n'arrondit nativement que le haut des fenêtres. Le paquet installe et co
 ## Bascule clair / sombre
 Le bouton clair/sombre du widget Flex Hub (ou `plasma-apply-lookandfeel -a XMacTahoe.Light|Dark`) change le thème global. Comme Plasma ne pilote pas Kvantum, `extra/xmactahoe-sync-variant` (déclenché par l'unité systemd utilisateur `xmactahoe-variant.path`) aligne aussitôt Kvantum et GTK sur la variante active. Les applications Qt déjà ouvertes (Dolphin, Spectacle...) prennent le nouveau style à leur prochain lancement.
 
+
+## Depuis la v1.2.0 : plus de Tahoe
+- **Icônes MacTahoe** (vinceliuice) sous les noms XMacTahoe (base), XMacTahoe-Night, XMacTahoe-Day, avec les glyphes de barre régénérés dans leur disposition `status/*`.
+- **Thème GTK MacTahoe** (Dark/Light) installé dans `~/.themes`, libadwaita compris (copie dans `~/.config/gtk-4.0`), suivi par la bascule clair/sombre.
+- **Verre** : popups (notifications, calendrier, Flex Hub) et dock plus denses avec contour clair, flou KWin.
+- **Ombres** de fenêtres plus larges et douces (paddings Aurorae).
+- **Animations KWin** : lampe magique à la réduction, aperçu en haut à gauche, bureau en haut à droite (`extra/kwinrc-effects.conf`).
+- **Dolphin** façon Finder (`extra/apps/dolphinrc`, copié seulement s'il n'y a pas de config), **Konsole** avec profil macOS et palette `XMacTahoe` façon Terminal.app.
+- **Écran de verrouillage** sur le fond dynamique XMacTahoe. Le thème SDDM (écran de connexion) reste à installer en root depuis le KDE Store (« Apple Tahoe SDDM »).
+
 ## Contenu
 | Composant | Nom |
 |---|---|
 | Thèmes globaux | XMacTahoe.Dark / XMacTahoe.Light / XMacTahoe.Splash |
 | Thèmes Plasma | XMacTahoe-Dark (AppleDark-ALL corrigé : barre solide sombre) / XMacTahoe-Light |
 | Schémas de couleurs | XMacTahoeDark / XMacTahoeLight |
-| Icônes | XMacTahoe-Night / XMacTahoe-Day (corbeille corrigée) |
+| Icônes | XMacTahoe (base MacTahoe), XMacTahoe-Night / XMacTahoe-Day |
 | Curseur | XMacTahoe-cursors |
 | Kvantum | XMacTahoeDark / XMacTahoe |
 | Décorations (Aurorae) | XMacTahoe-Night / XMacTahoe |
 | Fond d'écran | XMacTahoe (dynamique jour/nuit) |
 | Widgets | kppleMenu, Window Title Fork, Flex Hub, Command Output, Simple Separator, AppGrid (RPM) |
 | Polices | Inter Variable, JetBrains Mono |
-| Extra | settings.ini GTK 3/4 |
+| GTK | MacTahoe-Dark / MacTahoe-Light + settings.ini GTK 3/4 |
 
 Origine : Apple Tahoe (zayronxio), MacSequoia (vinceliuice), Mkos Big Sur (zayronxio). Licences GPL.
 

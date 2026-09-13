@@ -16,6 +16,15 @@ while IFS= read -r line; do
     *=*) [ -n "$group" ] && kwriteconfig6 --file kwinrc --group "$group" --key "${line%%=*}" "${line#*=}" ;;
   esac
 done < "$D/kwinrc-round-corners.conf"
+# animations et coins actifs façon macOS (lampe magique, bureau en haut à droite, aperçu en haut à gauche)
+group=""
+while IFS= read -r line; do
+  case "$line" in
+    \[*\]) group="${line#[}"; group="${group%]}" ;;
+    *=*) [ -n "$group" ] && kwriteconfig6 --file kwinrc --group "$group" --key "${line%%=*}" "${line#*=}" ;;
+  esac
+done < "$D/kwinrc-effects.conf"
+gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
 # rechargement complet : un simple reconfigure ne suffit pas à relire la config
 gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.kde.kwin.Effects.unloadEffect kwin4_effect_shapecorners >/dev/null 2>&1
 sleep 1
