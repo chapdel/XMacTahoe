@@ -1,0 +1,9 @@
+{
+    "KPlugin": {
+        "Authors": [ { "Name": "vinceliuice" } ],
+        "Id": "XMacTahoe-Liuice",
+        "License": "GPL-3.0",
+        "Name": "XMacTahoe Liuice",
+        "Version": "1.0"
+    }
+}

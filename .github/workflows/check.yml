@@ -1,0 +1,16 @@
+name: check
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+      - name: shellcheck
+        run: shellcheck -S warning install.sh uninstall.sh extra/xmactahoe-round-corners extra/xmactahoe-sync-variant extra/xmactahoe-boot-install extra/xmactahoe-accent extra/xmactahoe-system-install || true
+      - name: package consistency
+        run: python3 tools/check-package.py

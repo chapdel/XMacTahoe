@@ -13,6 +13,10 @@ tar -xzf XMacTahoe-vX.Y.Z.tar.gz && cd XMacTahoe
 ./install.sh --light      # apply the light variant
 ./install.sh --no-apply   # copy the files without changing the active theme
 ./install.sh --no-round-corners   # skip the KWin rounded-corners effect
+./install.sh --accent purple      # accent color: blue purple pink red orange yellow green graphite
+./install.sh --wallpaper XMacTahoe-Liuice   # alternative day/night wallpaper by vinceliuice
+./install.sh --root               # also run the root steps (system-wide copy + login screen, Plymouth)
+./uninstall.sh                    # back to Breeze Dark, remove everything (--keep-files keeps the files)
 ```
 
 System dependency (Fedora): `kvantum` (dnf). `plasma-applet-appgrid` ships as an RPM in `extra/rpm/` (COPR `scujas/plasma-applet-appgrid` repo file included) and is installed by the script when missing.
@@ -20,7 +24,7 @@ System dependency (Fedora): `kvantum` (dnf). `plasma-applet-appgrid` ships as an
 Two optional steps need root and are printed at the end of the install:
 
 - **Boot splash (Plymouth)**: `sudo extra/xmactahoe-boot-install` installs the `xmactahoe` theme (Apple-style logo, spinner, black background) and rebuilds the initramfs.
-- **Login screen**: this setup uses the Plasma Login Manager (not SDDM). It picks up the global theme from System Settings → Login Screen (Plasma) → "Apply Plasma Settings" (root authentication).
+- **Login screen and all users**: `sudo extra/xmactahoe-system-install` copies the themes into `/usr/share`, makes XMacTahoe.Dark the system default (`/etc/xdg`) and points the Plasma Login Manager wallpaper to XMacTahoe. `./install.sh --root` runs both root steps.
 
 ## What you get
 
@@ -33,7 +37,7 @@ Two optional steps need root and are printed at the end of the install:
 | Cursors | XMacTahoe-cursors (WhiteSur cursors) |
 | Application style | Kvantum: XMacTahoeDark, XMacTahoe (translucent windows with blur) |
 | Window decorations | Aurorae: XMacTahoe-Night, XMacTahoe (traffic lights, symbols on hover, wide soft shadows) |
-| Wallpaper | XMacTahoe (dynamic day/night) |
+| Wallpapers | XMacTahoe (dynamic day/night, zayronxio), XMacTahoe-Liuice (day/night, vinceliuice) |
 | GTK | MacTahoe-Dark, MacTahoe-Light, libadwaita included; GTK 3/4 settings |
 | Widgets | kppleMenu (Apple menu), Window Title Fork, Flex Hub (control center), Command Output, Simple Separator, AppGrid (RPM) |
 | Fonts | Inter Variable, JetBrains Mono |
@@ -87,6 +91,14 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 - **GTK apps use the KDE file dialogs** (`GTK_USE_PORTAL=1` via `extra/environment.d`, effective at next login).
 - **Dolphin** defaults are only copied when no `dolphinrc` exists yet.
 
+## Accent color
+
+`extra/xmactahoe-accent <name>` (or `./install.sh --accent <name>`) applies one of the macOS accents — blue, purple, pink, red, orange, yellow, green, graphite — to the Plasma accent color, both XMacTahoe color schemes (selection, focus, hover) and Kvantum (highlight and accent paths). Files are regenerated from `extra/pristine`, so the accent can be changed at will. GTK and folder icons keep the MacTahoe blue.
+
+## Checks and CI
+
+`tools/check-package.py` validates the package: shell and Python syntax, every `defaults` entry pointing to a bundled component, Aurorae rc names, Kvantum pairs, all Plasma theme SVGs parsing with the color stylesheet inside `<defs>`, layouts parsing as JavaScript and only referencing bundled widgets, and a dry run of the glyph generator. It runs on every push through GitHub Actions (`.github/workflows/check.yml`). `tools/fix-svg-stylesheets.py` repairs third-party Plasma themes whose color stylesheet is misplaced (the root cause of the "light bar" bug). `tools/export-layout.py` re-exports the live panel layout into the package, normalized to a single screen so it applies to any monitor count.
+
 ## Maintenance
 
 - Edit inside this folder, then re-run `./install.sh`.
@@ -95,6 +107,8 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 - Release: `git tag vX.Y.Z && tar --exclude='XMacTahoe/.git' -czf ../XMacTahoe-vX.Y.Z.tar.gz XMacTahoe && gh release create vX.Y.Z ../XMacTahoe-vX.Y.Z.tar.gz`.
 
 ## Changelog
+
+- **1.4.0** — uninstaller, package checker + CI, light variant parity (glass, fixed SVG stylesheets, Kvantum 30 %), single-screen layout export, accent colors, alternative Tahoe wallpaper, dock separator/highlight, system-wide + login screen root installer.
 
 - **1.3.0** — nearly transparent top bar, Apple menu wired for Wayland, glass control center, macOS-style notifications, WhiteSur cursors, KDE dialogs in GTK apps, Tahoe lock screen, Plymouth theme.
 - **1.2.x** — MacTahoe icons and GTK theme, glass panels/popups, wider shadows, KWin animations, Dolphin/Konsole defaults, lock screen wallpaper, translucent windows (Kvantum 35 %).

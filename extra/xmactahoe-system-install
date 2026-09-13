@@ -1,0 +1,26 @@
+#!/bin/bash
+# Makes XMacTahoe available system-wide (all users, and the Plasma Login Manager greeter).
+# Run with sudo. Copies the themes into /usr/share, sets XMacTahoe.Dark as the default global theme
+# for new users and the greeter (/etc/xdg), and points the login screen wallpaper to XMacTahoe.
+set -euo pipefail
+D="$(cd "$(dirname "$0")/.." && pwd)"
+[ "$(id -u)" = 0 ] || { echo "Run with sudo: sudo $0"; exit 1; }
+for sub in plasma/look-and-feel plasma/desktoptheme color-schemes icons aurorae/themes wallpapers; do
+  mkdir -p "/usr/share/$sub"; cp -a "$D/$sub/." "/usr/share/$sub/"
+done
+mkdir -p /usr/share/fonts/xmactahoe && cp -a "$D/fonts/." /usr/share/fonts/xmactahoe/ && fc-cache -f >/dev/null 2>&1 || true
+mkdir -p /etc/xdg
+kwriteconfig6 --file /etc/xdg/kdeglobals --group KDE --key LookAndFeelPackage XMacTahoe.Dark
+kwriteconfig6 --file /etc/xdg/kdeglobals --group General --key ColorScheme XMacTahoeDark
+kwriteconfig6 --file /etc/xdg/kdeglobals --group Icons --key Theme XMacTahoe-Night
+kwriteconfig6 --file /etc/xdg/kcminputrc --group Mouse --key cursorTheme XMacTahoe-cursors
+kwriteconfig6 --file /etc/xdg/plasmarc --group Theme --key name XMacTahoe-Dark
+mkdir -p /etc/plasmalogin.conf.d
+cat > /etc/plasmalogin.conf.d/xmactahoe.conf <<'CONF'
+[Greeter]
+WallpaperPlugin=org.kde.image
+[Greeter][Wallpaper][org.kde.image][General]
+Image=file:///usr/share/wallpapers/XMacTahoe/
+PreviewImage=file:///usr/share/wallpapers/XMacTahoe/
+CONF
+echo "✓ XMacTahoe installed system-wide; login screen uses the XMacTahoe wallpaper and global theme (effective at next login screen)."

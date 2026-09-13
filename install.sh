@@ -1,15 +1,18 @@
 #!/bin/bash
 # Installs the "XMacTahoe" global theme (KDE Plasma 6).
-# Usage: ./install.sh [--light] [--layout] [--no-apply] [--no-round-corners]
+# Usage: ./install.sh [--light] [--layout] [--no-apply] [--no-round-corners] [--accent NAME] [--wallpaper NAME] [--root]
 # Shortcuts: Meta = AppGrid grid, Alt+Space = AppGrid compact mode (wired by extra/kde-desktop-repair)
 #   --light     apply the light variant (dark by default)
 #   --layout    also reset the panel layout (top bar + dock)
 #   --no-apply  copy the files without changing the active theme
 #   --no-round-corners  do not install/enable the KWin rounded-corners effect
+#   --accent NAME   blue|purple|pink|red|orange|yellow|green|graphite (extra/xmactahoe-accent)
+#   --wallpaper NAME  XMacTahoe (default, zayronxio dynamic) or XMacTahoe-Liuice (vinceliuice day/night)
+#   --root          also run the root steps with sudo: system-wide copy + login screen, Plymouth boot theme
 set -euo pipefail
 D="$(cd "$(dirname "$0")" && pwd)"
-VARIANT=dark; LAYOUT=""; APPLY=1; ROUND=1
-for a in "$@"; do case "$a" in --light) VARIANT=light;; --layout) LAYOUT="--resetLayout";; --no-apply) APPLY=0;; --no-round-corners) ROUND=0;; esac; done
+VARIANT=dark; LAYOUT=""; APPLY=1; ROUND=1; ACCENT=""; WALL=""; ROOT=0; prev=""
+for a in "$@"; do case "$prev" in --accent) ACCENT="$a"; prev=""; continue;; --wallpaper) WALL="$a"; prev=""; continue;; esac; case "$a" in --accent|--wallpaper) prev="$a";; --root) ROOT=1;; --light) VARIANT=light;; --layout) LAYOUT="--resetLayout";; --no-apply) APPLY=0;; --no-round-corners) ROUND=0;; esac; done
 LS="$HOME/.local/share"
 mkdir -p "$LS"/{plasma/desktoptheme,plasma/look-and-feel,plasma/plasmoids,color-schemes,icons,aurorae/themes,wallpapers,fonts} "$HOME/.config/Kvantum" "$HOME/.icons"
 echo "→ Copying components into ~/.local/share ..."
@@ -67,10 +70,16 @@ if [ "$APPLY" = 1 ]; then
   "$HOME/.local/bin/xmactahoe-sync-variant"
   echo "→ Restarting plasmashell ..."
   systemctl --user restart plasma-plasmashell.service 2>/dev/null || (kquitapp6 plasmashell; sleep 1; plasmashell --replace >/dev/null 2>&1 &)
+  [ -n "$ACCENT" ] && "$D/extra/xmactahoe-accent" "$ACCENT"
+  if [ -n "$WALL" ]; then plasma-apply-wallpaperimage "$LS/wallpapers/$WALL" >/dev/null 2>&1 || true; kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image "$WALL"; fi
   echo "→ Rounded window corners (KWin effect) ..."
   [ "$ROUND" = 1 ] && "$D/extra/xmactahoe-round-corners"
   echo "→ AppGrid shortcuts (Meta = grid, Alt+Space = compact) ..."
   sleep 10; "$HOME/.local/bin/kde-desktop-repair" --no-backup || echo "⚠ run later: kde-desktop-repair"
 fi
-echo "ℹ Optional root steps: sudo $D/extra/xmactahoe-boot-install (Plymouth); login screen: System Settings → Login Screen (Plasma) → Apply Plasma Settings."
+if [ "$ROOT" = 1 ]; then
+  echo "→ Root steps (sudo): system-wide copy + login screen, Plymouth ..."
+  sudo "$D/extra/xmactahoe-system-install" && sudo "$D/extra/xmactahoe-boot-install" || echo "⚠ root steps failed or were cancelled"
+fi
+echo "ℹ Root steps (or ./install.sh --root): sudo $D/extra/xmactahoe-system-install (all users + login screen), sudo $D/extra/xmactahoe-boot-install (Plymouth)."
 echo "✓ Done. To switch variants: plasma-apply-lookandfeel -a XMacTahoe.Dark | XMacTahoe.Light"

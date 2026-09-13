@@ -1,0 +1,26 @@
+#!/bin/bash
+# Sets the accent color (macOS names) across Plasma, the XMacTahoe color schemes and Kvantum.
+# Usage: xmactahoe-accent <blue|purple|pink|red|orange|yellow|green|graphite>
+# Files are regenerated from the pristine copies in extra/pristine, so accents can be changed any number of times.
+set -euo pipefail
+D="$(cd "$(dirname "$0")" && pwd)"
+case "${1:-blue}" in
+  blue)     HEX=0a84ff ;; purple) HEX=bf5af2 ;; pink) HEX=ff375f ;; red) HEX=ff453a ;;
+  orange)   HEX=ff9f0a ;; yellow) HEX=ffd60a ;; green) HEX=30d158 ;; graphite) HEX=8e8e93 ;;
+  *) echo "unknown accent '${1}' (blue purple pink red orange yellow green graphite)"; exit 1 ;;
+esac
+R=$((16#${HEX:0:2})); G=$((16#${HEX:2:2})); Bc=$((16#${HEX:4:2}))
+LS="$HOME/.local/share"; mkdir -p "$LS/color-schemes" "$HOME/.config/Kvantum/XMacTahoe"
+# color schemes: selection + focus/hover decorations (pristine blue 43,141,232 / 47,151,249 / 49,91,239 / 79,127,239)
+for cs in XMacTahoeDark XMacTahoeLight; do
+  sed -e "s/^BackgroundNormal=43,141,232/BackgroundNormal=$R,$G,$Bc/" -e "s/^DecorationFocus=.*/DecorationFocus=$R,$G,$Bc/" -e "s/^DecorationHover=.*/DecorationHover=$R,$G,$Bc/" \
+      -e "s/^BackgroundAlternate=79,127,239/BackgroundAlternate=$R,$G,$Bc/" "$D/pristine/color-schemes/$cs.colors" > "$LS/color-schemes/$cs.colors"
+done
+# Kvantum: highlight keys + accent paths in the SVGs (pristine #315bef)
+for k in XMacTahoe XMacTahoeDark; do
+  sed -e "s/^highlight.color=.*/highlight.color=#$HEX/" -e "s/^inactive.highlight.color=.*/inactive.highlight.color=#$HEX/" "$D/pristine/Kvantum/$k.kvconfig" > "$HOME/.config/Kvantum/XMacTahoe/$k.kvconfig"
+  sed -e "s/#315bef/#$HEX/g" -e "s/#315BEF/#$HEX/g" "$D/pristine/Kvantum/$k.svg" > "$HOME/.config/Kvantum/XMacTahoe/$k.svg"
+done
+kwriteconfig6 --file kdeglobals --group General --key AccentColor "$R,$G,$Bc"
+CUR=$(kreadconfig6 --file kdeglobals --group General --key ColorScheme); plasma-apply-colorscheme "$CUR" >/dev/null 2>&1 || true
+echo "✓ accent ${1:-blue} (#$HEX) applied: Plasma, color schemes, Kvantum (relaunch Qt apps). GTK and folder icons keep the MacTahoe blue."

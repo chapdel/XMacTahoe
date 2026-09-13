@@ -3,45 +3,12 @@ var plasma = getApiVersion(1);
 var layout = {
     "desktops": [
         {
-            "applets": [
-            ],
+            "applets": [],
             "config": {
                 "/": {
-                    "ItemGeometries-1920x1080": "",
-                    "ItemGeometriesHorizontal": "",
                     "formfactor": "0",
                     "immutability": "1",
                     "lastScreen": "0",
-                    "wallpaperplugin": "org.kde.image"
-                }
-            },
-            "wallpaperPlugin": "org.kde.image"
-        },
-        {
-            "applets": [
-            ],
-            "config": {
-                "/": {
-                    "ItemGeometries-1920x1080": "",
-                    "ItemGeometriesHorizontal": "",
-                    "formfactor": "0",
-                    "immutability": "1",
-                    "lastScreen": "1",
-                    "wallpaperplugin": "org.kde.image"
-                }
-            },
-            "wallpaperPlugin": "org.kde.image"
-        },
-        {
-            "applets": [
-            ],
-            "config": {
-                "/": {
-                    "ItemGeometries-1680x1050": "",
-                    "ItemGeometriesHorizontal": "",
-                    "formfactor": "0",
-                    "immutability": "1",
-                    "lastScreen": "2",
                     "wallpaperplugin": "org.kde.image"
                 }
             },
@@ -53,18 +20,15 @@ var layout = {
             "alignment": "center",
             "applets": [
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
@@ -95,8 +59,7 @@ var layout = {
                     "plugin": "org.kpple.kppleMenu"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
@@ -110,13 +73,11 @@ var layout = {
                     "plugin": "org.kde.windowtitle.Fork"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.appmenu"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.panelspacer"
                 },
                 {
@@ -129,8 +90,7 @@ var layout = {
                     "plugin": "org.kde.plasma.systemtray"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
@@ -158,8 +118,7 @@ var layout = {
                     "plugin": "Plasma.Flex.Hub"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
@@ -193,18 +152,15 @@ var layout = {
                     "plugin": "org.kde.plasma.digitalclock"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
@@ -242,8 +198,7 @@ var layout = {
             "alignment": "center",
             "applets": [
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
@@ -252,22 +207,24 @@ var layout = {
                             "launchers": ""
                         },
                         "/General": {
+                            "groupPopups": "true",
+                            "highlightWindows": "true",
                             "iconSpacing": "0",
                             "indicateAudioStreams": "false",
                             "launchers": "applications:xmactahoe-appgrid.desktop,applications:org.kde.dolphin.desktop,applications:org.kde.konsole.desktop",
-                            "maxStripes": "1"
+                            "maxStripes": "1",
+                            "separateLaunchers": "true",
+                            "showToolTips": "true"
                         }
                     },
                     "plugin": "org.kde.plasma.icontasks"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "zayron.simple.separator"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
@@ -280,13 +237,11 @@ var layout = {
                     "plugin": "org.kde.plasma.calculator"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.trash"
                 },
                 {
-                    "config": {
-                    },
+                    "config": {},
                     "plugin": "org.kde.plasma.marginsseparator"
                 }
             ],
@@ -314,7 +269,7 @@ var layout = {
 
 plasma.loadSerializedLayout(layout);
 
-// XMacTahoe : raccourci Meta (grille complète) sur le widget AppGrid (invisible, barre du haut)
+// XMacTahoe: Meta shortcut (full grid) on the AppGrid widget (invisible, top bar)
 for (var i = 0; i < panelIds.length; i++) {
     var ws = panelById(panelIds[i]).widgets();
     for (var j = 0; j < ws.length; j++) {
