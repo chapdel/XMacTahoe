@@ -1,6 +1,6 @@
 #!/bin/bash
 # Installs the "XMacTahoe" global theme (KDE Plasma 6).
-# Usage: ./install.sh [--light] [--layout] [--no-apply] [--no-round-corners] [--accent NAME] [--wallpaper NAME] [--root]
+# Usage: ./install.sh [--light] [--layout] [--no-apply] [--no-round-corners] [--accent NAME] [--wallpaper NAME] [--root] [--no-glass] [--auto-appearance] [--update]
 # Shortcuts: Meta = AppGrid grid, Alt+Space = AppGrid compact mode (wired by extra/kde-desktop-repair)
 #   --light     apply the light variant (dark by default)
 #   --layout    also reset the panel layout (top bar + dock)
@@ -9,11 +9,22 @@
 #   --accent NAME   blue|purple|pink|red|orange|yellow|green|graphite (extra/xmactahoe-accent)
 #   --wallpaper NAME  XMacTahoe (default, zayronxio dynamic) or XMacTahoe-Liuice (vinceliuice day/night)
 #   --root          also run the root steps with sudo: system-wide copy + login screen, Plymouth boot theme
+#   --no-glass      opaque panels/windows, no blur (modest GPUs); extra/xmactahoe-glass on|off later
+#   --auto-appearance  light after sunrise, dark after sunset (systemd timer; extra/xmactahoe-auto-appearance)
+#   --update        download the latest GitHub release and run its installer with the same options
 set -euo pipefail
 D="$(cd "$(dirname "$0")" && pwd)"
-VARIANT=dark; LAYOUT=""; APPLY=1; ROUND=1; ACCENT=""; WALL=""; ROOT=0; prev=""
-for a in "$@"; do case "$prev" in --accent) ACCENT="$a"; prev=""; continue;; --wallpaper) WALL="$a"; prev=""; continue;; esac; case "$a" in --accent|--wallpaper) prev="$a";; --root) ROOT=1;; --light) VARIANT=light;; --layout) LAYOUT="--resetLayout";; --no-apply) APPLY=0;; --no-round-corners) ROUND=0;; esac; done
+VARIANT=dark; LAYOUT=""; APPLY=1; ROUND=1; ACCENT=""; WALL=""; ROOT=0; prev=""; GLASS=1; AUTOAPP=0; UPDATE=0
+for a in "$@"; do case "$prev" in --accent) ACCENT="$a"; prev=""; continue;; --wallpaper) WALL="$a"; prev=""; continue;; esac; case "$a" in --accent|--wallpaper) prev="$a";; --root) ROOT=1;; --no-glass) GLASS=0;; --auto-appearance) AUTOAPP=1;; --update) UPDATE=1;; --light) VARIANT=light;; --layout) LAYOUT="--resetLayout";; --no-apply) APPLY=0;; --no-round-corners) ROUND=0;; esac; done
 LS="$HOME/.local/share"
+if [ "$UPDATE" = 1 ]; then
+  CUR=$(cat "$D/VERSION" 2>/dev/null || echo 0); LATEST=$(curl -fsSL https://api.github.com/repos/chapdel/XMacTahoe/releases/latest | sed -n 's/.*"tag_name": *"v\([^"]*\)".*/\1/p')
+  [ -z "$LATEST" ] && { echo "⚠ cannot reach GitHub"; exit 1; }
+  if [ "$LATEST" = "$CUR" ]; then echo "✓ already up to date ($CUR)"; exit 0; fi
+  echo "→ Updating $CUR → $LATEST ..."; T=$(mktemp -d); curl -fsSL -o "$T/x.tar.gz" "https://github.com/chapdel/XMacTahoe/releases/download/v$LATEST/XMacTahoe-v$LATEST.tar.gz" && tar -xzf "$T/x.tar.gz" -C "$T"
+  ARGS=(); for a in "$@"; do [ "$a" != --update ] && ARGS+=("$a"); done
+  exec "$T/XMacTahoe/install.sh" "${ARGS[@]}"
+fi
 mkdir -p "$LS"/{plasma/desktoptheme,plasma/look-and-feel,plasma/plasmoids,color-schemes,icons,aurorae/themes,wallpapers,fonts} "$HOME/.config/Kvantum" "$HOME/.icons"
 echo "→ Copying components into ~/.local/share ..."
 cp -a "$D"/plasma/desktoptheme/.   "$LS/plasma/desktoptheme/"
@@ -46,6 +57,9 @@ cp -a "$D"/extra/applications/. "$LS/applications/"
 cp "$LS/icons/XMacTahoe-Night/128x128/apps/xmactahoe-transparent.svg" "$LS/icons/hicolor/scalable/apps/" 2>/dev/null || true
 kbuildsycoca6 --noincremental >/dev/null 2>&1 || true
 for v in gtk-3.0 gtk-4.0; do [ -f "$D/extra/gtk/$v-settings.ini" ] && { mkdir -p "$HOME/.config/$v"; cp "$D/extra/gtk/$v-settings.ini" "$HOME/.config/$v/settings.ini"; }; done
+# Quick Look (Dolphin context menu) + viewer script
+mkdir -p "$LS/kio/servicemenus"; cp "$D/extra/servicemenus/xmactahoe-quicklook.desktop" "$LS/kio/servicemenus/"; chmod +x "$LS/kio/servicemenus/xmactahoe-quicklook.desktop"
+cp "$D/extra/xmactahoe-quicklook" "$HOME/.local/bin/"; chmod +x "$HOME/.local/bin/xmactahoe-quicklook"
 # repair script for the AppGrid shortcuts / top bar
 mkdir -p "$HOME/.local/bin"; cp "$D/extra/kde-desktop-repair" "$HOME/.local/bin/kde-desktop-repair"; chmod +x "$HOME/.local/bin/kde-desktop-repair"
 # Kvantum/GTK sync on every light/dark switch (Flex Hub, plasma-apply-lookandfeel)
@@ -71,6 +85,10 @@ if [ "$APPLY" = 1 ]; then
   echo "→ Restarting plasmashell ..."
   systemctl --user restart plasma-plasmashell.service 2>/dev/null || (kquitapp6 plasmashell; sleep 1; plasmashell --replace >/dev/null 2>&1 &)
   [ -n "$ACCENT" ] && "$D/extra/xmactahoe-accent" "$ACCENT"
+  cp "$D/extra/xmactahoe-glass" "$D/extra/xmactahoe-auto-appearance" "$HOME/.local/bin/"; chmod +x "$HOME/.local/bin/xmactahoe-glass" "$HOME/.local/bin/xmactahoe-auto-appearance"
+  mkdir -p "$LS/org.kde.syntax-highlighting/themes"; cp "$D"/extra/apps/kate-themes/*.theme "$LS/org.kde.syntax-highlighting/themes/"; cp "$D/extra/apps/XMacTahoe-Light.colorscheme" "$LS/konsole/"
+  if [ "$AUTOAPP" = 1 ]; then cp "$D"/extra/systemd/xmactahoe-appearance.* "$HOME/.config/systemd/user/"; systemctl --user daemon-reload; systemctl --user enable --now xmactahoe-appearance.timer 2>/dev/null; fi
+  [ "$GLASS" = 0 ] && "$D/extra/xmactahoe-glass" off
   if [ -n "$WALL" ]; then plasma-apply-wallpaperimage "$LS/wallpapers/$WALL" >/dev/null 2>&1 || true; kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image "$WALL"; fi
   echo "→ Rounded window corners (KWin effect) ..."
   [ "$ROUND" = 1 ] && "$D/extra/xmactahoe-round-corners"

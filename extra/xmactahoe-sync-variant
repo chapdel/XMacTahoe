@@ -12,6 +12,8 @@ CUR=$(sed -n 's/^theme=//p' "$HOME/.config/Kvantum/kvantum.kvconfig" 2>/dev/null
 if [ "$CUR" != "$KV" ]; then
   printf '[General]\ntheme=%s\n' "$KV" > "$HOME/.config/Kvantum/kvantum.kvconfig"
 fi
+# Konsole: Terminal.app-like palette matching the variant (new windows)
+KP="$HOME/.local/share/konsole/macOS.profile"; [ -f "$KP" ] && sed -i "s/^ColorScheme=.*/ColorScheme=$( [ "$KV" = XMacTahoe ] && echo XMacTahoe-Light || echo XMacTahoe )/" "$KP"
 for v in gtk-3.0 gtk-4.0; do
   f="$HOME/.config/$v/settings.ini"; [ -f "$f" ] || continue
   grep -q '^gtk-application-prefer-dark-theme=' "$f" \

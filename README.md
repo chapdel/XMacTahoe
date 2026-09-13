@@ -2,7 +2,9 @@
 
 Everything needed to reproduce a macOS Tahoe-like desktop on KDE Plasma 6 in one go, with no dependency on the KDE Store. Built and tested on Fedora 44 / Plasma 6.7 (Wayland).
 
-![XMacTahoe](plasma/look-and-feel/XMacTahoe.Dark/contents/previews/preview.png)
+![XMacTahoe dark](docs/preview-dark.png)
+
+![Light and dark](docs/light-dark.gif)
 
 ## Installation
 
@@ -16,6 +18,9 @@ tar -xzf XMacTahoe-vX.Y.Z.tar.gz && cd XMacTahoe
 ./install.sh --accent purple      # accent color: blue purple pink red orange yellow green graphite
 ./install.sh --wallpaper XMacTahoe-Liuice   # alternative day/night wallpaper by vinceliuice
 ./install.sh --root               # also run the root steps (system-wide copy + login screen, Plymouth)
+./install.sh --auto-appearance    # light after sunrise, dark after sunset (like macOS "Auto")
+./install.sh --no-glass           # opaque panels and windows, no blur (modest GPUs)
+./install.sh --update             # fetch the latest release and re-run the installer
 ./uninstall.sh                    # back to Breeze Dark, remove everything (--keep-files keeps the files)
 ```
 
@@ -91,6 +96,26 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 - **GTK apps use the KDE file dialogs** (`GTK_USE_PORTAL=1` via `extra/environment.d`, effective at next login).
 - **Dolphin** defaults are only copied when no `dolphinrc` exists yet.
 
+## Automatic appearance
+
+`./install.sh --auto-appearance` enables a user timer that switches to XMacTahoe.Light after sunrise and back to XMacTahoe.Dark after sunset, like the macOS "Auto" setting. The location comes from `~/.config/xmactahoe/location` (`latitude longitude`) or, failing that, from KWin Night Light's auto-detected coordinates. Only the ten minutes after each event trigger a switch, so a manual toggle in Flex Hub is respected until the next sunrise or sunset. `extra/xmactahoe-auto-appearance --now` applies the expected variant immediately.
+
+## Glass on or off
+
+`extra/xmactahoe-glass off` makes panels, popups and Qt windows opaque and disables KWin blur and contrast, for modest GPUs; `on` restores the glass. `./install.sh --no-glass` does it at install time.
+
+## Quick Look
+
+Right-click a file in Dolphin → **Quick Look** opens it in a lightweight viewer chosen by type: images in Gwenview full screen, PDF and EPUB in Okular presentation mode, video and audio in Haruna/Dragon/VLC, text read-only in Kate. Dolphin exposes no selection over D-Bus, so a Space-bar shortcut is not possible without a plugin.
+
+## Editors and terminal
+
+Konsole ships a `macOS` profile with the `XMacTahoe` (dark) and `XMacTahoe-Light` Terminal.app-like palettes; the light/dark sync switches the profile palette for new windows. Kate and KWrite get the Xcode-like **XMacTahoe Dark** and **XMacTahoe Light** color themes (Settings → Color Theme).
+
+## Splash screen
+
+`XMacTahoe.Splash` continues the Plymouth boot screen: black background, white logo and a thin progress bar.
+
 ## Accent color
 
 `extra/xmactahoe-accent <name>` (or `./install.sh --accent <name>`) applies one of the macOS accents — blue, purple, pink, red, orange, yellow, green, graphite — to the Plasma accent color, both XMacTahoe color schemes (selection, focus, hover) and Kvantum (highlight and accent paths). Files are regenerated from `extra/pristine`, so the accent can be changed at will. GTK and folder icons keep the MacTahoe blue.
@@ -107,6 +132,8 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 - Release: `git tag vX.Y.Z && tar --exclude='XMacTahoe/.git' -czf ../XMacTahoe-vX.Y.Z.tar.gz XMacTahoe && gh release create vX.Y.Z ../XMacTahoe-vX.Y.Z.tar.gz`.
 
 ## Changelog
+
+- **1.5.0** — real previews and light/dark GIF, `--update`, automatic appearance timer, Quick Look service menu, redesigned splash, Konsole light palette + Kate Xcode-like themes, `--no-glass` / `xmactahoe-glass`.
 
 - **1.4.0** — uninstaller, package checker + CI, light variant parity (glass, fixed SVG stylesheets, Kvantum 30 %), single-screen layout export, accent colors, alternative Tahoe wallpaper, dock separator/highlight, system-wide + login screen root installer.
 

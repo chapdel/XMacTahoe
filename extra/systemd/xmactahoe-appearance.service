@@ -1,0 +1,6 @@
+[Unit]
+Description=XMacTahoe: apply the appearance expected for the time of day
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/xmactahoe-auto-appearance

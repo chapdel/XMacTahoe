@@ -1,0 +1,29 @@
+#!/bin/bash
+# Turns the glass (blur + translucency) on or off for modest GPUs. Usage: xmactahoe-glass on|off
+D="$(cd "$(dirname "$0")/.." && pwd)"; LS="$HOME/.local/share/plasma/desktoptheme"
+case "${1:-on}" in
+  off)
+    kwriteconfig6 --file kwinrc --group Plugins --key blurEnabled false; kwriteconfig6 --file kwinrc --group Plugins --key contrastEnabled false
+    for k in XMacTahoe XMacTahoeDark; do f="$HOME/.config/Kvantum/XMacTahoe/$k.kvconfig"; [ -f "$f" ] && sed -i 's/^translucent_windows=.*/translucent_windows=false/; s/^blurring=.*/blurring=false/; s/^popup_blurring=.*/popup_blurring=false/' "$f"; done
+    python3 - "$LS" <<'PY'
+import sys,glob,gzip,re,os
+for f in glob.glob(f'{sys.argv[1]}/XMacTahoe-*/**/*.svgz', recursive=True):
+    if not re.search(r'(panel-background|dialogs/background)\.svgz$', f): continue
+    s=gzip.open(f,'rb').read().decode()
+    n=re.sub(r'opacity:0\.(?:18|35|42|45|55|58|72|85)(;fill:#(?:1a1a1a|1c1c1e|242424|ffffff|141417|1a191b))', r'opacity:1\1', s)
+    n=re.sub(r'(fill:#ffffff;opacity:)0\.[0-9]+', r'\g<1>1', n)
+    if n!=s:
+        with gzip.open(f,'wb') as g: g.write(n.encode())
+PY
+    gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript 'var ps=panels(); for (var i=0;i<ps.length;i++) ps[i].opacity="opaque";' >/dev/null 2>&1
+    echo "glass off: opaque panels and popups, no blur, opaque Qt windows" ;;
+  on)
+    kwriteconfig6 --file kwinrc --group Plugins --key blurEnabled true; kwriteconfig6 --file kwinrc --group Plugins --key contrastEnabled true
+    cp -a "$D/Kvantum/XMacTahoe/." "$HOME/.config/Kvantum/XMacTahoe/"
+    for t in XMacTahoe-Dark XMacTahoe-Light; do rm -rf "$LS/$t"; cp -a "$D/plasma/desktoptheme/$t" "$LS/"; done
+    gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript 'var ps=panels(); for (var i=0;i<ps.length;i++) ps[i].opacity="translucent";' >/dev/null 2>&1
+    echo "glass on" ;;
+  *) echo "usage: $0 on|off"; exit 1 ;;
+esac
+gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
+rm -f "$HOME/.cache"/plasma_theme_XMacTahoe-*.kcache "$HOME/.cache/ksvg-elements"; systemctl --user restart plasma-plasmashell.service 2>/dev/null

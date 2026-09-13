@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+MimeType=all/allfiles;
+Actions=quicklook;
+X-KDE-Priority=TopLevel
+
+[Desktop Action quicklook]
+Name=Quick Look
+Name[fr]=Coup d'œil
+Icon=view-preview
+Exec=xmactahoe-quicklook %U

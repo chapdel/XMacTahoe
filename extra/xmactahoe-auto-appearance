@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+"""macOS-like "Auto" appearance: light after sunrise, dark after sunset.
+Location: ~/.config/xmactahoe/location (two numbers: latitude longitude), otherwise KWin Night Light's
+auto-detected coordinates (kwinrc [NightColor] LatitudeAuto/LongitudeAuto), otherwise nothing happens.
+Run by xmactahoe-appearance.timer every 10 minutes; only switches inside the 10 minutes following an
+event, so a manual toggle in Flex Hub is respected until the next sunrise/sunset.
+Usage: xmactahoe-auto-appearance [--now]   (--now applies the expected variant immediately)
+"""
+import math, os, sys, subprocess, datetime, configparser
+def location():
+    p = os.path.expanduser('~/.config/xmactahoe/location')
+    if os.path.exists(p):
+        a, b = open(p).read().split()[:2]; return float(a), float(b)
+    cp = configparser.ConfigParser(strict=False, interpolation=None); cp.read(os.path.expanduser('~/.config/kwinrc'))
+    if cp.has_section('NightColor') and cp.has_option('NightColor', 'LatitudeAuto'):
+        return float(cp.get('NightColor', 'LatitudeAuto')), float(cp.get('NightColor', 'LongitudeAuto'))
+    return None
+def sun_events(lat, lon, day):
+    """NOAA approximation: returns (sunrise, sunset) as aware local datetimes."""
+    n = day.timetuple().tm_yday
+    def ev(rising):
+        lngHour = lon / 15.0; t = n + ((6 if rising else 18) - lngHour) / 24.0
+        M = (0.9856 * t) - 3.289
+        L = (M + 1.916 * math.sin(math.radians(M)) + 0.020 * math.sin(math.radians(2 * M)) + 282.634) % 360
+        RA = math.degrees(math.atan(0.91764 * math.tan(math.radians(L)))) % 360
+        RA = (RA + (math.floor(L / 90) * 90 - math.floor(RA / 90) * 90)) / 15.0
+        sinDec = 0.39782 * math.sin(math.radians(L)); cosDec = math.cos(math.asin(sinDec))
+        cosH = (math.cos(math.radians(90.833)) - sinDec * math.sin(math.radians(lat))) / (cosDec * math.cos(math.radians(lat)))
+        if cosH > 1 or cosH < -1: return None
+        H = (360 - math.degrees(math.acos(cosH))) if rising else math.degrees(math.acos(cosH)); H /= 15.0
+        T = H + RA - 0.06571 * t - 6.622; UT = (T - lngHour) % 24
+        utc = datetime.datetime.combine(day, datetime.time(0), tzinfo=datetime.timezone.utc) + datetime.timedelta(hours=UT)
+        return utc.astimezone()
+    return ev(True), ev(False)
+def current():
+    try: return open(os.path.expanduser('~/.config/kdedefaults/package')).read().strip()
+    except OSError: return ''
+def apply(v):
+    if current() != v:
+        subprocess.run(['plasma-apply-lookandfeel', '-a', v], capture_output=True); print('switched to', v)
+loc = location()
+if not loc: sys.exit(0)
+now = datetime.datetime.now().astimezone(); rise, set_ = sun_events(*loc, now.date())
+if not rise or not set_: sys.exit(0)
+expected = 'XMacTahoe.Light' if rise <= now < set_ else 'XMacTahoe.Dark'
+if '--now' in sys.argv: apply(expected); sys.exit(0)
+window = datetime.timedelta(minutes=10)
+if rise <= now < rise + window or set_ <= now < set_ + window: apply(expected)

@@ -1,0 +1,141 @@
+{
+  "metadata": {
+    "name": "XMacTahoe Light",
+    "revision": 1,
+    "license": "GPL-3.0",
+    "copyright": [
+      "Xcode-like colors, XMacTahoe"
+    ]
+  },
+  "editor-colors": {
+    "BackgroundColor": "#ffffff",
+    "CodeFolding": "#e8e8ec",
+    "CurrentLine": "#f2f2f7",
+    "CurrentLineNumber": "#333333",
+    "IconBorder": "#ffffff",
+    "IndentationLine": "#e0e0e5",
+    "LineNumbers": "#a0a0a5",
+    "MarkBookmark": "#0a84ff",
+    "MarkBreakpointActive": "#ff453a",
+    "MarkBreakpointDisabled": "#8e8e93",
+    "MarkBreakpointReached": "#ffd60a",
+    "MarkError": "#ff453a",
+    "MarkExecution": "#30d158",
+    "MarkWarning": "#ff9f0a",
+    "ModifiedLines": "#ff9f0a",
+    "ReplaceHighlight": "#30d158",
+    "SavedLines": "#30d158",
+    "SearchHighlight": "#ffd60a",
+    "Separator": "#e0e0e5",
+    "SpellChecking": "#ff453a",
+    "TabMarker": "#d0d0d5",
+    "TemplateBackground": "#f2f2f7",
+    "TemplateFocusedPlaceholder": "#0a84ff",
+    "TemplatePlaceholder": "#e8e8ec",
+    "TemplateReadOnlyPlaceholder": "#e8e8ec",
+    "TextSelection": "#b3d4ff",
+    "WordWrapMarker": "#e0e0e5"
+  },
+  "text-styles": {
+    "Normal": {
+      "text-color": "#000000"
+    },
+    "Keyword": {
+      "text-color": "#ad3da4",
+      "bold": true
+    },
+    "Function": {
+      "text-color": "#326d74"
+    },
+    "Variable": {
+      "text-color": "#0f68a0"
+    },
+    "ControlFlow": {
+      "text-color": "#ad3da4",
+      "bold": true
+    },
+    "Operator": {
+      "text-color": "#000000"
+    },
+    "BuiltIn": {
+      "text-color": "#804fb8"
+    },
+    "Extension": {
+      "text-color": "#326d74"
+    },
+    "Preprocessor": {
+      "text-color": "#78492a"
+    },
+    "Attribute": {
+      "text-color": "#0f68a0"
+    },
+    "Char": {
+      "text-color": "#d12f1b"
+    },
+    "SpecialChar": {
+      "text-color": "#d12f1b"
+    },
+    "String": {
+      "text-color": "#d12f1b"
+    },
+    "VerbatimString": {
+      "text-color": "#d12f1b"
+    },
+    "SpecialString": {
+      "text-color": "#d12f1b"
+    },
+    "Import": {
+      "text-color": "#ad3da4"
+    },
+    "DataType": {
+      "text-color": "#0b4f79"
+    },
+    "DecVal": {
+      "text-color": "#272ad8"
+    },
+    "BaseN": {
+      "text-color": "#272ad8"
+    },
+    "Float": {
+      "text-color": "#272ad8"
+    },
+    "Constant": {
+      "text-color": "#804fb8"
+    },
+    "Comment": {
+      "text-color": "#5d6c79",
+      "italic": true
+    },
+    "Documentation": {
+      "text-color": "#5d6c79",
+      "italic": true
+    },
+    "Annotation": {
+      "text-color": "#5d6c79"
+    },
+    "CommentVar": {
+      "text-color": "#5d6c79"
+    },
+    "RegionMarker": {
+      "text-color": "#0f68a0",
+      "background-color": "#f2f2f7"
+    },
+    "Information": {
+      "text-color": "#b58900"
+    },
+    "Warning": {
+      "text-color": "#c2410c"
+    },
+    "Alert": {
+      "text-color": "#d12f1b",
+      "bold": true
+    },
+    "Error": {
+      "text-color": "#d12f1b",
+      "underline": true
+    },
+    "Others": {
+      "text-color": "#326d74"
+    }
+  }
+}
