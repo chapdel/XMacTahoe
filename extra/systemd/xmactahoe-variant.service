@@ -1,5 +1,5 @@
 [Unit]
-Description=XMacTahoe : aligne Kvantum et GTK sur la variante active
+Description=XMacTahoe: align Kvantum and GTK with the active variant
 
 [Service]
 Type=oneshot

@@ -1,5 +1,5 @@
 [Unit]
-Description=XMacTahoe : surveille la bascule clair/sombre du thème global
+Description=XMacTahoe: watch the global theme light/dark switch
 
 [Path]
 PathChanged=%h/.config/kdedefaults/package

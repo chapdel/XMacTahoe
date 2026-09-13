@@ -1,14 +1,14 @@
 #!/bin/bash
-# Applique les coins arrondis façon macOS Tahoe (effet KWin "KDE Rounded Corners").
-# Installe le paquet si besoin (COPR matinlotfali/KDE-Rounded-Corners, sudo demandé),
-# écrit les réglages dans kwinrc et (re)charge l'effet à chaud.
+# Applies macOS Tahoe-style rounded corners (KWin effect "KDE Rounded Corners").
+# Installs the package when missing (COPR matinlotfali/KDE-Rounded-Corners, sudo required),
+# writes the settings to kwinrc and (re)loads the effect live.
 D="$(cd "$(dirname "$0")" && pwd)"
 if ! rpm -q kwin-effect-roundcorners >/dev/null 2>&1; then
-  echo "→ Installation de kwin-effect-roundcorners (COPR matinlotfali/KDE-Rounded-Corners)"
+  echo "→ Installing kwin-effect-roundcorners (COPR matinlotfali/KDE-Rounded-Corners)"
   sudo dnf copr enable -y matinlotfali/KDE-Rounded-Corners && sudo dnf install -y kwin-effect-roundcorners \
-    || { echo "⚠ Installation impossible : coins arrondis non appliqués."; exit 1; }
+    || { echo "⚠ Install failed: rounded corners not applied."; exit 1; }
 fi
-# réglages : chaque ligne clé=valeur du fichier .conf, par groupe
+# settings: every key=value line of the .conf file, per group
 group=""
 while IFS= read -r line; do
   case "$line" in
@@ -16,7 +16,7 @@ while IFS= read -r line; do
     *=*) [ -n "$group" ] && kwriteconfig6 --file kwinrc --group "$group" --key "${line%%=*}" "${line#*=}" ;;
   esac
 done < "$D/kwinrc-round-corners.conf"
-# animations et coins actifs façon macOS (lampe magique, bureau en haut à droite, aperçu en haut à gauche)
+# macOS-like animations and hot corners (magic lamp, desktop top right, overview top left)
 group=""
 while IFS= read -r line; do
   case "$line" in
@@ -25,8 +25,8 @@ while IFS= read -r line; do
   esac
 done < "$D/kwinrc-effects.conf"
 gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
-# rechargement complet : un simple reconfigure ne suffit pas à relire la config
+# full reload: a plain reconfigure does not re-read this effect's config
 gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.kde.kwin.Effects.unloadEffect kwin4_effect_shapecorners >/dev/null 2>&1
 sleep 1
 gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.kde.kwin.Effects.loadEffect kwin4_effect_shapecorners >/dev/null 2>&1
-echo "✓ Coins arrondis actifs (rayon $(kreadconfig6 --file kwinrc --group Round-Corners --key Size) px)"
+echo "✓ Rounded corners active (radius $(kreadconfig6 --file kwinrc --group Round-Corners --key Size) px)"

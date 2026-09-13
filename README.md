@@ -1,73 +1,102 @@
-# XMacTahoe — thème global KDE Plasma 6 autonome
+# XMacTahoe — a self-contained macOS Tahoe-style global theme for KDE Plasma 6
 
-Tout ce qu'il faut pour retrouver mon bureau macOS-like d'un coup, sans dépendre du KDE Store.
+Everything needed to reproduce a macOS Tahoe-like desktop on KDE Plasma 6 in one go, with no dependency on the KDE Store. Built and tested on Fedora 44 / Plasma 6.7 (Wayland).
+
+![XMacTahoe](plasma/look-and-feel/XMacTahoe.Dark/contents/previews/preview.png)
 
 ## Installation
+
 ```bash
-./install.sh            # installe tout et applique la variante sombre
-./install.sh --layout   # idem + recrée la barre du haut et le dock (à faire sur une machine neuve)
-./install.sh --light    # variante claire
+tar -xzf XMacTahoe-vX.Y.Z.tar.gz && cd XMacTahoe
+./install.sh              # install everything and apply the dark variant
+./install.sh --layout     # same, plus recreate the top bar and the dock (use on a fresh machine)
+./install.sh --light      # apply the light variant
+./install.sh --no-apply   # copy the files without changing the active theme
+./install.sh --no-round-corners   # skip the KWin rounded-corners effect
 ```
-Dépendances système (Fedora) : `kvantum` (dnf) ; `plasma-applet-appgrid` est fourni en RPM dans `extra/rpm/` et installé automatiquement par le script (dépôt COPR `scujas/plasma-applet-appgrid` joint).
 
-## Raccourcis clavier (AppGrid, dans le dock)
-| Touche | Action |
+System dependency (Fedora): `kvantum` (dnf). `plasma-applet-appgrid` ships as an RPM in `extra/rpm/` (COPR `scujas/plasma-applet-appgrid` repo file included) and is installed by the script when missing.
+
+Two optional steps need root and are printed at the end of the install:
+
+- **Boot splash (Plymouth)**: `sudo extra/xmactahoe-boot-install` installs the `xmactahoe` theme (Apple-style logo, spinner, black background) and rebuilds the initramfs.
+- **Login screen**: this setup uses the Plasma Login Manager (not SDDM). It picks up the global theme from System Settings → Login Screen (Plasma) → "Apply Plasma Settings" (root authentication).
+
+## What you get
+
+| Component | Name |
 |---|---|
-| `Meta` (Super) seul | grille complète des applications |
-| `Alt+Space` | AppGrid en mode compact (recherche) |
+| Global themes | `XMacTahoe.Dark`, `XMacTahoe.Light`, `XMacTahoe.Splash` — with panel layout, lock screen and splash |
+| Plasma themes | XMacTahoe-Dark (glass panels and popups), XMacTahoe-Light |
+| Color schemes | XMacTahoeDark, XMacTahoeLight |
+| Icons | XMacTahoe (base, from MacTahoe by vinceliuice), XMacTahoe-Night, XMacTahoe-Day |
+| Cursors | XMacTahoe-cursors (WhiteSur cursors) |
+| Application style | Kvantum: XMacTahoeDark, XMacTahoe (translucent windows with blur) |
+| Window decorations | Aurorae: XMacTahoe-Night, XMacTahoe (traffic lights, symbols on hover, wide soft shadows) |
+| Wallpaper | XMacTahoe (dynamic day/night) |
+| GTK | MacTahoe-Dark, MacTahoe-Light, libadwaita included; GTK 3/4 settings |
+| Widgets | kppleMenu (Apple menu), Window Title Fork, Flex Hub (control center), Command Output, Simple Separator, AppGrid (RPM) |
+| Fonts | Inter Variable, JetBrains Mono |
+| Apps | Dolphin (Finder-like defaults), Konsole (macOS profile + `XMacTahoe` Terminal.app-like palette) |
 
-Le widget AppGrid vit **invisible** (icône transparente) à l'extrémité droite de la barre du haut : placé dans le dock, chaque appui sur `Meta` faisait apparaître le dock. Le dock garde une icône « Applications » (`extra/applications/xmactahoe-appgrid.desktop`) qui ouvre la même grille.
+Based on Apple Tahoe / AppleDark-ALL / Mkos Big Sur (zayronxio) and MacTahoe / MacSequoia / WhiteSur (vinceliuice). GPL-3.0.
 
-Ils sont câblés par `extra/kde-desktop-repair`, copié dans `~/.local/bin`. Si un jour ils ne répondent plus (widget recréé, thème réappliqué) : `kde-desktop-repair` (ou `--check` pour diagnostiquer).
+## Desktop layout
 
-## Coins arrondis des fenêtres (façon Tahoe)
-Plasma n'arrondit nativement que le haut des fenêtres. Le paquet installe et configure l'effet KWin **KDE Rounded Corners** (matinlotfali, COPR `matinlotfali/KDE-Rounded-Corners`, paquet `kwin-effect-roundcorners`) : rayon 18 px sur toutes les fenêtres, y compris maximisées, contour blanc discret, pas d'arrondi en plein écran. Réglages dans `extra/kwinrc-round-corners.conf`, appliqués par `extra/xmactahoe-round-corners` (relançable seul). `./install.sh --no-round-corners` pour s'en passer. Interface graphique : Configuration du système → Effets de bureau → Rounded Corners.
+- **Top bar** (24 px, edge to edge): Apple menu, window title, global menu, system tray with SF Symbols-style glyphs, control center (Flex Hub), date and time. Nearly transparent (18 %) with KWin blur and contrast, like the Tahoe menu bar.
+- **Dock** (floating, dodges windows): Applications launcher, pinned apps, calculator, trash.
+- **Panels** run in "translucent" mode so blur is always applied.
 
-## Bascule clair / sombre
-Le bouton clair/sombre du widget Flex Hub (ou `plasma-apply-lookandfeel -a XMacTahoe.Light|Dark`) change le thème global. Comme Plasma ne pilote pas Kvantum, `extra/xmactahoe-sync-variant` (déclenché par l'unité systemd utilisateur `xmactahoe-variant.path`) aligne aussitôt Kvantum et GTK sur la variante active. Les applications Qt déjà ouvertes (Dolphin, Spectacle...) prennent le nouveau style à leur prochain lancement.
+## Keyboard shortcuts (AppGrid launcher)
 
-
-
-## Depuis la v1.3.0
-- **Barre du haut quasi transparente** (18 %) avec flou et contraste, comme la barre de menus Tahoe.
-- **Menu Pomme** (kppleMenu) câblé pour Plasma 6 Wayland : À propos, Réglages, Discover, Forcer à quitter (KWin), Suspendre, Redémarrer/Éteindre/Se déconnecter (invite Plasma), Verrouiller.
-- **Flex Hub** en cartes de verre (blanc 14 %, rayon 28), **notifications** en haut à droite 5 s, **curseurs** WhiteSur sous le nom XMacTahoe-cursors.
-- **Dialogues de fichiers KDE dans les applications GTK** (`GTK_USE_PORTAL=1`, `extra/environment.d`, actif à la prochaine session).
-- **Écran de verrouillage** façon Tahoe fourni par le thème global (`contents/lockscreen`) : horloge en haut, avatar et mot de passe en bas.
-- **Écran de connexion** : ce poste utilise Plasma Login Manager (pas SDDM) ; il reprend le thème global via Configuration du système → Écran de connexion (Plasma) → « Appliquer les réglages de Plasma » (authentification root).
-- **Plymouth** : `sudo extra/xmactahoe-boot-install` installe le thème de démarrage `xmactahoe` (logo pomme, roue, fond noir) et reconstruit l'initramfs.
-- Les boutons de fenêtre affichent déjà ×, − et plein écran au survol (décoration Aurorae).
-
-## Depuis la v1.2.0 : plus de Tahoe
-- **Icônes MacTahoe** (vinceliuice) sous les noms XMacTahoe (base), XMacTahoe-Night, XMacTahoe-Day, avec les glyphes de barre régénérés dans leur disposition `status/*`.
-- **Thème GTK MacTahoe** (Dark/Light) installé dans `~/.themes`, libadwaita compris (copie dans `~/.config/gtk-4.0`), suivi par la bascule clair/sombre.
-- **Verre** : barre du haut, dock et popups translucides (fond #1c1c1e à 58 %) avec flou et contraste KWin ; panneaux en mode « translucide » (v1.2.1). Fenêtres Qt translucides via Kvantum (`translucent_windows`, flou), GTK et Electron restent opaques.
-- **Ombres** de fenêtres plus larges et douces (paddings Aurorae).
-- **Animations KWin** : lampe magique à la réduction, aperçu en haut à gauche, bureau en haut à droite (`extra/kwinrc-effects.conf`).
-- **Dolphin** façon Finder (`extra/apps/dolphinrc`, copié seulement s'il n'y a pas de config), **Konsole** avec profil macOS et palette `XMacTahoe` façon Terminal.app.
-- **Écran de verrouillage** sur le fond dynamique XMacTahoe. Le thème SDDM (écran de connexion) reste à installer en root depuis le KDE Store (« Apple Tahoe SDDM »).
-
-## Contenu
-| Composant | Nom |
+| Key | Action |
 |---|---|
-| Thèmes globaux | XMacTahoe.Dark / XMacTahoe.Light / XMacTahoe.Splash |
-| Thèmes Plasma | XMacTahoe-Dark (AppleDark-ALL corrigé : barre solide sombre) / XMacTahoe-Light |
-| Schémas de couleurs | XMacTahoeDark / XMacTahoeLight |
-| Icônes | XMacTahoe (base MacTahoe), XMacTahoe-Night / XMacTahoe-Day (corbeille du dock : icône colorée liée sur la symbolique) |
-| Curseur | XMacTahoe-cursors |
-| Kvantum | XMacTahoeDark / XMacTahoe |
-| Décorations (Aurorae) | XMacTahoe-Night / XMacTahoe |
-| Fond d'écran | XMacTahoe (dynamique jour/nuit) |
-| Widgets | kppleMenu, Window Title Fork, Flex Hub, Command Output, Simple Separator, AppGrid (RPM) |
-| Polices | Inter Variable, JetBrains Mono |
-| GTK | MacTahoe-Dark / MacTahoe-Light + settings.ini GTK 3/4 |
+| `Meta` (Super) alone | full application grid |
+| `Alt+Space` | AppGrid compact mode (search) |
 
-Origine : Apple Tahoe (zayronxio), MacSequoia (vinceliuice), Mkos Big Sur (zayronxio). Licences GPL.
+The AppGrid widget lives **invisibly** (transparent icon) at the right end of the top bar: when it sat in the dock, every `Meta` press made the dock pop up. The dock keeps an "Applications" icon (`extra/applications/xmactahoe-appgrid.desktop`) that opens the same grid.
 
-## Icônes de la barre de menus (style macOS Tahoe)
-Les glyphes de la bandeau système (Wi-Fi, son, Bluetooth, batterie, luminosité, notifications, presse-papiers, mises à jour, Telegram) sont générés par `tools/gen-tray-icons.py` dans les dossiers `*/panel` des packs XMacTahoe-Night/Day et dans `icons/` des thèmes Plasma. Pour les régénérer après modification du script :
+Both shortcuts are wired by `extra/kde-desktop-repair`, copied to `~/.local/bin`. If they ever stop responding (widget recreated, theme re-applied), run `kde-desktop-repair` (`--check` only diagnoses).
+
+## Rounded corners (Tahoe-style)
+
+Plasma only rounds the top of windows. The package installs and configures the KWin effect **KDE Rounded Corners** (matinlotfali, COPR `matinlotfali/KDE-Rounded-Corners`, package `kwin-effect-roundcorners`): 18 px radius on every window including maximized ones, a subtle white outline, no rounding in full screen. Settings live in `extra/kwinrc-round-corners.conf`, applied by `extra/xmactahoe-round-corners` (can be re-run alone). GUI: System Settings → Desktop Effects → Rounded Corners.
+
+## Light / dark switching
+
+The light/dark toggle in the Flex Hub widget (or `plasma-apply-lookandfeel -a XMacTahoe.Light|Dark`) changes the global theme. Since Plasma does not drive Kvantum or GTK, `extra/xmactahoe-sync-variant` (triggered by the user systemd unit `xmactahoe-variant.path`) immediately aligns Kvantum, the GTK theme, libadwaita and the icon theme with the active variant. Qt applications that are already open pick up the new style when relaunched.
+
+## Menu bar icons (SF Symbols style)
+
+The system tray glyphs (Wi-Fi, sound, Bluetooth, battery, brightness, notifications, clipboard, updates, Telegram, control center) are generated by `tools/gen-tray-icons.py` into the `status/*` and `*/panel` directories of the XMacTahoe-Night/Day icon packs and into `icons/` of the Plasma themes. To regenerate after editing the script:
+
 ```bash
-python3 tools/gen-tray-icons.py icons plasma/desktoptheme          # dans le paquet
-python3 tools/gen-tray-icons.py ~/.local/share/icons ~/.local/share/plasma/desktoptheme   # installé
+python3 tools/gen-tray-icons.py icons plasma/desktoptheme                                   # inside the package
+python3 tools/gen-tray-icons.py ~/.local/share/icons ~/.local/share/plasma/desktoptheme   # installed copy
 rm ~/.cache/icon-cache.kcache && systemctl --user restart plasma-plasmashell
 ```
+
+Applications that hand the tray a bitmap instead of an icon name (qBittorrent, Whatsie, ...) keep their own colors.
+
+## Other macOS-like touches
+
+- **Apple menu** entries wired for Plasma 6 on Wayland: About, System Settings, App Store (Discover), Force Quit (KWin), Sleep, Restart / Shut Down / Log Out (Plasma prompts), Lock Screen.
+- **Animations**: magic lamp minimize, Overview on the top-left corner, Show Desktop on the top-right corner (`extra/kwinrc-effects.conf`).
+- **Notifications** top right, 5 s.
+- **Lock screen** provided by the global theme (`contents/lockscreen`): big clock at the top, avatar and password at the bottom, on the XMacTahoe wallpaper.
+- **GTK apps use the KDE file dialogs** (`GTK_USE_PORTAL=1` via `extra/environment.d`, effective at next login).
+- **Dolphin** defaults are only copied when no `dolphinrc` exists yet.
+
+## Maintenance
+
+- Edit inside this folder, then re-run `./install.sh`.
+- After changing a Plasma theme SVG: `rm ~/.cache/plasma_theme_XMacTahoe-*.kcache ~/.cache/ksvg-elements && systemctl --user restart plasma-plasmashell`.
+- After changing rounded-corners settings: `extra/xmactahoe-round-corners` (a plain KWin reconfigure does not reload that effect's config).
+- Release: `git tag vX.Y.Z && tar --exclude='XMacTahoe/.git' -czf ../XMacTahoe-vX.Y.Z.tar.gz XMacTahoe && gh release create vX.Y.Z ../XMacTahoe-vX.Y.Z.tar.gz`.
+
+## Changelog
+
+- **1.3.0** — nearly transparent top bar, Apple menu wired for Wayland, glass control center, macOS-style notifications, WhiteSur cursors, KDE dialogs in GTK apps, Tahoe lock screen, Plymouth theme.
+- **1.2.x** — MacTahoe icons and GTK theme, glass panels/popups, wider shadows, KWin animations, Dolphin/Konsole defaults, lock screen wallpaper, translucent windows (Kvantum 35 %).
+- **1.1.0** — rounded corners on all windows.
+- **1.0.x** — initial self-contained theme; Aurorae rc fix; Kvantum/GTK light-dark sync.

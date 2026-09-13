@@ -3,7 +3,7 @@
     "KPlugin": {
         "Authors": [ { "Name": "Chapdel" } ],
         "Category": "",
-        "Description": "Thème global XMacTahoe (macOS-like), autonome (base Apple Tahoe de zayronxio, corrigée)",
+        "Description": "XMacTahoe global theme (macOS Tahoe-like), self-contained, autonome (base Apple Tahoe de zayronxio, corrigée)",
         "Id": "XMacTahoe.Light",
         "License": "GPLv3+",
         "Name": "XMacTahoe Light",

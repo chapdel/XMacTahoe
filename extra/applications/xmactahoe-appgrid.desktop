@@ -2,7 +2,7 @@
 Type=Application
 Name=Applications
 Name[fr]=Applications
-Comment=Ouvre la grille AppGrid
+Comment=Open the AppGrid application grid
 Icon=app-launcher
 Exec=busctl --user call org.kde.kglobalaccel /component/plasmashell org.kde.kglobalaccel.Component invokeShortcut s "activate application launcher"
 Terminal=false

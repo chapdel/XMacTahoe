@@ -1,6 +1,6 @@
 [Plymouth Theme]
 Name=XMacTahoe
-Description=Démarrage façon macOS Tahoe
+Description=macOS Tahoe-style boot splash
 ModuleName=two-step
 [two-step]
 Font=Cantarell 12
