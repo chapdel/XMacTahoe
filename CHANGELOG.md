@@ -1,3 +1,10 @@
+## 1.8.1 — 2026-09-13
+
+- Window decorations now based on MacSequoia (vinceliuice): the previous Mkos-based decoration drew a 34 px solid grey plate inside its shadow area, visible as a wide border around floating windows on light backgrounds.
+- Control center: Tahoe-style pill sliders (white, no handle) and state pills behind toggle icons (blue when active).
+
+Upgrading: `xmactahoe update`.
+
 ## 1.8.0 — 2026-09-13
 
 - Control center (Flex Hub) laid out like macOS Tahoe: connectivity card, Focus, Appearance/Screenshot, brightness, sound, Now Playing, toggles row with labels; night light toggle named Night Shift.

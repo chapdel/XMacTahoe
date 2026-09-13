@@ -41,7 +41,7 @@ Two optional steps need root and are printed at the end of the install:
 | Icons | XMacTahoe (base, from MacTahoe by vinceliuice), XMacTahoe-Night, XMacTahoe-Day |
 | Cursors | XMacTahoe-cursors (WhiteSur cursors) |
 | Application style | Kvantum: XMacTahoeDark, XMacTahoe (translucent windows with blur) |
-| Window decorations | Aurorae: XMacTahoe-Night, XMacTahoe (traffic lights, symbols on hover, standard shadows) |
+| Window decorations | Aurorae: XMacTahoe-Night, XMacTahoe (based on MacSequoia by vinceliuice: traffic lights, symbols on hover, clean shadow) |
 | Wallpapers | XMacTahoe (dynamic day/night, zayronxio), XMacTahoe-Liuice (day/night, vinceliuice) |
 | GTK | MacTahoe-Dark, MacTahoe-Light, libadwaita included; GTK 3/4 settings |
 | Widgets | kppleMenu (Apple menu), Window Title Fork, Flex Hub (control center), Command Output, Simple Separator, AppGrid (RPM) |
