@@ -71,6 +71,25 @@ var layout = {
                     "config": {
                         "/": {
                             "popupWidth": "400"
+                        },
+                        "/Advanced": {
+                            "forceQuitSettings": "gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.killWindow",
+                            "lockScreenSettings": "loginctl lock-session",
+                            "logOutSettings": "gdbus call --session --dest org.kde.LogoutPrompt --object-path /LogoutPrompt --method org.kde.LogoutPrompt.promptLogout",
+                            "restartSettings": "gdbus call --session --dest org.kde.LogoutPrompt --object-path /LogoutPrompt --method org.kde.LogoutPrompt.promptReboot",
+                            "shutDownSettings": "gdbus call --session --dest org.kde.LogoutPrompt --object-path /LogoutPrompt --method org.kde.LogoutPrompt.promptShutDown",
+                            "systemPreferencesSettings": "systemsettings"
+                        },
+                        "/General": {
+                            "aboutThisComputerSettings": "kinfocenter",
+                            "appStoreSettings": "plasma-discover",
+                            "forceQuitSettings": "gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.killWindow",
+                            "lockScreenSettings": "loginctl lock-session",
+                            "logOutSettings": "gdbus call --session --dest org.kde.LogoutPrompt --object-path /LogoutPrompt --method org.kde.LogoutPrompt.promptLogout",
+                            "restartSettings": "gdbus call --session --dest org.kde.LogoutPrompt --object-path /LogoutPrompt --method org.kde.LogoutPrompt.promptReboot",
+                            "shutDownSettings": "gdbus call --session --dest org.kde.LogoutPrompt --object-path /LogoutPrompt --method org.kde.LogoutPrompt.promptShutDown",
+                            "sleepSettings": "systemctl suspend",
+                            "systemPreferencesSettings": "systemsettings"
                         }
                     },
                     "plugin": "org.kpple.kppleMenu"
@@ -121,12 +140,16 @@ var layout = {
                             "popupWidth": "333"
                         },
                         "/General": {
+                            "customCardColor": "#ffffff",
                             "darkTheme": "XMacTahoe.Dark",
                             "elements": "9,0,6,7,13,14,5,10,8",
+                            "enabledCustomColor": "true",
                             "labelsToggles": "false",
                             "lightTheme": "XMacTahoe.Light",
-                            "radiusCardCustom": "36",
+                            "opacityCardCustom": "14",
+                            "radiusCardCustom": "28",
                             "selected_theme": "custom",
+                            "shadowOpacity": "0",
                             "usePlasmaDesing": "false",
                             "xElements": "0,2,0,0,0,3,1,0,2",
                             "yElements": "0,0,2,3,4,4,4,1,4"
@@ -152,7 +175,7 @@ var layout = {
                 {
                     "config": {
                         "/": {
-                            "popupHeight": "375",
+                            "popupHeight": "451",
                             "popupWidth": "525"
                         },
                         "/Appearance": {
@@ -187,12 +210,12 @@ var layout = {
                 {
                     "config": {
                         "/": {
-                            "popupHeight": "375",
-                            "popupWidth": "525"
+                            "popupHeight": "376",
+                            "popupWidth": "529"
                         },
                         "/General": {
                             "icon": "xmactahoe-transparent",
-                            "powerButtonsMigrated": "true"
+                            "recentApps": "gparted.desktop,org.kde.discover.desktop,io.github.shiftey.Desktop.desktop,org.kde.partitionmanager.desktop,org.mozilla.firefox.desktop"
                         }
                     },
                     "plugin": "dev.xarbit.appgrid"
@@ -206,7 +229,7 @@ var layout = {
                     "wallpaperplugin": "org.kde.image"
                 }
             },
-            "height": 1.5,
+            "height": 2,
             "hiding": "normal",
             "lengthMode": "fill",
             "location": "top",
@@ -231,7 +254,7 @@ var layout = {
                         "/General": {
                             "iconSpacing": "0",
                             "indicateAudioStreams": "false",
-                            "launchers": "applications:xmactahoe-appgrid.desktop,applications:org.kde.dolphin.desktop,applications:org.mozilla.firefox.desktop,applications:org.kde.discover.desktop,applications:org.kde.gwenview.desktop,applications:org.kde.konsole.desktop,applications:systemsettings.desktop,applications:org.inkscape.Inkscape.desktop,applications:libreoffice-writer.desktop,applications:libreoffice-calc.desktop",
+                            "launchers": "applications:xmactahoe-appgrid.desktop,applications:org.kde.dolphin.desktop,applications:org.kde.konsole.desktop",
                             "maxStripes": "1"
                         }
                     },
@@ -276,7 +299,7 @@ var layout = {
                 }
             },
             "height": 4.125,
-            "hiding": "dodgewindows",
+            "hiding": "normal",
             "lengthMode": "fit",
             "location": "bottom",
             "maximumLength": 120,
@@ -291,7 +314,7 @@ var layout = {
 
 plasma.loadSerializedLayout(layout);
 
-// Chapdel: raccourci Meta (grille complète) sur le widget AppGrid (invisible, barre du haut)
+// XMacTahoe : raccourci Meta (grille complète) sur le widget AppGrid (invisible, barre du haut)
 for (var i = 0; i < panelIds.length; i++) {
     var ws = panelById(panelIds[i]).widgets();
     for (var j = 0; j < ws.length; j++) {

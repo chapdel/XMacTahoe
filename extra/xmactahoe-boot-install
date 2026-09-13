@@ -1,0 +1,10 @@
+#!/bin/bash
+# Installe le thème de démarrage Plymouth "xmactahoe" (logo pomme + roue, fond noir).
+# À lancer avec sudo : reconstruit l'initramfs (dracut), compter une minute.
+set -e
+D="$(cd "$(dirname "$0")" && pwd)"
+[ "$(id -u)" = 0 ] || { echo "Lancer avec sudo : sudo $0"; exit 1; }
+rm -rf /usr/share/plymouth/themes/xmactahoe
+cp -r "$D/plymouth/xmactahoe" /usr/share/plymouth/themes/xmactahoe
+plymouth-set-default-theme -R xmactahoe
+echo "✓ Plymouth : thème xmactahoe actif (visible au prochain démarrage)."

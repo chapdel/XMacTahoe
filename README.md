@@ -27,6 +27,17 @@ Plasma n'arrondit nativement que le haut des fenêtres. Le paquet installe et co
 Le bouton clair/sombre du widget Flex Hub (ou `plasma-apply-lookandfeel -a XMacTahoe.Light|Dark`) change le thème global. Comme Plasma ne pilote pas Kvantum, `extra/xmactahoe-sync-variant` (déclenché par l'unité systemd utilisateur `xmactahoe-variant.path`) aligne aussitôt Kvantum et GTK sur la variante active. Les applications Qt déjà ouvertes (Dolphin, Spectacle...) prennent le nouveau style à leur prochain lancement.
 
 
+
+## Depuis la v1.3.0
+- **Barre du haut quasi transparente** (18 %) avec flou et contraste, comme la barre de menus Tahoe.
+- **Menu Pomme** (kppleMenu) câblé pour Plasma 6 Wayland : À propos, Réglages, Discover, Forcer à quitter (KWin), Suspendre, Redémarrer/Éteindre/Se déconnecter (invite Plasma), Verrouiller.
+- **Flex Hub** en cartes de verre (blanc 14 %, rayon 28), **notifications** en haut à droite 5 s, **curseurs** WhiteSur sous le nom XMacTahoe-cursors.
+- **Dialogues de fichiers KDE dans les applications GTK** (`GTK_USE_PORTAL=1`, `extra/environment.d`, actif à la prochaine session).
+- **Écran de verrouillage** façon Tahoe fourni par le thème global (`contents/lockscreen`) : horloge en haut, avatar et mot de passe en bas.
+- **Écran de connexion** : ce poste utilise Plasma Login Manager (pas SDDM) ; il reprend le thème global via Configuration du système → Écran de connexion (Plasma) → « Appliquer les réglages de Plasma » (authentification root).
+- **Plymouth** : `sudo extra/xmactahoe-boot-install` installe le thème de démarrage `xmactahoe` (logo pomme, roue, fond noir) et reconstruit l'initramfs.
+- Les boutons de fenêtre affichent déjà ×, − et plein écran au survol (décoration Aurorae).
+
 ## Depuis la v1.2.0 : plus de Tahoe
 - **Icônes MacTahoe** (vinceliuice) sous les noms XMacTahoe (base), XMacTahoe-Night, XMacTahoe-Day, avec les glyphes de barre régénérés dans leur disposition `status/*`.
 - **Thème GTK MacTahoe** (Dark/Light) installé dans `~/.themes`, libadwaita compris (copie dans `~/.config/gtk-4.0`), suivi par la bascule clair/sombre.

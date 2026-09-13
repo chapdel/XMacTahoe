@@ -30,6 +30,10 @@ mkdir -p "$HOME/.themes"; cp -a "$D"/gtk/themes/. "$HOME/.themes/"
 [ -f "$HOME/.config/dolphinrc" ] || cp "$D/extra/apps/dolphinrc" "$HOME/.config/dolphinrc"
 mkdir -p "$HOME/.local/share/konsole"; cp "$D"/extra/apps/macOS.profile "$D"/extra/apps/XMacTahoe.colorscheme "$HOME/.local/share/konsole/"
 kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile macOS.profile
+# notifications façon macOS (haut droite, 5 s) ; dialogues KDE dans les applis GTK (effet à la prochaine session)
+kwriteconfig6 --file plasmanotifyrc --group Notifications --key PopupTimeout 5000
+kwriteconfig6 --file plasmanotifyrc --group Notifications --key PopupPosition TopRight
+mkdir -p "$HOME/.config/environment.d"; cp "$D/extra/environment.d/xmactahoe.conf" "$HOME/.config/environment.d/"
 # écran de verrouillage : fond XMacTahoe
 kwriteconfig6 --file kscreenlockerrc --group Greeter --key WallpaperPlugin org.kde.image
 kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image XMacTahoe
@@ -68,4 +72,5 @@ if [ "$APPLY" = 1 ]; then
   echo "→ Raccourcis AppGrid (Meta = grille, Alt+Space = compact) ..."
   sleep 10; "$HOME/.local/bin/kde-desktop-repair" --no-backup || echo "⚠ relance plus tard : kde-desktop-repair"
 fi
+echo "ℹ Étapes root facultatives : sudo $D/extra/xmactahoe-boot-install (Plymouth) ; écran de connexion : Configuration du système → Écran de connexion (Plasma) → Appliquer les réglages de Plasma."
 echo "✓ Terminé. Pour basculer : plasma-apply-lookandfeel -a XMacTahoe.Dark | XMacTahoe.Light"
