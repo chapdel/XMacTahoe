@@ -42,7 +42,7 @@ Le bouton clair/sombre du widget Flex Hub (ou `plasma-apply-lookandfeel -a XMacT
 | Thèmes globaux | XMacTahoe.Dark / XMacTahoe.Light / XMacTahoe.Splash |
 | Thèmes Plasma | XMacTahoe-Dark (AppleDark-ALL corrigé : barre solide sombre) / XMacTahoe-Light |
 | Schémas de couleurs | XMacTahoeDark / XMacTahoeLight |
-| Icônes | XMacTahoe (base MacTahoe), XMacTahoe-Night / XMacTahoe-Day |
+| Icônes | XMacTahoe (base MacTahoe), XMacTahoe-Night / XMacTahoe-Day (corbeille du dock : icône colorée liée sur la symbolique) |
 | Curseur | XMacTahoe-cursors |
 | Kvantum | XMacTahoeDark / XMacTahoe |
 | Décorations (Aurorae) | XMacTahoe-Night / XMacTahoe |
