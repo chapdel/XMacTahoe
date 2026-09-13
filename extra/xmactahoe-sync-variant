@@ -12,6 +12,9 @@ CUR=$(sed -n 's/^theme=//p' "$HOME/.config/Kvantum/kvantum.kvconfig" 2>/dev/null
 if [ "$CUR" != "$KV" ]; then
   printf '[General]\ntheme=%s\n' "$KV" > "$HOME/.config/Kvantum/kvantum.kvconfig"
 fi
+# Kate / KWrite: Xcode-like color theme matching the variant (new windows)
+KT="XMacTahoe $( [ "$KV" = XMacTahoe ] && echo Light || echo Dark )"
+for rc in katerc kwriterc; do kwriteconfig6 --file "$rc" --group "KTextEditor Renderer" --key "Auto Color Theme Selection" false; kwriteconfig6 --file "$rc" --group "KTextEditor Renderer" --key "Color Theme" "$KT"; done
 # Konsole: Terminal.app-like palette matching the variant (new windows)
 KP="$HOME/.local/share/konsole/macOS.profile"; [ -f "$KP" ] && sed -i "s/^ColorScheme=.*/ColorScheme=$( [ "$KV" = XMacTahoe ] && echo XMacTahoe-Light || echo XMacTahoe )/" "$KP"
 for v in gtk-3.0 gtk-4.0; do

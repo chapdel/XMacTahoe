@@ -1,0 +1,22 @@
+#!/bin/bash
+# Do Not Disturb, macOS Focus-like. Usage:
+#   xmactahoe-dnd on [HH:MM]      mute notifications now, until HH:MM (default: 1 hour)
+#   xmactahoe-dnd off             back to normal
+#   xmactahoe-dnd schedule HH:MM-HH:MM   every day from start to end (user systemd timer)
+#   xmactahoe-dnd schedule off    remove the schedule
+#   xmactahoe-dnd status
+CFG="$HOME/.config/xmactahoe"; mkdir -p "$CFG"; SD="$HOME/.config/systemd/user"
+until_iso(){ local t="$1"; local today; today=$(date -d "today $t" +%s); [ "$today" -le "$(date +%s)" ] && today=$((today+86400)); date -d "@$today" +%Y-%m-%dT%H:%M:%S; }
+case "${1:-status}" in
+  on)  U=$(until_iso "${2:-$(date -d '+1 hour' +%H:%M)}"); kwriteconfig6 --file plasmanotifyrc --group DoNotDisturb --key Until "$U"; echo "do not disturb until $U" ;;
+  off) kwriteconfig6 --file plasmanotifyrc --group DoNotDisturb --key Until --delete; echo "notifications back to normal" ;;
+  schedule)
+    if [ "${2:-}" = off ]; then systemctl --user disable --now xmactahoe-dnd.timer 2>/dev/null; rm -f "$SD/xmactahoe-dnd".* "$CFG/dnd"; systemctl --user daemon-reload; echo "schedule removed"; exit 0; fi
+    S="${2%-*}"; E="${2#*-}"; [ -n "$S" ] && [ -n "$E" ] && [ "$S" != "$2" ] || { echo "usage: $0 schedule HH:MM-HH:MM"; exit 1; }
+    echo "$S-$E" > "$CFG/dnd"; mkdir -p "$SD"
+    printf '[Unit]\nDescription=XMacTahoe: do not disturb schedule\n\n[Timer]\nOnCalendar=*-*-* %s:00\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n' "$S" > "$SD/xmactahoe-dnd.timer"
+    printf '[Unit]\nDescription=XMacTahoe: start do not disturb until %s\n\n[Service]\nType=oneshot\nExecStart=%%h/.local/bin/xmactahoe-dnd on %s\n' "$E" "$E" > "$SD/xmactahoe-dnd.service"
+    systemctl --user daemon-reload; systemctl --user enable --now xmactahoe-dnd.timer >/dev/null 2>&1; echo "do not disturb every day $S → $E" ;;
+  status) u=$(kreadconfig6 --file plasmanotifyrc --group DoNotDisturb --key Until); [ -n "$u" ] && echo "do not disturb until $u" || echo "notifications normal"; [ -f "$CFG/dnd" ] && echo "schedule: $(cat "$CFG/dnd")" ;;
+  *) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//' ;;
+esac

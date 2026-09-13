@@ -124,9 +124,13 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 Right-click a file in Dolphin → **Quick Look** opens it in a lightweight viewer chosen by type: images in Gwenview full screen, PDF and EPUB in Okular presentation mode, video and audio in Haruna/Dragon/VLC, text read-only in Kate. Dolphin exposes no selection over D-Bus, so a Space-bar shortcut is not possible without a plugin.
 
+## Do Not Disturb
+
+`xmactahoe dnd on 18:00` mutes notifications until 18:00, `off` restores them, `schedule 22:00-07:00` mutes them every day on that window (user systemd timer), like a macOS Focus schedule.
+
 ## Editors and terminal
 
-Konsole ships a `macOS` profile with the `XMacTahoe` (dark) and `XMacTahoe-Light` Terminal.app-like palettes; the light/dark sync switches the profile palette for new windows. Kate and KWrite get the Xcode-like **XMacTahoe Dark** and **XMacTahoe Light** color themes (Settings → Color Theme).
+Konsole ships a `macOS` profile with the `XMacTahoe` (dark) and `XMacTahoe-Light` Terminal.app-like palettes; the light/dark sync switches the profile palette for new windows. Kate and KWrite get the Xcode-like **XMacTahoe Dark** and **XMacTahoe Light** color themes, also switched by the sync for new windows.
 
 ## Splash screen
 
@@ -149,13 +153,4 @@ Konsole ships a `macOS` profile with the `XMacTahoe` (dark) and `XMacTahoe-Light
 
 ## Changelog
 
-- **1.6.0** — `xmactahoe` command and `doctor`, restore point + `--restore`, Flex Hub quick controls, Firefox MacTahoe theme, Flatpak overrides, KWin rules for Electron apps, eight-slot dynamic wallpaper, reduce-motion toggle, GitHub Pages site and issue templates.
-
-- **1.5.0** — real previews and light/dark GIF, `--update`, automatic appearance timer, Quick Look service menu, redesigned splash, Konsole light palette + Kate Xcode-like themes, `--no-glass` / `xmactahoe-glass`.
-
-- **1.4.0** — uninstaller, package checker + CI, light variant parity (glass, fixed SVG stylesheets, Kvantum 30 %), single-screen layout export, accent colors, alternative Tahoe wallpaper, dock separator/highlight, system-wide + login screen root installer.
-
-- **1.3.0** — nearly transparent top bar, Apple menu wired for Wayland, glass control center, macOS-style notifications, WhiteSur cursors, KDE dialogs in GTK apps, Tahoe lock screen, Plymouth theme.
-- **1.2.x** — MacTahoe icons and GTK theme, glass panels/popups, wider shadows, KWin animations, Dolphin/Konsole defaults, lock screen wallpaper, translucent windows (Kvantum 35 %).
-- **1.1.0** — rounded corners on all windows.
-- **1.0.x** — initial self-contained theme; Aurorae rc fix; Kvantum/GTK light-dark sync.
+See [CHANGELOG.md](CHANGELOG.md). Releases are published with `tools/release.sh`, which builds the archive, `SHA256SUMS` and, with `--sign`, a detached GPG signature.
