@@ -10,7 +10,7 @@
         "Id": "Plasma.Flex.Hub",
         "Description": "Plasma Flex Hub is a modular and customizable control center for Plasma 6.",
         "Category": "Utilities",
-        "Icon": "configure",
+        "Icon": "xmactahoe-controlcenter",
         "EnabledByDefault": true,
         "License": "GPL-3.0+",
         "ServiceTypes": [

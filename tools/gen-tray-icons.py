@@ -82,6 +82,10 @@ def paperplane(muted=False, attention=False):
     if muted: out += [stroke(SLASH, 4.0, cls="ColorScheme-Background"), stroke(SLASH, 1.9)]
     if attention: out += [circle(17.5, 5, 4.0, cls="ColorScheme-Background"), circle(17.5, 5, 2.6)]
     return out
+def controlcenter():
+    # deux interrupteurs (SF "switch.2") : rail arrondi + bouton, l'un à gauche, l'autre à droite
+    return [rrect(3, 3.2, 16, 6.6, 3.3, strokew=1.8), circle(6.8, 6.5, 2.1),
+            rrect(3, 12.2, 16, 6.6, 3.3, strokew=1.8), circle(15.2, 15.5, 2.1)]
 def update_circle(count=0):
     out = [circle(11, 11, 8.0, strokew=1.9), stroke("M11 6.6 V15 M7.6 11.6 L11 15 L14.4 11.6", 1.9)]
     return out
@@ -136,6 +140,7 @@ def glyph_for(fname):
         return bell(badge=bool(re.search(r'new|active|unread', n)), disabled=bool(re.search(r'disabled|off', n)))
     if re.match(r'update-(none|low|medium|high)\.svg', n): return update_circle()
     if 'telegram' in n: return paperplane(muted='mute' in n, attention='attention' in n)
+    if n == 'xmactahoe-controlcenter.svg': return controlcenter()
     return None
 
 def write_pack(root, dark=True):
@@ -154,7 +159,7 @@ def write_pack(root, dark=True):
                   'network-bluetooth-activated.svg', 'network-bluetooth-inactive.svg', 'preferences-system-bluetooth.svg',
                   'preferences-system-bluetooth-activated.svg', 'preferences-system-bluetooth-inactive.svg', 'brightness-high.svg', 'brightness-low.svg',
                   'klipper-symbolic.svg', 'edit-paste-symbolic.svg', 'network-wireless-symbolic.svg', 'network-wireless-off.svg',
-                  'org.telegram.desktop-symbolic.svg', 'org.telegram.desktop-mute-symbolic.svg', 'org.telegram.desktop-attention-symbolic.svg'}
+                  'org.telegram.desktop-symbolic.svg', 'org.telegram.desktop-mute-symbolic.svg', 'org.telegram.desktop-attention-symbolic.svg', 'xmactahoe-controlcenter.svg', 'update-none.svg', 'update-low.svg', 'update-medium.svg', 'update-high.svg'}
         if sub.endswith('symbolic'):
             names |= {n[:-4] + '-symbolic.svg' for n in list(names) if n.endswith('.svg') and not n.endswith('-symbolic.svg')}
         for fn in sorted(names):
