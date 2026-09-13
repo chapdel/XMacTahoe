@@ -30,7 +30,7 @@ Le bouton clair/sombre du widget Flex Hub (ou `plasma-apply-lookandfeel -a XMacT
 ## Depuis la v1.2.0 : plus de Tahoe
 - **Icônes MacTahoe** (vinceliuice) sous les noms XMacTahoe (base), XMacTahoe-Night, XMacTahoe-Day, avec les glyphes de barre régénérés dans leur disposition `status/*`.
 - **Thème GTK MacTahoe** (Dark/Light) installé dans `~/.themes`, libadwaita compris (copie dans `~/.config/gtk-4.0`), suivi par la bascule clair/sombre.
-- **Verre** : popups (notifications, calendrier, Flex Hub) et dock plus denses avec contour clair, flou KWin.
+- **Verre** : barre du haut, dock et popups translucides (fond #1c1c1e à 58 %) avec flou et contraste KWin ; panneaux en mode « translucide » (v1.2.1). Fenêtres Qt translucides via Kvantum (`translucent_windows`, flou), GTK et Electron restent opaques.
 - **Ombres** de fenêtres plus larges et douces (paddings Aurorae).
 - **Animations KWin** : lampe magique à la réduction, aperçu en haut à gauche, bureau en haut à droite (`extra/kwinrc-effects.conf`).
 - **Dolphin** façon Finder (`extra/apps/dolphinrc`, copié seulement s'il n'y a pas de config), **Konsole** avec profil macOS et palette `XMacTahoe` façon Terminal.app.

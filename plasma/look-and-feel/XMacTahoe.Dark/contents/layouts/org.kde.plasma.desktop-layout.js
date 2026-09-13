@@ -213,7 +213,7 @@ var layout = {
             "maximumLength": 120,
             "minimumLength": 120,
             "offset": 0,
-            "opacity": "adaptive"
+            "opacity": "translucent"
         },
         {
             "alignment": "center",
@@ -282,7 +282,7 @@ var layout = {
             "maximumLength": 120,
             "minimumLength": 120,
             "offset": 0,
-            "opacity": "adaptive"
+            "opacity": "translucent"
         }
     ],
     "serializationFormatVersion": "1"
