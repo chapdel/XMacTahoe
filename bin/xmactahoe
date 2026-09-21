@@ -7,7 +7,8 @@
 #   auto on|off|now|toggle  automatic light/dark appearance (sunrise/sunset)
 #   dynamic on|off|now      eight-slot dynamic wallpaper following the sun
 #   wallpaper NAME          XMacTahoe | XMacTahoe-Liuice
-#   firefox | flatpak | rules   apply the Firefox theme / Flatpak overrides / KWin window rules
+#   firefox | flatpak       apply the Firefox theme / Flatpak overrides
+#   rules                   remove the forced title-bar rules of versions 1.6.0-1.8.1
 #   dnd on [HH:MM]|off|schedule HH:MM-HH:MM|status   do not disturb (macOS Focus-like)
 #   doctor [--fix]          check (and repair) the installation
 #   update                  fetch the latest release and re-install

@@ -98,7 +98,7 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 ## Everyday command
 
-`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `firefox`, `flatpak`, `rules`, `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
+`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `firefox`, `flatpak`, `rules` (removes old forced title-bar rules), `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
 
 `xmactahoe doctor` checks the whole installation (theme layers, Kvantum/GTK alignment, files, units, rounded corners, shortcuts) and `--fix` repairs what it can. The installer saves a restore point of your Plasma configuration before its first run; `xmactahoe restore` (or `./uninstall.sh --restore`) puts it back exactly.
 
@@ -106,7 +106,7 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 - **Firefox**: vinceliuice's MacTahoe userChrome theme is applied to every profile (`xmactahoe firefox`; a default profile is created if Firefox was never started).
 - **Flatpak**: user overrides expose the GTK theme, icons, cursors and libadwaita config to sandboxed apps (`xmactahoe flatpak`, updated on each light/dark switch). No Kvantum runtime exists yet for the KDE 6.10/6.11 platforms, so Qt Flatpaks keep their own style.
-- **Electron and CSD apps**: KWin window rules force the theme's decoration on Chrome, Spotify, Typora, GitHub Desktop, WhatsApp clients, Telegram, Zed, Cursor, Postman, Claude, VS Code and Obsidian (`xmactahoe rules`).
+- **Title bars**: every app chooses its own decoration. Apps that draw their own title bar (Chrome, VS Code, Spotify...) keep it; the others get the theme's traffic lights. Versions 1.6.0-1.8.1 forced the theme's title bar on Electron apps, which doubled the bar on Chrome; `xmactahoe rules` (run by the installer and `xmactahoe doctor --fix`) removes those rules. For MacTahoe-style buttons in Chrome's tab strip: Chrome → Settings → Appearance → Theme "GTK".
 
 ## Dynamic wallpaper
 

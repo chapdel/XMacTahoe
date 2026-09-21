@@ -98,7 +98,7 @@ if [ "$APPLY" = 1 ]; then
   if [ -n "$WALL" ]; then plasma-apply-wallpaperimage "$LS/wallpapers/$WALL" >/dev/null 2>&1 || true; kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image "$WALL"; fi
   echo "→ Rounded window corners (KWin effect) ..."
   [ "$ROUND" = 1 ] && "$D/extra/xmactahoe-round-corners"
-  echo "→ Firefox theme, Flatpak overrides, KWin window rules, Flex Hub controls ..."
+  echo "→ Firefox theme, Flatpak overrides, Flex Hub controls (and removal of old forced title-bar rules) ..."
   "$D/extra/xmactahoe-firefox" >/dev/null 2>&1; "$D/extra/xmactahoe-flatpak" >/dev/null 2>&1; "$D/extra/xmactahoe-window-rules" >/dev/null 2>&1; "$D/extra/xmactahoe-flexhub-controls" >/dev/null 2>&1
   echo "→ AppGrid shortcuts (Meta = grid, Alt+Space = compact) ..."
   sleep 10; "$HOME/.local/bin/kde-desktop-repair" --no-backup || echo "⚠ run later: kde-desktop-repair"

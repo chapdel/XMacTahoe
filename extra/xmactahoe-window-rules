@@ -1,14 +1,22 @@
 #!/bin/bash
-# KWin window rules: force the theme's decoration (traffic lights) on known Electron / CSD apps.
-RC="$HOME/.config/kwinrulesrc"; i=0; ids=()
-for cls in google-chrome spotify typora "GitHub Desktop" com.ktechpit.whatsie org.telegram.desktop dev.zed.Zed cursor Postman com.anthropic.Claude code obsidian; do
-  i=$((i+1)); id="xmactahoe-$i"; ids+=("$id")
-  kwriteconfig6 --file kwinrulesrc --group "$id" --key Description "XMacTahoe decoration: $cls"
-  kwriteconfig6 --file kwinrulesrc --group "$id" --key wmclass "$cls"; kwriteconfig6 --file kwinrulesrc --group "$id" --key wmclassmatch 2
-  kwriteconfig6 --file kwinrulesrc --group "$id" --key noborder false; kwriteconfig6 --file kwinrulesrc --group "$id" --key noborderrule 2
-done
-existing=$(kreadconfig6 --file kwinrulesrc --group General --key rules); keep=$(echo "$existing" | tr ',' '\n' | grep -v '^xmactahoe-' | grep -v '^$' | paste -sd, -)
-all=$(printf '%s,' "${ids[@]}"); all="${keep:+$keep,}${all%,}"
-kwriteconfig6 --file kwinrulesrc --group General --key rules "$all"; kwriteconfig6 --file kwinrulesrc --group General --key count "$(echo "$all" | tr ',' '\n' | grep -c .)"
+# Removes the KWin window rules that XMacTahoe 1.6.0 - 1.8.1 created.
+# Those rules forced the theme's title bar on Chrome and Electron apps; apps that draw their own
+# title bar (Chrome, VS Code, Spotify...) then showed two bars. Each app now picks its own
+# decoration: Chrome keeps its tab strip with its buttons, apps that ask for it get the theme's
+# traffic lights. Tip: Chrome → Settings → Appearance → Theme "GTK" draws MacTahoe-style buttons.
+python3 - <<'PY'
+import os, re
+p = os.path.expanduser('~/.config/kwinrulesrc')
+if not os.path.exists(p): raise SystemExit
+t = open(p).read()
+secs = re.split(r'(?m)^(?=\[)', t)
+keep = [s for s in secs if not s.startswith('[xmactahoe-')]
+removed = len(secs) - len(keep)
+out = ''.join(keep)
+ids = [s[1:s.index(']')] for s in keep if s.startswith('[') and not s.startswith('[General]')]
+out = re.sub(r'(?m)^rules=.*$', 'rules=' + ','.join(ids), out)
+out = re.sub(r'(?m)^count=.*$', 'count=%d' % len(ids), out)
+open(p, 'w').write(out)
+print(f'✓ {removed} XMacTahoe window rule(s) removed; apps choose their own title bar')
+PY
 gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
-echo "✓ ${#ids[@]} window rules applied (server-side decoration forced on Electron/CSD apps)"
