@@ -8,6 +8,7 @@
 #   dynamic on|off|now      eight-slot dynamic wallpaper following the sun
 #   wallpaper NAME          XMacTahoe | XMacTahoe-Liuice
 #   firefox | flatpak       apply the Firefox theme / Flatpak overrides
+#   chrome [--classic]      Chrome in GTK mode: MacTahoe traffic lights in the tab strip (quit Chrome first)
 #   rules                   remove the forced title-bar rules of versions 1.6.0-1.8.1
 #   dnd on [HH:MM]|off|schedule HH:MM-HH:MM|status   do not disturb (macOS Focus-like)
 #   doctor [--fix]          check (and repair) the installation
@@ -32,6 +33,7 @@ case "$cmd" in
               now) "$E/xmactahoe-dynamic-wallpaper" ;; esac ;;
   wallpaper) plasma-apply-wallpaperimage "$HOME/.local/share/wallpapers/${1:-XMacTahoe}" ;;
   firefox)  "$E/xmactahoe-firefox" ;;
+  chrome)   "$E/xmactahoe-chrome" "$@" ;;
   flatpak)  "$E/xmactahoe-flatpak" ;;
   rules)    "$E/xmactahoe-window-rules" ;;
   dnd)      "$E/xmactahoe-dnd" "$@" ;;
@@ -40,5 +42,5 @@ case "$cmd" in
   restore)  "$PKG/uninstall.sh" --restore ;;
   uninstall) "$PKG/uninstall.sh" "$@" ;;
   version)  cat "$PKG/VERSION" ;;
-  *) sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//' ;;
 esac

@@ -106,7 +106,7 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 - **Firefox**: vinceliuice's MacTahoe userChrome theme is applied to every profile (`xmactahoe firefox`; a default profile is created if Firefox was never started).
 - **Flatpak**: user overrides expose the GTK theme, icons, cursors and libadwaita config to sandboxed apps (`xmactahoe flatpak`, updated on each light/dark switch). No Kvantum runtime exists yet for the KDE 6.10/6.11 platforms, so Qt Flatpaks keep their own style.
-- **Title bars**: every app chooses its own decoration. Apps that draw their own title bar (Chrome, VS Code, Spotify...) keep it; the others get the theme's traffic lights. Versions 1.6.0-1.8.1 forced the theme's title bar on Electron apps, which doubled the bar on Chrome; `xmactahoe rules` (run by the installer and `xmactahoe doctor --fix`) removes those rules. For MacTahoe-style buttons in Chrome's tab strip: Chrome → Settings → Appearance → Theme "GTK".
+- **Title bars**: every app chooses its own decoration. Apps that draw their own title bar (Chrome, VS Code, Spotify...) keep it; the others get the theme's traffic lights. Versions 1.6.0-1.8.1 forced the theme's title bar on Electron apps, which doubled the bar on Chrome; `xmactahoe rules` (run by the installer and `xmactahoe doctor --fix`) removes those rules. For MacTahoe traffic lights in Chrome's tab strip, `xmactahoe chrome` switches Chrome to its GTK theme mode (quit Chrome with Ctrl+Shift+Q first, it is relaunched with the session restored; `--classic` reverts). Chrome then also follows the light/dark variant.
 
 ## Dynamic wallpaper
 

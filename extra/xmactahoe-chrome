@@ -1,0 +1,19 @@
+#!/bin/bash
+# Google Chrome with MacTahoe window buttons: switches Chrome to its GTK theme mode, so its tab strip
+# draws the MacTahoe traffic lights (colored when the window is active, grey in the background) and
+# follows the light/dark variant. Chrome must be closed: quit it with Ctrl+Shift+Q (keeps every window),
+# then run this; Chrome is relaunched with the last session restored.
+# Usage: xmactahoe-chrome [--classic]   (--classic goes back to Chrome's own buttons)
+P="$HOME/.config/google-chrome/Default/Preferences"
+[ -f "$P" ] || { echo "Google Chrome profile not found"; exit 0; }
+if pgrep -x chrome >/dev/null; then echo "Chrome is running: quit it with Ctrl+Shift+Q (keeps all windows), then run this again."; exit 1; fi
+MODE=1; [ "${1:-}" = --classic ] && MODE=0
+cp "$P" "$P.xmactahoe.bak"
+python3 - "$P" "$MODE" <<'PY'
+import json, sys
+p, mode = sys.argv[1], int(sys.argv[2])
+d = json.load(open(p)); d.setdefault('extensions', {}).setdefault('theme', {})['system_theme'] = mode
+open(p, 'w').write(json.dumps(d, separators=(',', ':'), ensure_ascii=False))
+PY
+(setsid google-chrome --restore-last-session >/dev/null 2>&1 &)
+echo "✓ Chrome $( [ $MODE = 1 ] && echo 'uses the GTK theme (MacTahoe buttons)' || echo 'uses its classic look' ), session restored (backup: $P.xmactahoe.bak)"

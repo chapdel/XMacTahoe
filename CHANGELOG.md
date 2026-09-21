@@ -1,3 +1,9 @@
+## 1.8.3 — 2026-09-21
+
+- `xmactahoe chrome`: switches Google Chrome to its GTK theme mode, so the tab strip shows the MacTahoe traffic lights (colored when active, grey in the background) and Chrome follows the light/dark variant. Quit Chrome with Ctrl+Shift+Q first; it is relaunched with the session restored. `--classic` reverts.
+
+Upgrading: `xmactahoe update`.
+
 ## 1.8.2 — 2026-09-21
 
 - Fix: double title bar on Chrome (and other apps that draw their own). The KWin rules added in 1.6.0 forced the theme's title bar on top of Chrome's tab strip. They are now removed by the installer, `xmactahoe rules` and `xmactahoe doctor --fix`; every app picks its own title bar again.
