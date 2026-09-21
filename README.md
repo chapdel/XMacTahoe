@@ -53,7 +53,7 @@ Based on Apple Tahoe / AppleDark-ALL / Mkos Big Sur (zayronxio) and MacTahoe / M
 ## Desktop layout
 
 - **Top bar** (24 px, edge to edge): Apple menu, window title, global menu, system tray with SF Symbols-style glyphs, control center (Flex Hub), date and time. Nearly transparent (18 %) with KWin blur and contrast, like the Tahoe menu bar.
-- **Dock** (floating, dodges windows): Applications launcher, pinned apps, calculator, trash.
+- **Dock** (floating, auto-hides like macOS "Automatically hide and show the Dock": it appears when the pointer touches the bottom edge): Applications launcher, pinned apps, calculator, trash. `xmactahoe dock autohide|dodge|always` changes it; `dodge` keeps it visible whenever no window overlaps it.
 - **Panels** run in "translucent" mode so blur is always applied.
 
 ## Keyboard shortcuts (AppGrid launcher)

@@ -1,0 +1,7 @@
+#!/bin/bash
+# Dock visibility. Usage: xmactahoe-dock autohide|dodge|always|status
+#   autohide  hidden until the pointer touches the bottom edge (macOS "Automatically hide and show the Dock")
+#   dodge     visible unless a window covers its area (stays up when no window overlaps it)
+#   always    always visible, windows stop above it
+case "${1:-status}" in autohide) H=autohide;; dodge) H=dodgewindows;; always) H=none;; status) H="";; *) sed -n '2,5p' "$0" | sed 's/^# \{0,1\}//'; exit 1;; esac
+gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript "var ps=panels(); for (var i=0;i<ps.length;i++){ if (ps[i].location=='bottom') { if ('$H') ps[i].hiding='$H'; print(ps[i].hiding); } }" | grep -oE "[a-z]+" | tail -1 | sed 's/dodgewindows/dodge/; s/^none$/always/'

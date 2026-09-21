@@ -270,7 +270,7 @@ var layout = {
                 }
             },
             "height": 4.125,
-            "hiding": "normal",
+            "hiding": "autohide",
             "lengthMode": "fit",
             "location": "bottom",
             "maximumLength": 120,

@@ -24,6 +24,8 @@ for d in layout['desktops']:
         d['config']['/'].pop(k, None)
 for p in layout['panels']:
     p['config'].setdefault('/', {})['lastScreen'] = '0'
+    # the live state can be transient (dock forced visible during screenshots): pin the intended modes
+    p['hiding'] = 'autohide' if p.get('location') == 'bottom' else 'normal'
     for a in p['applets']:
         if a['plugin'] == 'org.kde.plasma.systemtray':
             a['config'] = {'/General': {'iconSpacing': '3', 'scaleIconsToFit': 'false'}}

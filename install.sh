@@ -66,7 +66,7 @@ cp "$LS/icons/XMacTahoe-Night/128x128/apps/xmactahoe-transparent.svg" "$LS/icons
 kbuildsycoca6 --noincremental >/dev/null 2>&1 || true
 for v in gtk-3.0 gtk-4.0; do [ -f "$D/extra/gtk/$v-settings.ini" ] && { mkdir -p "$HOME/.config/$v"; cp "$D/extra/gtk/$v-settings.ini" "$HOME/.config/$v/settings.ini"; }; done
 # xmactahoe command + helper scripts
-cp "$D/bin/xmactahoe" "$D/extra/xmactahoe-doctor" "$D/extra/xmactahoe-motion" "$D/extra/xmactahoe-dynamic-wallpaper" "$D/extra/xmactahoe-dnd" "$HOME/.local/bin/"; chmod +x "$HOME/.local/bin"/xmactahoe*
+cp "$D/bin/xmactahoe" "$D/extra/xmactahoe-dock" "$D/extra/xmactahoe-doctor" "$D/extra/xmactahoe-motion" "$D/extra/xmactahoe-dynamic-wallpaper" "$D/extra/xmactahoe-dnd" "$HOME/.local/bin/"; chmod +x "$HOME/.local/bin"/xmactahoe*
 # Quick Look (Dolphin context menu) + viewer script
 mkdir -p "$LS/kio/servicemenus"; cp "$D/extra/servicemenus/xmactahoe-quicklook.desktop" "$LS/kio/servicemenus/"; chmod +x "$LS/kio/servicemenus/xmactahoe-quicklook.desktop"
 cp "$D/extra/xmactahoe-quicklook" "$HOME/.local/bin/"; chmod +x "$HOME/.local/bin/xmactahoe-quicklook"

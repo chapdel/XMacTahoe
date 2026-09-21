@@ -1,3 +1,10 @@
+## 1.9.2 — 2026-09-21
+
+- **Dock**: auto-hides like macOS ("Automatically hide and show the Dock"): it appears when the pointer touches the bottom edge. The previous "dodge windows" mode kept it on screen whenever no window overlapped it, which looked like a frozen dock. `xmactahoe dock autohide|dodge|always` switches.
+- Fix: the packaged layout had been exported while the dock was temporarily forced visible, so fresh installs got a permanent dock; `tools/export-layout.py` now pins the intended modes.
+
+Upgrading: `xmactahoe update`, or just `xmactahoe dock autohide`.
+
 ## 1.9.1 — 2026-09-21
 
 - **Ghostty** now matches the other windows: the theme's title bar with the traffic lights, tabs only when there are several, the XMacTahoe Terminal.app-like light/dark palettes (auto), JetBrains Mono and an opaque background. `xmactahoe ghostty` (run by the installer) manages a block in the Ghostty config; conflicting lines are commented out and `--remove` restores them.
