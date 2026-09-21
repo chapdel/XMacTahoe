@@ -1,3 +1,10 @@
+## 1.8.2 — 2026-09-21
+
+- Fix: double title bar on Chrome (and other apps that draw their own). The KWin rules added in 1.6.0 forced the theme's title bar on top of Chrome's tab strip. They are now removed by the installer, `xmactahoe rules` and `xmactahoe doctor --fix`; every app picks its own title bar again.
+- Tip: Chrome → Settings → Appearance → Theme "GTK" gives MacTahoe-style buttons in the tab strip.
+
+Upgrading: `xmactahoe update`.
+
 ## 1.8.1 — 2026-09-13
 
 - Window decorations now based on MacSequoia (vinceliuice): the previous Mkos-based decoration drew a 34 px solid grey plate inside its shadow area, visible as a wide border around floating windows on light backgrounds.
