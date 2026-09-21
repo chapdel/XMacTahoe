@@ -6,7 +6,13 @@
 # Usage: xmactahoe-chrome [--classic]   (--classic goes back to Chrome's own buttons)
 P="$HOME/.config/google-chrome/Default/Preferences"
 [ -f "$P" ] || { echo "Google Chrome profile not found"; exit 0; }
-if pgrep -x chrome >/dev/null; then echo "Chrome is running: quit it with Ctrl+Shift+Q (keeps all windows), then run this again."; exit 1; fi
+MANUAL="In Chrome, open chrome://settings/appearance and choose the \"GTK\" theme (\"Classic\" to revert). It applies at once."
+# A profile signed in to a Google account restores the theme choice from sync at startup,
+# overwriting any edit of the Preferences file: the choice has to be made in Chrome's settings.
+if python3 -c "import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if d.get('account_info') else 1)" "$P" 2>/dev/null; then
+  echo "This Chrome profile is signed in and synced, so the theme must be set in Chrome itself."; echo "$MANUAL"; exit 0
+fi
+if pgrep -x chrome >/dev/null; then echo "Chrome is running: quit it with Ctrl+Shift+Q (keeps all windows), then run this again."; echo "Or: $MANUAL"; exit 1; fi
 MODE=1; [ "${1:-}" = --classic ] && MODE=0
 cp "$P" "$P.xmactahoe.bak"
 python3 - "$P" "$MODE" <<'PY'

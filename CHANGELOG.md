@@ -1,3 +1,9 @@
+## 1.8.4 — 2026-09-21
+
+- `xmactahoe chrome`: a Chrome profile signed in to a Google account restores its theme from sync at startup, overwriting a Preferences edit. The command now detects it and tells you to pick the **GTK** theme in `chrome://settings/appearance` instead; the automatic edit is kept for profiles that are not signed in.
+
+Upgrading: `xmactahoe update`.
+
 ## 1.8.3 — 2026-09-21
 
 - `xmactahoe chrome`: switches Google Chrome to its GTK theme mode, so the tab strip shows the MacTahoe traffic lights (colored when active, grey in the background) and Chrome follows the light/dark variant. Quit Chrome with Ctrl+Shift+Q first; it is relaunched with the session restored. `--classic` reverts.
