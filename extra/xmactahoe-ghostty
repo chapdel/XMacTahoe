@@ -1,0 +1,27 @@
+#!/bin/bash
+# Makes Ghostty consistent with the theme: server-side title bar with the traffic lights (like every other
+# window), tabs only when there are several, XMacTahoe light/dark palettes (auto), JetBrains Mono 11 and the
+# an opaque background (Ghostty translucency is not blurred by the Glass effect). The settings live in a managed block at the end of the config; previous
+# window-decoration / gtk-titlebar-style / window-show-tab-bar / gtk-custom-css lines are commented out.
+# Usage: xmactahoe-ghostty [--remove]
+D="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"; PKG=$(cat "$HOME/.config/xmactahoe/package-dir" 2>/dev/null); [ -d "${PKG:-/nonexistent}/extra/apps/ghostty" ] && D="$PKG/extra"
+command -v ghostty >/dev/null || { echo "Ghostty not installed"; exit 0; }
+G="$HOME/.config/ghostty"; mkdir -p "$G/themes"
+C="$G/config.ghostty"; [ -f "$C" ] || { [ -f "$G/config" ] && C="$G/config"; }; touch "$C"
+cp "$C" "$C.xmactahoe.bak"
+python3 - "$C" "$D/apps/ghostty/xmactahoe.conf" "${1:-}" <<'PY'
+import sys, re
+cfg, block, mode = sys.argv[1], sys.argv[2], sys.argv[3]
+s = open(cfg).read()
+s = re.sub(r'\n?# >>> XMacTahoe >>>.*?# <<< XMacTahoe <<<\n?', '\n', s, flags=re.S)
+keys = ('window-decoration', 'gtk-titlebar-style', 'window-show-tab-bar', 'gtk-custom-css', 'theme', 'font-family', 'font-size', 'background-opacity', 'background-blur', 'window-padding-x', 'window-padding-y')
+if mode == '--remove':
+    s = re.sub(r'(?m)^# \(XMacTahoe\) ', '', s)
+else:
+    s = re.sub(r'(?m)^(\s*(%s)\s*=)' % '|'.join(map(re.escape, keys)), r'# (XMacTahoe) \1', s)
+    s = s.rstrip('\n') + '\n\n# >>> XMacTahoe >>>\n' + open(block).read() + '# <<< XMacTahoe <<<\n'
+open(cfg, 'w').write(s.lstrip('\n'))
+PY
+[ "${1:-}" = --remove ] || cp "$D/apps/ghostty/themes/"* "$G/themes/"
+pkill -USR2 -x ghostty 2>/dev/null   # live config reload
+echo "✓ Ghostty $( [ "${1:-}" = --remove ] && echo 'restored' || echo 'matches the theme' ) (backup: $C.xmactahoe.bak). The title bar style applies to new windows."

@@ -1,0 +1,23 @@
+# XMacTahoe — Terminal.app-like palette of the XMacTahoe theme (same colors as the Konsole profile)
+palette = 0=#000000
+palette = 1=#c93b3b
+palette = 2=#35b435
+palette = 3=#c4a51a
+palette = 4=#2c5acc
+palette = 5=#b53cb5
+palette = 6=#2eb2b2
+palette = 7=#bfbfbf
+palette = 8=#666666
+palette = 9=#ff5555
+palette = 10=#55ff55
+palette = 11=#ffff55
+palette = 12=#5555ff
+palette = 13=#ff55ff
+palette = 14=#55ffff
+palette = 15=#ffffff
+background = #1e1e1e
+foreground = #e6e6e6
+cursor-color = #e6e6e6
+cursor-text = #1e1e1e
+selection-background = #3f638b
+selection-foreground = #e6e6e6

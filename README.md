@@ -134,6 +134,10 @@ Right-click a file in Dolphin → **Quick Look** opens it in a lightweight viewe
 
 `xmactahoe dnd on 18:00` mutes notifications until 18:00, `off` restores them, `schedule 22:00-07:00` mutes them every day on that window (user systemd timer), like a macOS Focus schedule.
 
+## Ghostty
+
+`xmactahoe ghostty` (run by the installer when Ghostty is present) aligns Ghostty with the other windows: the theme's title bar with the traffic lights (`window-decoration = server`), tabs in a row below only when there are several, the XMacTahoe light/dark palettes switched automatically with the variant, JetBrains Mono 11 and an opaque background (Ghostty's translucency is not blurred by the Glass effect). The settings sit in a managed block at the end of the config; conflicting lines are commented out, not deleted, and `--remove` restores them.
+
 ## Editors and terminal
 
 Konsole ships a `macOS` profile with the `XMacTahoe` (dark) and `XMacTahoe-Light` Terminal.app-like palettes; the light/dark sync switches the profile palette for new windows. Kate and KWrite get the Xcode-like **XMacTahoe Dark** and **XMacTahoe Light** color themes, also switched by the sync for new windows.

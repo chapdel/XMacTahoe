@@ -1,3 +1,9 @@
+## 1.9.1 — 2026-09-21
+
+- **Ghostty** now matches the other windows: the theme's title bar with the traffic lights, tabs only when there are several, the XMacTahoe Terminal.app-like light/dark palettes (auto), JetBrains Mono and an opaque background. `xmactahoe ghostty` (run by the installer) manages a block in the Ghostty config; conflicting lines are commented out and `--remove` restores them.
+
+Upgrading: `xmactahoe update`.
+
 ## 1.9.0 — 2026-09-21
 
 - **Liquid glass**: the installer now asks which glass to use (or `--glass frosted|liquid|off`), and `xmactahoe glass frosted|liquid|off` switches at any time. Liquid uses the Glass KWin effect (COPR `ama1470/kwin-effects-glass`, installed on request): Snell-style refraction on the edges, edge lighting, clearer and more saturated glass, closer to macOS Tahoe. Frosted (KWin blur) stays the default, light on the GPU.

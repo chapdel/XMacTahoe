@@ -7,7 +7,7 @@ errors = []
 def err(m): errors.append(m); print('FAIL', m)
 def ok(m): print('ok  ', m)
 # 1. shell syntax
-for sh in ['install.sh', 'uninstall.sh', 'extra/xmactahoe-round-corners', 'extra/xmactahoe-sync-variant', 'extra/xmactahoe-boot-install', 'extra/xmactahoe-accent', 'extra/xmactahoe-system-install', 'extra/xmactahoe-glass', 'extra/xmactahoe-firefox', 'extra/xmactahoe-flatpak', 'extra/xmactahoe-window-rules', 'extra/xmactahoe-motion', 'extra/xmactahoe-doctor', 'extra/xmactahoe-flexhub-controls', 'extra/xmactahoe-quicklook', 'extra/xmactahoe-chrome', 'extra/xmactahoe-dnd', 'bin/xmactahoe']:
+for sh in ['install.sh', 'uninstall.sh', 'extra/xmactahoe-round-corners', 'extra/xmactahoe-sync-variant', 'extra/xmactahoe-boot-install', 'extra/xmactahoe-accent', 'extra/xmactahoe-system-install', 'extra/xmactahoe-glass', 'extra/xmactahoe-firefox', 'extra/xmactahoe-flatpak', 'extra/xmactahoe-window-rules', 'extra/xmactahoe-motion', 'extra/xmactahoe-doctor', 'extra/xmactahoe-flexhub-controls', 'extra/xmactahoe-quicklook', 'extra/xmactahoe-chrome', 'extra/xmactahoe-ghostty', 'extra/xmactahoe-dnd', 'bin/xmactahoe']:
     p = f'{B}/{sh}'
     if not os.path.exists(p): continue
     r = subprocess.run(['bash', '-n', p], capture_output=True, text=True)
