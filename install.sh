@@ -52,6 +52,8 @@ kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile macO
 kwriteconfig6 --file plasmanotifyrc --group Notifications --key PopupTimeout 5000
 kwriteconfig6 --file plasmanotifyrc --group Notifications --key PopupPosition TopRight
 mkdir -p "$HOME/.config/environment.d"; cp "$D/extra/environment.d/xmactahoe.conf" "$HOME/.config/environment.d/"
+# apps with their own color scheme (Settings → Color Scheme) would ignore the theme: reset them
+for rc in dolphinrc konsolerc katerc kwriterc okularrc gwenviewrc arkrc spectaclerc systemsettingsrc; do kwriteconfig6 --file "$rc" --group UiSettings --key ColorScheme --delete 2>/dev/null; done
 # lock screen: XMacTahoe wallpaper
 kwriteconfig6 --file kscreenlockerrc --group Greeter --key WallpaperPlugin org.kde.image
 kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image XMacTahoe

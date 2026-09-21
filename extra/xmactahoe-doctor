@@ -13,6 +13,11 @@ systemctl --user is-enabled -q xmactahoe-variant.path 2>/dev/null && ok "variant
 if rpm -q kwin-effect-roundcorners >/dev/null 2>&1; then r=$(gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.kde.kwin.Effects.isEffectLoaded kwin4_effect_shapecorners 2>/dev/null); case "$r" in *true*) ok "rounded corners effect loaded";; *) ko "rounded corners effect not loaded"; [ $FIX = 1 ] && "$E/xmactahoe-round-corners" >/dev/null;; esac; else ko "kwin-effect-roundcorners not installed (extra/xmactahoe-round-corners)"; fi
 [ -f "$HOME/.config/environment.d/xmactahoe.conf" ] && ok "GTK portal env file" || { ko "GTK portal env file missing"; [ $FIX = 1 ] && { mkdir -p "$HOME/.config/environment.d"; cp "$E/environment.d/xmactahoe.conf" "$HOME/.config/environment.d/"; }; }
 [ -x "$HOME/.local/bin/kde-desktop-repair" ] && { out=$("$HOME/.local/bin/kde-desktop-repair" --check 2>&1); echo "$out" | grep -q "rien a faire" && ok "AppGrid shortcuts (Meta, Alt+Space)" || { ko "AppGrid shortcuts need repair"; [ $FIX = 1 ] && "$HOME/.local/bin/kde-desktop-repair" --no-backup >/dev/null 2>&1; }; }
+for rc in dolphinrc konsolerc katerc kwriterc okularrc gwenviewrc arkrc spectaclerc systemsettingsrc; do
+  v=$(kreadconfig6 --file "$rc" --group UiSettings --key ColorScheme 2>/dev/null)
+  if [ -n "$v" ]; then ko "$rc forces its own app color scheme '$v' (unreadable text with the theme)"; [ $FIX = 1 ] && kwriteconfig6 --file "$rc" --group UiSettings --key ColorScheme --delete; fi
+done
+ok "app color scheme overrides checked"
 grep -q '^\[xmactahoe-' "$HOME/.config/kwinrulesrc" 2>/dev/null && { ko "old forced title-bar rules present (double title bars)"; [ $FIX = 1 ] && "$E/xmactahoe-window-rules" >/dev/null; } || ok "no forced title-bar rules"
 [ -x "$HOME/.local/bin/xmactahoe" ] && ok "xmactahoe command" || ko "xmactahoe command missing"
 echo; [ $bad = 0 ] && echo "All good." || echo "$bad problem(s)$( [ $FIX = 1 ] && echo ' — fixes applied where possible, re-run to confirm' || echo ' — run: xmactahoe doctor --fix' )"; exit $(( bad > 0 ))

@@ -94,7 +94,7 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 - **Notifications** top right, 5 s.
 - **Lock screen** provided by the global theme (`contents/lockscreen`): big clock at the top, avatar and password at the bottom, on the XMacTahoe wallpaper.
 - **GTK apps use the KDE file dialogs** (`GTK_USE_PORTAL=1` via `extra/environment.d`, effective at next login).
-- **Dolphin** defaults are only copied when no `dolphinrc` exists yet.
+- **Dolphin** defaults are only copied when no `dolphinrc` exists yet. KDE apps can force their own color scheme (Settings → Color Scheme); a light one on top of the dark theme gives black text on a dark background, so the installer resets those per-app choices and `xmactahoe doctor --fix` catches them later.
 
 ## Everyday command
 

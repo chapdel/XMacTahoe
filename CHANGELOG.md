@@ -1,3 +1,9 @@
+## 1.8.5 — 2026-09-21
+
+- Fix: black text on a dark background in Dolphin. Dolphin had its own light color scheme (Settings → Color Scheme, here KvFlatLight), which overrides the theme; the packaged Dolphin defaults carried it too. The installer now resets per-app color schemes of KDE apps, and `xmactahoe doctor --fix` detects them.
+
+Upgrading: `xmactahoe update`.
+
 ## 1.8.4 — 2026-09-21
 
 - `xmactahoe chrome`: a Chrome profile signed in to a Google account restores its theme from sync at startup, overwriting a Preferences edit. The command now detects it and tells you to pick the **GTK** theme in `chrome://settings/appearance` instead; the automatic edit is kept for profiles that are not signed in.
