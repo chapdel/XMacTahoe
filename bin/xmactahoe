@@ -2,7 +2,7 @@
 # XMacTahoe command line. Usage: xmactahoe <command> [args]
 #   light | dark            switch the global theme variant
 #   accent NAME             blue purple pink red orange yellow green graphite
-#   glass on|off|toggle     blur and translucency
+#   glass frosted|liquid|off|toggle|status   frosted blur, liquid glass (kwin-effects-glass) or opaque
 #   motion on|off|toggle    animations (off = instant, for modest machines / accessibility)
 #   auto on|off|now|toggle  automatic light/dark appearance (sunrise/sunset)
 #   dynamic on|off|now      eight-slot dynamic wallpaper following the sun
@@ -20,7 +20,7 @@ E="$PKG/extra"; cmd="${1:-help}"; shift || true
 case "$cmd" in
   light|dark) plasma-apply-lookandfeel -a "XMacTahoe.$( [ "$cmd" = light ] && echo Light || echo Dark )" ;;
   accent)   "$E/xmactahoe-accent" "${1:-blue}" ;;
-  glass)    a="${1:-toggle}"; [ "$a" = toggle ] && { [ "$(kreadconfig6 --file kwinrc --group Plugins --key blurEnabled)" = false ] && a=on || a=off; }; "$E/xmactahoe-glass" "$a" ;;
+  glass)    a="${1:-status}"; [ "$a" = on ] && a=$(cat "$HOME/.config/xmactahoe/glass-last" 2>/dev/null || echo frosted); "$E/xmactahoe-glass" "$a" ;;
   motion)   "$E/xmactahoe-motion" "${1:-toggle}" ;;
   auto)     a="${1:-toggle}"; case "$a" in
               on)  cp "$E"/systemd/xmactahoe-appearance.* "$HOME/.config/systemd/user/"; systemctl --user daemon-reload; systemctl --user enable --now xmactahoe-appearance.timer; "$E/xmactahoe-auto-appearance" --now; echo "auto appearance on" ;;

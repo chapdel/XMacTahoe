@@ -1,3 +1,11 @@
+## 1.9.0 — 2026-09-21
+
+- **Liquid glass**: the installer now asks which glass to use (or `--glass frosted|liquid|off`), and `xmactahoe glass frosted|liquid|off` switches at any time. Liquid uses the Glass KWin effect (COPR `ama1470/kwin-effects-glass`, installed on request): Snell-style refraction on the edges, edge lighting, clearer and more saturated glass, closer to macOS Tahoe. Frosted (KWin blur) stays the default, light on the GPU.
+- Fix: the Control Center **Glass** button toggled to a fully opaque bar and dock; it now toggles between off and the last glass mode.
+- `xmactahoe doctor` checks that the loaded effect matches the chosen glass mode.
+
+Upgrading: `xmactahoe update`.
+
 ## 1.8.5 — 2026-09-21
 
 - Fix: black text on a dark background in Dolphin. Dolphin had its own light color scheme (Settings → Color Scheme, here KvFlatLight), which overrides the theme; the packaged Dolphin defaults carried it too. The installer now resets per-app color schemes of KDE apps, and `xmactahoe doctor --fix` detects them.

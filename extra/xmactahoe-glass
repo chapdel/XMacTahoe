@@ -1,29 +1,62 @@
 #!/bin/bash
-# Turns the glass (blur + translucency) on or off for modest GPUs. Usage: xmactahoe-glass on|off
-D="$(cd "$(dirname "$0")/.." && pwd)"; LS="$HOME/.local/share/plasma/desktoptheme"
-case "${1:-on}" in
+# Glass modes for panels, dock, popups and translucent Qt windows.
+#   frosted  KWin blur: frosted glass, light on the GPU (default)
+#   liquid   kwin-effects-glass: refraction + edge lighting, closer to macOS Tahoe Liquid Glass (heavier)
+#   off      opaque panels, popups and windows, no blur
+#   toggle   off <-> last glass mode (used by the Control Center button)
+#   status   print the current mode
+# Usage: xmactahoe-glass frosted|liquid|off|toggle|status
+D="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+PKG=$(cat "$HOME/.config/xmactahoe/package-dir" 2>/dev/null); [ -d "${PKG:-/nonexistent}/extra" ] && D="$PKG"
+LS="$HOME/.local/share/plasma/desktoptheme"; ST="$HOME/.config/xmactahoe"; mkdir -p "$ST"
+GLASS_SO=/usr/lib64/qt6/plugins/kwin/effects/plugins/glass.so
+CUR=$(cat "$ST/glass" 2>/dev/null || echo frosted); LAST=$(cat "$ST/glass-last" 2>/dev/null || echo frosted)
+MODE="${1:-status}"
+[ "$MODE" = status ] && { echo "$CUR"; exit 0; }
+[ "$MODE" = toggle ] && { [ "$CUR" = off ] && MODE="$LAST" || MODE=off; }
+if [ "$MODE" = liquid ] && [ ! -f "$GLASS_SO" ]; then
+  echo "⚠ Liquid glass needs the kwin-effects-glass package:"; echo "   sudo dnf copr enable ama1470/kwin-effects-glass && sudo dnf install kwin-effects-glass"; echo "→ Using frosted glass instead."; MODE=frosted
+fi
+dbus_fx(){ gdbus call --session --dest org.kde.KWin --object-path /Effects --method "org.kde.kwin.Effects.$1" "$2" >/dev/null 2>&1; }
+panels(){ gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript "var ps=panels(); for (var i=0;i<ps.length;i++) ps[i].opacity='$1';" >/dev/null 2>&1; }
+RESTART=0
+case "$MODE" in
+  frosted|liquid)
+    if [ "$CUR" = off ]; then   # restore the translucent theme files and panels
+      cp -a "$D/Kvantum/XMacTahoe/." "$HOME/.config/Kvantum/XMacTahoe/"
+      for t in XMacTahoe-Dark XMacTahoe-Light; do rm -rf "$LS/$t"; cp -a "$D/plasma/desktoptheme/$t" "$LS/"; done
+      RESTART=1
+    fi
+    panels translucent
+    kwriteconfig6 --file kwinrc --group Plugins --key contrastEnabled true
+    kwriteconfig6 --file kwinrc --group Plugins --key translucencyEnabled false
+    if [ "$MODE" = liquid ]; then
+      group=""; while IFS= read -r line; do case "$line" in \[*\]) group="${line#[}"; group="${group%]}";; *=*) [ -n "$group" ] && kwriteconfig6 --file kwinrc --group "$group" --key "${line%%=*}" "${line#*=}";; esac; done < "$D/extra/kwinrc-glass.conf"
+      kwriteconfig6 --file kwinrc --group Plugins --key blurEnabled false; kwriteconfig6 --file kwinrc --group Plugins --key glassEnabled true
+      dbus_fx unloadEffect blur; dbus_fx unloadEffect glass; sleep 0.5; dbus_fx loadEffect glass
+    else
+      kwriteconfig6 --file kwinrc --group Plugins --key glassEnabled false; kwriteconfig6 --file kwinrc --group Plugins --key blurEnabled true
+      dbus_fx unloadEffect glass; dbus_fx loadEffect blur
+    fi
+    echo "$MODE" > "$ST/glass"; echo "$MODE" > "$ST/glass-last"
+    echo "glass: $MODE" ;;
   off)
-    kwriteconfig6 --file kwinrc --group Plugins --key blurEnabled false; kwriteconfig6 --file kwinrc --group Plugins --key contrastEnabled false
+    kwriteconfig6 --file kwinrc --group Plugins --key blurEnabled false; kwriteconfig6 --file kwinrc --group Plugins --key glassEnabled false; kwriteconfig6 --file kwinrc --group Plugins --key contrastEnabled false
+    dbus_fx unloadEffect blur; dbus_fx unloadEffect glass
     for k in XMacTahoe XMacTahoeDark; do f="$HOME/.config/Kvantum/XMacTahoe/$k.kvconfig"; [ -f "$f" ] && sed -i 's/^translucent_windows=.*/translucent_windows=false/; s/^blurring=.*/blurring=false/; s/^popup_blurring=.*/popup_blurring=false/' "$f"; done
     python3 - "$LS" <<'PY'
-import sys,glob,gzip,re,os
+import sys,glob,gzip,re
 for f in glob.glob(f'{sys.argv[1]}/XMacTahoe-*/**/*.svgz', recursive=True):
     if not re.search(r'(panel-background|dialogs/background)\.svgz$', f): continue
     s=gzip.open(f,'rb').read().decode()
-    n=re.sub(r'opacity:0\.(?:18|35|42|45|55|58|72|85)(;fill:#(?:1a1a1a|1c1c1e|242424|ffffff|141417|1a191b))', r'opacity:1\1', s)
+    n=re.sub(r'opacity:0\.[0-9]+(;fill:#(?:1a1a1a|1c1c1e|242424|ffffff|141417|1a191b))', r'opacity:1\1', s)
     n=re.sub(r'(fill:#ffffff;opacity:)0\.[0-9]+', r'\g<1>1', n)
     if n!=s:
         with gzip.open(f,'wb') as g: g.write(n.encode())
 PY
-    gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript 'var ps=panels(); for (var i=0;i<ps.length;i++) ps[i].opacity="opaque";' >/dev/null 2>&1
-    echo "glass off: opaque panels and popups, no blur, opaque Qt windows" ;;
-  on)
-    kwriteconfig6 --file kwinrc --group Plugins --key blurEnabled true; kwriteconfig6 --file kwinrc --group Plugins --key contrastEnabled true
-    cp -a "$D/Kvantum/XMacTahoe/." "$HOME/.config/Kvantum/XMacTahoe/"
-    for t in XMacTahoe-Dark XMacTahoe-Light; do rm -rf "$LS/$t"; cp -a "$D/plasma/desktoptheme/$t" "$LS/"; done
-    gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript 'var ps=panels(); for (var i=0;i<ps.length;i++) ps[i].opacity="translucent";' >/dev/null 2>&1
-    echo "glass on" ;;
-  *) echo "usage: $0 on|off"; exit 1 ;;
+    panels opaque; [ "$CUR" != off ] && echo "$CUR" > "$ST/glass-last"; echo off > "$ST/glass"; RESTART=1
+    echo "glass: off (opaque, no blur)" ;;
+  *) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac
 gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
-rm -f "$HOME/.cache"/plasma_theme_XMacTahoe-*.kcache "$HOME/.cache/ksvg-elements"; systemctl --user restart plasma-plasmashell.service 2>/dev/null
+if [ "$RESTART" = 1 ] && [ -z "${XMT_NO_RESTART:-}" ]; then rm -f "$HOME/.cache"/plasma_theme_XMacTahoe-*.kcache "$HOME/.cache/ksvg-elements"; systemctl --user restart plasma-plasmashell.service 2>/dev/null; fi

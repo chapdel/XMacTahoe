@@ -1,6 +1,6 @@
 #!/bin/bash
 # Installs the "XMacTahoe" global theme (KDE Plasma 6).
-# Usage: ./install.sh [--light] [--layout] [--no-apply] [--no-round-corners] [--accent NAME] [--wallpaper NAME] [--root] [--no-glass] [--auto-appearance] [--update]
+# Usage: ./install.sh [--light] [--layout] [--no-apply] [--no-round-corners] [--accent NAME] [--wallpaper NAME] [--root] [--glass frosted|liquid|off] [--auto-appearance] [--update]
 # Shortcuts: Meta = AppGrid grid, Alt+Space = AppGrid compact mode (wired by extra/kde-desktop-repair)
 #   --light     apply the light variant (dark by default)
 #   --layout    also reset the panel layout (top bar + dock)
@@ -9,13 +9,15 @@
 #   --accent NAME   blue|purple|pink|red|orange|yellow|green|graphite (extra/xmactahoe-accent)
 #   --wallpaper NAME  XMacTahoe (default, zayronxio dynamic) or XMacTahoe-Liuice (vinceliuice day/night)
 #   --root          also run the root steps with sudo: system-wide copy + login screen, Plymouth boot theme
-#   --no-glass      opaque panels/windows, no blur (modest GPUs); extra/xmactahoe-glass on|off later
+#   --glass MODE    frosted (KWin blur, light on the GPU), liquid (refraction + edge lighting, needs
+#                   kwin-effects-glass, heavier) or off (opaque). Asked interactively when omitted.
+#                   --no-glass = --glass off. Change later with: xmactahoe glass frosted|liquid|off
 #   --auto-appearance  light after sunrise, dark after sunset (systemd timer; extra/xmactahoe-auto-appearance)
 #   --update        download the latest GitHub release and run its installer with the same options
 set -euo pipefail
 D="$(cd "$(dirname "$0")" && pwd)"
-VARIANT=dark; LAYOUT=""; APPLY=1; ROUND=1; ACCENT=""; WALL=""; ROOT=0; prev=""; GLASS=1; AUTOAPP=0; UPDATE=0
-for a in "$@"; do case "$prev" in --accent) ACCENT="$a"; prev=""; continue;; --wallpaper) WALL="$a"; prev=""; continue;; esac; case "$a" in --accent|--wallpaper) prev="$a";; --root) ROOT=1;; --no-glass) GLASS=0;; --auto-appearance) AUTOAPP=1;; --update) UPDATE=1;; --light) VARIANT=light;; --layout) LAYOUT="--resetLayout";; --no-apply) APPLY=0;; --no-round-corners) ROUND=0;; esac; done
+VARIANT=dark; LAYOUT=""; APPLY=1; ROUND=1; ACCENT=""; WALL=""; ROOT=0; prev=""; GLASSMODE=""; AUTOAPP=0; UPDATE=0
+for a in "$@"; do case "$prev" in --accent) ACCENT="$a"; prev=""; continue;; --wallpaper) WALL="$a"; prev=""; continue;; --glass) GLASSMODE="$a"; prev=""; continue;; esac; case "$a" in --accent|--wallpaper|--glass) prev="$a";; --root) ROOT=1;; --no-glass) GLASSMODE=off;; --auto-appearance) AUTOAPP=1;; --update) UPDATE=1;; --light) VARIANT=light;; --layout) LAYOUT="--resetLayout";; --no-apply) APPLY=0;; --no-round-corners) ROUND=0;; esac; done
 LS="$HOME/.local/share"
 # restore point of the Plasma config before the first install (uninstall.sh --restore puts it back)
 RP="$LS/xmactahoe/restore"
@@ -87,16 +89,33 @@ if [ "$APPLY" = 1 ]; then
   if [ "$VARIANT" = light ]; then KV=XMacTahoe; LNF=XMacTahoe.Light; else KV=XMacTahoeDark; LNF=XMacTahoe.Dark; fi
   printf '[General]\ntheme=%s\n' "$KV" > "$HOME/.config/Kvantum/kvantum.kvconfig"
   rm -f "$HOME/.cache"/plasma_theme_XMacTahoe-*.kcache "$HOME/.cache/ksvg-elements" "$HOME/.cache/icon-cache.kcache"
+  # glass mode: frosted blur or liquid glass
+  GLASS_SO=/usr/lib64/qt6/plugins/kwin/effects/plugins/glass.so
+  if [ -z "$GLASSMODE" ]; then
+    if [ -t 0 ]; then
+      echo; echo "Glass effect for the menu bar, dock, popups and translucent windows:"
+      echo "  1) Frosted glass  KWin blur, light on the GPU (default)"
+      echo "  2) Liquid glass   refraction + edge lighting, closer to macOS Tahoe (kwin-effects-glass, heavier)"
+      echo "  3) Off            opaque, no blur"
+      read -r -p "Choice [1]: " c; case "$c" in 2) GLASSMODE=liquid;; 3) GLASSMODE=off;; *) GLASSMODE=frosted;; esac
+    else GLASSMODE=$(cat "$HOME/.config/xmactahoe/glass" 2>/dev/null || echo frosted); fi
+  fi
+  case "$GLASSMODE" in frosted|liquid|off) ;; *) echo "⚠ unknown glass mode '$GLASSMODE', using frosted"; GLASSMODE=frosted;; esac
+  if [ "$GLASSMODE" = liquid ] && [ ! -f "$GLASS_SO" ]; then
+    echo "→ Liquid glass needs kwin-effects-glass (COPR ama1470/kwin-effects-glass, sudo password required)"
+    if [ -t 0 ] && sudo dnf copr enable -y ama1470/kwin-effects-glass && sudo dnf install -y kwin-effects-glass; then :; else echo "⚠ not installed: using frosted glass"; GLASSMODE=frosted; fi
+  fi
   echo "→ Applying global theme $LNF ${LAYOUT:+(with panel layout)} ..."
   plasma-apply-lookandfeel -a "$LNF" $LAYOUT
   "$HOME/.local/bin/xmactahoe-sync-variant"
-  echo "→ Restarting plasmashell ..."
-  systemctl --user restart plasma-plasmashell.service 2>/dev/null || (kquitapp6 plasmashell; sleep 1; plasmashell --replace >/dev/null 2>&1 &)
   [ -n "$ACCENT" ] && "$D/extra/xmactahoe-accent" "$ACCENT"
   cp "$D/extra/xmactahoe-glass" "$D/extra/xmactahoe-auto-appearance" "$HOME/.local/bin/"; chmod +x "$HOME/.local/bin/xmactahoe-glass" "$HOME/.local/bin/xmactahoe-auto-appearance"
   mkdir -p "$LS/org.kde.syntax-highlighting/themes"; cp "$D"/extra/apps/kate-themes/*.theme "$LS/org.kde.syntax-highlighting/themes/"; cp "$D/extra/apps/XMacTahoe-Light.colorscheme" "$LS/konsole/"
   if [ "$AUTOAPP" = 1 ]; then cp "$D"/extra/systemd/xmactahoe-appearance.* "$HOME/.config/systemd/user/"; systemctl --user daemon-reload; systemctl --user enable --now xmactahoe-appearance.timer 2>/dev/null; fi
-  [ "$GLASS" = 0 ] && "$D/extra/xmactahoe-glass" off
+  echo "→ Glass: $GLASSMODE ..."; XMT_NO_RESTART=1 "$D/extra/xmactahoe-glass" "$GLASSMODE"
+  echo "→ Restarting plasmashell ..."
+  rm -f "$HOME/.cache"/plasma_theme_XMacTahoe-*.kcache "$HOME/.cache/ksvg-elements"
+  systemctl --user restart plasma-plasmashell.service 2>/dev/null || (kquitapp6 plasmashell; sleep 1; plasmashell --replace >/dev/null 2>&1 &)
   if [ -n "$WALL" ]; then plasma-apply-wallpaperimage "$LS/wallpapers/$WALL" >/dev/null 2>&1 || true; kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image "$WALL"; fi
   echo "→ Rounded window corners (KWin effect) ..."
   [ "$ROUND" = 1 ] && "$D/extra/xmactahoe-round-corners"

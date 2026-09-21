@@ -19,5 +19,11 @@ for rc in dolphinrc konsolerc katerc kwriterc okularrc gwenviewrc arkrc spectacl
 done
 ok "app color scheme overrides checked"
 grep -q '^\[xmactahoe-' "$HOME/.config/kwinrulesrc" 2>/dev/null && { ko "old forced title-bar rules present (double title bars)"; [ $FIX = 1 ] && "$E/xmactahoe-window-rules" >/dev/null; } || ok "no forced title-bar rules"
+GM=$(cat "$HOME/.config/xmactahoe/glass" 2>/dev/null || echo frosted); LE=$(gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.freedesktop.DBus.Properties.Get org.kde.kwin.Effects loadedEffects 2>/dev/null)
+case "$GM" in
+  liquid)  echo "$LE" | grep -q "'glass'" && ! echo "$LE" | grep -q "'blur'" && ok "glass mode liquid (Glass effect loaded)" || { ko "glass mode liquid but effects out of sync"; [ $FIX = 1 ] && "$E/xmactahoe-glass" liquid >/dev/null; } ;;
+  frosted) echo "$LE" | grep -q "'blur'" && ! echo "$LE" | grep -q "'glass'" && ok "glass mode frosted (KWin blur loaded)" || { ko "glass mode frosted but effects out of sync"; [ $FIX = 1 ] && "$E/xmactahoe-glass" frosted >/dev/null; } ;;
+  off)     ok "glass mode off" ;;
+esac
 [ -x "$HOME/.local/bin/xmactahoe" ] && ok "xmactahoe command" || ko "xmactahoe command missing"
 echo; [ $bad = 0 ] && echo "All good." || echo "$bad problem(s)$( [ $FIX = 1 ] && echo ' — fixes applied where possible, re-run to confirm' || echo ' — run: xmactahoe doctor --fix' )"; exit $(( bad > 0 ))

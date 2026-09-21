@@ -19,7 +19,7 @@ tar -xzf XMacTahoe-vX.Y.Z.tar.gz && cd XMacTahoe
 ./install.sh --wallpaper XMacTahoe-Liuice   # alternative day/night wallpaper by vinceliuice
 ./install.sh --root               # also run the root steps (system-wide copy + login screen, Plymouth)
 ./install.sh --auto-appearance    # light after sunrise, dark after sunset (like macOS "Auto")
-./install.sh --no-glass           # opaque panels and windows, no blur (modest GPUs)
+./install.sh --glass liquid       # liquid glass (refraction + edge lighting); frosted (default) or off
 ./install.sh --update             # fetch the latest release and re-run the installer
 ./uninstall.sh                    # back to Breeze Dark, remove everything (--keep-files keeps the files)
 ```
@@ -116,9 +116,15 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 `./install.sh --auto-appearance` enables a user timer that switches to XMacTahoe.Light after sunrise and back to XMacTahoe.Dark after sunset, like the macOS "Auto" setting. The location comes from `~/.config/xmactahoe/location` (`latitude longitude`) or, failing that, from KWin Night Light's auto-detected coordinates. Only the ten minutes after each event trigger a switch, so a manual toggle in Flex Hub is respected until the next sunrise or sunset. `extra/xmactahoe-auto-appearance --now` applies the expected variant immediately.
 
-## Glass on or off
+## Frosted or liquid glass
 
-`extra/xmactahoe-glass off` makes panels, popups and Qt windows opaque and disables KWin blur and contrast, for modest GPUs; `on` restores the glass. `./install.sh --no-glass` does it at install time.
+The installer asks which glass to use (or take `--glass frosted|liquid|off`), and `xmactahoe glass frosted|liquid|off` switches at any time:
+
+- **Frosted** (default): KWin's blur behind the menu bar, dock, popups and translucent Qt windows. Light on the GPU.
+- **Liquid**: the [Glass](https://github.com/4v3ngR/kwin-effects-glass) KWin effect (COPR `ama1470/kwin-effects-glass`, installed on request) replaces the blur and adds Snell-style refraction on the edges, edge lighting and clearer, more saturated glass, closer to macOS Tahoe's Liquid Glass. Settings in `extra/kwinrc-glass.conf`. Heavier on the GPU and tied to the exact KWin version (it can stop working after a Plasma update until the COPR is rebuilt; switch to frosted meanwhile). Edge lighting is skipped by the effect on strongly rounded docks.
+- **Off**: opaque panels, popups and windows, no blur.
+
+The Control Center's **Glass** button toggles between off and the last glass mode. `xmactahoe doctor` checks that the loaded effect matches the chosen mode.
 
 ## Quick Look
 
