@@ -27,6 +27,7 @@ kwriteconfig6 --file kwinrc --group ElectricBorders --key TopRight --delete
 kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image --delete
 kwriteconfig6 --file plasmanotifyrc --group Notifications --key PopupTimeout --delete
 kwriteconfig6 --file plasmanotifyrc --group Notifications --key PopupPosition --delete
+kwriteconfig6 --file kwinrc --group Plugins --key xmactahoe-attentionEnabled --delete; rm -rf "$LS/kwin/scripts/xmactahoe-attention"
 gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
 # user services and helpers
 for u in xmactahoe-variant.path xmactahoe-appearance.timer xmactahoe-wallpaper.timer; do systemctl --user disable --now $u 2>/dev/null; done; rm -f "$HOME/.config/systemd/user/xmactahoe-"*; systemctl --user daemon-reload 2>/dev/null

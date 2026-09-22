@@ -1,0 +1,14 @@
+{
+    "KPlugin": {
+        "Id": "xmactahoe-attention",
+        "Name": "XMacTahoe dock attention",
+        "Description": "macOS-like: when an app requests attention the auto-hidden dock shows for a few seconds, then hides again",
+        "Authors": [ { "Name": "Chapdel" } ],
+        "License": "GPL-3.0",
+        "Version": "1.0",
+        "EnabledByDefault": false
+    },
+    "KPackageStructure": "KWin/Script",
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}

@@ -25,5 +25,6 @@ case "$GM" in
   frosted) echo "$LE" | grep -q "'blur'" && ! echo "$LE" | grep -q "'glass'" && ok "glass mode frosted (KWin blur loaded)" || { ko "glass mode frosted but effects out of sync"; [ $FIX = 1 ] && "$E/xmactahoe-glass" frosted >/dev/null; } ;;
   off)     ok "glass mode off" ;;
 esac
+gdbus call --session --dest org.kde.KWin --object-path /Scripting --method org.kde.kwin.Scripting.isScriptLoaded xmactahoe-attention 2>/dev/null | grep -q true && ok "dock attention script loaded" || { ko "dock attention script not loaded (dock can stay up while an app requests attention)"; [ $FIX = 1 ] && { mkdir -p "$HOME/.local/share/kwin/scripts"; cp -a "$E/kwin-scripts/xmactahoe-attention" "$HOME/.local/share/kwin/scripts/"; kwriteconfig6 --file kwinrc --group Plugins --key xmactahoe-attentionEnabled true; gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1; }; }
 [ -x "$HOME/.local/bin/xmactahoe" ] && ok "xmactahoe command" || ko "xmactahoe command missing"
 echo; [ $bad = 0 ] && echo "All good." || echo "$bad problem(s)$( [ $FIX = 1 ] && echo ' — fixes applied where possible, re-run to confirm' || echo ' — run: xmactahoe doctor --fix' )"; exit $(( bad > 0 ))

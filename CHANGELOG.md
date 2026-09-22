@@ -1,3 +1,10 @@
+## 1.9.3 — 2026-09-22
+
+- **Dock no longer stays stuck on screen** when an app requests attention (Telegram with unread messages, a finished download...). Plasma kept the auto-hidden dock visible until that app was opened; the new `xmactahoe-attention` KWin script shows it for about 5 seconds and lets it hide again, like the macOS bounce. Unread badges stay on the icons. Delay: `kwinrc [Script-xmactahoe-attention] RevealSeconds`.
+- `xmactahoe doctor` checks the script is loaded.
+
+Upgrading: `xmactahoe update`.
+
 ## 1.9.2 — 2026-09-21
 
 - **Dock**: auto-hides like macOS ("Automatically hide and show the Dock"): it appears when the pointer touches the bottom edge. The previous "dodge windows" mode kept it on screen whenever no window overlapped it, which looked like a frozen dock. `xmactahoe dock autohide|dodge|always` switches.

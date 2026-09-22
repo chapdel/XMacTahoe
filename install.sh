@@ -117,6 +117,9 @@ if [ "$APPLY" = 1 ]; then
   rm -f "$HOME/.cache"/plasma_theme_XMacTahoe-*.kcache "$HOME/.cache/ksvg-elements"
   systemctl --user restart plasma-plasmashell.service 2>/dev/null || (kquitapp6 plasmashell; sleep 1; plasmashell --replace >/dev/null 2>&1 &)
   if [ -n "$WALL" ]; then plasma-apply-wallpaperimage "$LS/wallpapers/$WALL" >/dev/null 2>&1 || true; kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image "$WALL"; fi
+  echo "→ Dock attention (shows ~5 s when an app requests attention, then hides) ..."
+  mkdir -p "$LS/kwin/scripts"; for k in "$D"/extra/kwin-scripts/*/; do n=$(basename "$k"); rm -rf "$LS/kwin/scripts/$n"; cp -a "$k" "$LS/kwin/scripts/$n"; kwriteconfig6 --file kwinrc --group Plugins --key "${n}Enabled" true; done
+  gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
   echo "→ Rounded window corners (KWin effect) ..."
   [ "$ROUND" = 1 ] && "$D/extra/xmactahoe-round-corners"
   echo "→ Firefox and Ghostty themes, Flatpak overrides, Flex Hub controls (and removal of old forced title-bar rules) ..."

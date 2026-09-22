@@ -67,6 +67,12 @@ for l in glob.glob(f'{B}/plasma/look-and-feel/*/contents/layouts/*.js'):
     for plug in set(re.findall(r'"plugin": "([^"]+)"', txt)):
         if not plug.startswith('org.kde.') and plug not in bundled: err(f'layout references non-bundled widget {plug}')
     ok(f'{os.path.relpath(l, B)}: widgets referenced are bundled or from Plasma')
+# 7b. KWin scripts parse as JavaScript and carry metadata
+for k in glob.glob(f'{B}/extra/kwin-scripts/*/'):
+    js = os.path.join(k, 'contents/code/main.js'); md = os.path.join(k, 'metadata.json')
+    (ok if os.path.exists(js) and os.path.exists(md) else err)(f'kwin script {os.path.basename(k.rstrip("/"))}: main.js + metadata.json')
+    if node and os.path.exists(js):
+        r = subprocess.run(['node', '--check', js], capture_output=True, text=True); (ok if r.returncode == 0 else err)(f'node --check {os.path.relpath(js, B)}')
 # 8. tray icon generator runs on a scratch copy
 import tempfile, shutil
 with tempfile.TemporaryDirectory() as td:
