@@ -1,5 +1,6 @@
 #!/bin/bash
-# Installs the "xmactahoe" Plymouth boot theme (Apple-style logo + spinner, black background).
+# Installs the "xmactahoe" Plymouth boot theme (menu-bar logo chosen with `xmactahoe logo` + spinner, black background).
+# Run the copy in ~/.local/share/xmactahoe/package/extra so it picks up that logo.
 # Run with sudo: rebuilds the initramfs (dracut), allow about a minute.
 set -e
 D="$(cd "$(dirname "$0")" && pwd)"

@@ -1,15 +1,17 @@
 #!/bin/bash
 # Applies vinceliuice's MacTahoe Firefox theme (userChrome) to every Firefox profile (native and Flatpak).
 # Creates a default profile first if Firefox has never been started.
-D="$(cd "$(dirname "$0")" && pwd)/firefox"
+PKG=$(cat "$HOME/.config/xmactahoe/package-dir" 2>/dev/null); D="${PKG:+$PKG/extra}/firefox"; [ -d "$D" ] || D="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)/firefox"
 dirs=(); for c in "$HOME/.config/mozilla/firefox" "$HOME/.mozilla/firefox"; do [ -d "$c" ] && dirs+=("$c"); done; [ -d "$HOME/.var/app/org.mozilla.firefox/.mozilla/firefox" ] && dirs+=("$HOME/.var/app/org.mozilla.firefox/.mozilla/firefox")
 if [ ${#dirs[@]} = 0 ] || ! ls "${dirs[0]}"/*.default* >/dev/null 2>&1; then
   command -v firefox >/dev/null && { firefox -CreateProfile default >/dev/null 2>&1; dirs=(); for c in "$HOME/.config/mozilla/firefox" "$HOME/.mozilla/firefox"; do [ -d "$c" ] && dirs+=("$c"); done; }
 fi
 n=0
 for base in "${dirs[@]}"; do for p in "$base"/*.default*; do [ -d "$p" ] || continue
-  rm -rf "$p/chrome"; mkdir -p "$p/chrome"; cp -r "$D/MacTahoe" "$D/customChrome.css" "$D/userChrome.css" "$D/userContent.css" "$p/chrome/"
-  for pref in 'toolkit.legacyUserProfileCustomizations.stylesheets' 'browser.tabs.drawInTitlebar' 'layers.acceleration.force-enabled' 'mozilla.widget.use-argb-visuals' 'widget.gtk.rounded-bottom-corners.enabled' 'svg.context-properties.content.enabled'; do grep -q "\"$pref\"" "$p/user.js" 2>/dev/null || echo "user_pref(\"$pref\", true);" >> "$p/user.js"; done
-  grep -q '"browser.uidensity"' "$p/user.js" 2>/dev/null || echo 'user_pref("browser.uidensity", 0);' >> "$p/user.js"
+  # keep the user's own chrome/ folder (restored by uninstall.sh); ours carries a .xmactahoe marker
+  if [ -d "$p/chrome" ] && [ ! -e "$p/chrome/.xmactahoe" ] && [ ! -d "$p/chrome/MacTahoe" ] && [ ! -e "$p/chrome.xmactahoe.bak" ]; then mv "$p/chrome" "$p/chrome.xmactahoe.bak"; fi
+  rm -rf "${p:?}/chrome"; mkdir -p "$p/chrome"; cp -r "$D/MacTahoe" "$D/customChrome.css" "$D/userChrome.css" "$D/userContent.css" "$p/chrome/"; touch "$p/chrome/.xmactahoe"
+  for pref in 'toolkit.legacyUserProfileCustomizations.stylesheets' 'browser.tabs.drawInTitlebar' 'layers.acceleration.force-enabled' 'mozilla.widget.use-argb-visuals' 'widget.gtk.rounded-bottom-corners.enabled' 'svg.context-properties.content.enabled'; do grep -q "\"$pref\"" "$p/user.js" 2>/dev/null || echo "user_pref(\"$pref\", true); // XMacTahoe" >> "$p/user.js"; done
+  grep -q '"browser.uidensity"' "$p/user.js" 2>/dev/null || echo 'user_pref("browser.uidensity", 0); // XMacTahoe' >> "$p/user.js"
   n=$((n+1)); done; done
 echo "✓ Firefox theme applied to $n profile(s) (restart Firefox)"

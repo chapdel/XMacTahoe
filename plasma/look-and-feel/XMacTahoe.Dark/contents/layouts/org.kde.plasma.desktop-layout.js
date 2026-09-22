@@ -102,7 +102,7 @@ var layout = {
                         },
                         "/General": {
                             "customCardColor": "#ffffff",
-                            "customControlCommand": "/home/chapdel/.local/bin/xmactahoe glass toggle,/home/chapdel/.local/bin/xmactahoe auto toggle,/home/chapdel/.local/bin/xmactahoe motion toggle",
+                            "customControlCommand": "@XMT_BIN@/xmactahoe glass toggle,@XMT_BIN@/xmactahoe auto toggle,@XMT_BIN@/xmactahoe motion toggle",
                             "customControlEnabledButton": "true,true,true",
                             "customControlEnabledIcons": "true,true,true",
                             "customControlHeights": "1,1,1",

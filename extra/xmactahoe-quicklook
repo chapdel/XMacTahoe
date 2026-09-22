@@ -3,8 +3,8 @@
 for f in "$@"; do
   m=$(xdg-mime query filetype "$f" 2>/dev/null)
   case "$m" in
-    image/*) command -v gwenview >/dev/null && { gwenview --fullscreen "$f" & } || xdg-open "$f" ;;
     application/pdf|application/epub+zip|image/vnd.djvu) command -v okular >/dev/null && { okular --presentation "$f" & } || xdg-open "$f" ;;
+    image/*) command -v gwenview >/dev/null && { gwenview --fullscreen "$f" & } || xdg-open "$f" ;;
     video/*|audio/*) for p in haruna dragon vlc; do command -v $p >/dev/null && { $p "$f" & break; }; done ;;
     text/*|application/json|application/x-shellscript|application/xml) command -v kate >/dev/null && { kate --new --readonly "$f" & } || xdg-open "$f" ;;
     *) xdg-open "$f" ;;

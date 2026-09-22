@@ -32,7 +32,8 @@ for p in layout['panels']:
         for grp in list(a.get('config', {}).values()):
             for k in ('knownApps','launchCounts','favoritesPortedToKAstats','headerActionsMigrated','iconMigratedFrom17','powerButtonsMigrated'):
                 grp.pop(k, None)
-out = head + 'var layout = ' + json.dumps(layout, indent=4, ensure_ascii=False) + '\n;\n\nplasma.loadSerializedLayout(layout);\n'
+layout_txt = json.dumps(layout, indent=4, ensure_ascii=False).replace(os.path.expanduser('~/.local/bin'), '@XMT_BIN@')
+out = head + 'var layout = ' + layout_txt + '\n;\n\nplasma.loadSerializedLayout(layout);\n'
 out += '''
 // XMacTahoe: Meta shortcut (full grid) on the AppGrid widget (invisible, top bar)
 for (var i = 0; i < panelIds.length; i++) {

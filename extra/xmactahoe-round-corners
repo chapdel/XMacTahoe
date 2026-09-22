@@ -2,7 +2,7 @@
 # Applies macOS Tahoe-style rounded corners (KWin effect "KDE Rounded Corners").
 # Installs the package when missing (COPR matinlotfali/KDE-Rounded-Corners, sudo required),
 # writes the settings to kwinrc and (re)loads the effect live.
-D="$(cd "$(dirname "$0")" && pwd)"
+PKG=$(cat "$HOME/.config/xmactahoe/package-dir" 2>/dev/null); D="${PKG:+$PKG/extra}"; [ -f "$D/kwinrc-round-corners.conf" ] || D="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
 if ! rpm -q kwin-effect-roundcorners >/dev/null 2>&1; then
   echo "→ Installing kwin-effect-roundcorners (COPR matinlotfali/KDE-Rounded-Corners)"
   sudo dnf copr enable -y matinlotfali/KDE-Rounded-Corners && sudo dnf install -y kwin-effect-roundcorners \

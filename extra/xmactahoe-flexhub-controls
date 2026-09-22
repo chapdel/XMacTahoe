@@ -8,7 +8,9 @@ var names=['Glass','Auto appearance','Reduce motion'], icons=['view-preview','we
 for (var i=0;i<panelIds.length;i++){ var ws=panelById(panelIds[i]).widgets(); for (var j=0;j<ws.length;j++){ var w=ws[j]; if (w.type!='Plasma.Flex.Hub') continue;
   w.currentConfigGroup=['General'];
   function L(k){ var v=w.readConfig(k)+''; return v? v.split(','):[]; }
-  var cn=L('customControlNames'); if (cn.indexOf('Glass')>=0) { print('already'); continue; }
+  var cn=L('customControlNames');
+  if (cn.indexOf('Glass')>=0) { var cmd=L('customControlCommand'), fixed=cmd.map(function(c){ return c.replace(/^\\S*xmactahoe /, '$X '); });
+    if (fixed.join(',')!==cmd.join(',')) { w.writeConfig('customControlCommand', fixed.join(',')); w.reloadConfig(); print('commands repaired'); } else print('already'); continue; }
   // Tahoe grid: 16 connectivity 2x2 | 11 focus 2x1 | 13 appearance | 14 screenshot | 6 brightness 4x1 | 7 sound 4x1 | 2 now playing 4x1 | 8 night shift
   w.writeConfig('elements','16,11,13,14,6,7,2,8'); w.writeConfig('xElements','0,2,2,3,0,0,0,0'); w.writeConfig('yElements','0,0,1,1,2,3,4,5');
   w.writeConfig('gridWidth','4'); w.writeConfig('gridHeight','6'); w.writeConfig('labelsToggles','true');

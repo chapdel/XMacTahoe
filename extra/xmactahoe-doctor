@@ -3,16 +3,22 @@
 FIX=0; [ "${1:-}" = --fix ] && FIX=1
 PKG=$(cat "$HOME/.config/xmactahoe/package-dir" 2>/dev/null); E="$PKG/extra"; LS="$HOME/.local/share"; bad=0
 ok(){ echo "  OK    $1"; }; ko(){ echo "  FAIL  $1"; bad=$((bad+1)); }
+[ -d "$E" ] && ok "package copy $PKG" || ko "package copy missing ('$PKG'): re-run install.sh from the full package, or xmactahoe update"
 V=$(cat "$HOME/.config/kdedefaults/package" 2>/dev/null)
 case "$V" in XMacTahoe.Dark) ok "global theme $V"; KV=XMacTahoeDark; GT=MacTahoe-Dark; IC=XMacTahoe-Night;; XMacTahoe.Light) ok "global theme $V"; KV=XMacTahoe; GT=MacTahoe-Light; IC=XMacTahoe-Day;; *) ko "global theme is '$V'"; [ $FIX = 1 ] && plasma-apply-lookandfeel -a XMacTahoe.Dark >/dev/null 2>&1; KV=XMacTahoeDark; GT=MacTahoe-Dark; IC=XMacTahoe-Night;; esac
 for c in "plasmarc:Theme:name:XMacTahoe-" "kdeglobals:Icons:Theme:$IC" "kcminputrc:Mouse:cursorTheme:XMacTahoe-cursors" "kdeglobals:KDE:widgetStyle:kvantum"; do IFS=: read f g k want <<<"$c"; v=$(kreadconfig6 --file "$f" --group "$g" --key "$k"); case "$v" in "$want"*) ok "$f [$g] $k=$v";; *) ko "$f [$g] $k='$v' (expected $want*)";; esac; done
+for v in Dark Light; do x=$(kreadconfig6 --file kdeglobals --group KDE --key "Default${v}LookAndFeel"); [ "$x" = "XMacTahoe.$v" ] && ok "Plasma ${v,,} theme $x" || { ko "Plasma ${v,,} theme '$x' (expected XMacTahoe.$v)"; [ $FIX = 1 ] && kwriteconfig6 --file kdeglobals --group KDE --key "Default${v}LookAndFeel" "XMacTahoe.$v"; }; done
 v=$(sed -n 's/^theme=//p' "$HOME/.config/Kvantum/kvantum.kvconfig" 2>/dev/null); [ "$v" = "$KV" ] && ok "Kvantum $v" || { ko "Kvantum '$v' (expected $KV)"; [ $FIX = 1 ] && "$HOME/.local/bin/xmactahoe-sync-variant"; }
 v=$(sed -n 's/^gtk-theme-name=//p' "$HOME/.config/gtk-3.0/settings.ini" 2>/dev/null); [ "$v" = "$GT" ] && ok "GTK $v" || { ko "GTK '$v' (expected $GT)"; [ $FIX = 1 ] && "$HOME/.local/bin/xmactahoe-sync-variant"; }
 for d in "plasma/desktoptheme/XMacTahoe-Dark" "plasma/look-and-feel/XMacTahoe.Dark" "icons/XMacTahoe-Night" "aurorae/themes/XMacTahoe-Night" "wallpapers/XMacTahoe"; do [ -d "$LS/$d" ] && ok "$d present" || ko "$d missing (re-run install.sh)"; done
 systemctl --user is-enabled -q xmactahoe-variant.path 2>/dev/null && ok "variant sync unit enabled" || { ko "variant sync unit not enabled"; [ $FIX = 1 ] && { cp "$E"/systemd/xmactahoe-variant.* "$HOME/.config/systemd/user/" 2>/dev/null; systemctl --user daemon-reload; systemctl --user enable --now xmactahoe-variant.path; }; }
 if rpm -q kwin-effect-roundcorners >/dev/null 2>&1; then r=$(gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.kde.kwin.Effects.isEffectLoaded kwin4_effect_shapecorners 2>/dev/null); case "$r" in *true*) ok "rounded corners effect loaded";; *) ko "rounded corners effect not loaded"; [ $FIX = 1 ] && "$E/xmactahoe-round-corners" >/dev/null;; esac; else ko "kwin-effect-roundcorners not installed (extra/xmactahoe-round-corners)"; fi
+if systemctl --user is-enabled -q xmactahoe-appearance.timer 2>/dev/null; then
+  if [ -s "$HOME/.config/xmactahoe/location" ] || [ -n "$(kreadconfig6 --file kwinrc --group NightColor --key LatitudeAuto 2>/dev/null)" ]; then ok "auto appearance has a location"
+  else ko "auto appearance is on but has no location: echo 'LATITUDE LONGITUDE' > ~/.config/xmactahoe/location"; fi
+fi
 [ -f "$HOME/.config/environment.d/xmactahoe.conf" ] && ok "GTK portal env file" || { ko "GTK portal env file missing"; [ $FIX = 1 ] && { mkdir -p "$HOME/.config/environment.d"; cp "$E/environment.d/xmactahoe.conf" "$HOME/.config/environment.d/"; }; }
-[ -x "$HOME/.local/bin/kde-desktop-repair" ] && { out=$("$HOME/.local/bin/kde-desktop-repair" --check 2>&1); echo "$out" | grep -q "rien a faire" && ok "AppGrid shortcuts (Meta, Alt+Space)" || { ko "AppGrid shortcuts need repair"; [ $FIX = 1 ] && "$HOME/.local/bin/kde-desktop-repair" --no-backup >/dev/null 2>&1; }; }
+[ -x "$HOME/.local/bin/kde-desktop-repair" ] && { "$HOME/.local/bin/kde-desktop-repair" --check >/dev/null 2>&1 && ok "AppGrid shortcuts (Meta, Alt+Space)" || { ko "AppGrid shortcuts need repair"; [ $FIX = 1 ] && "$HOME/.local/bin/kde-desktop-repair" --no-backup >/dev/null 2>&1; }; }
 for rc in dolphinrc konsolerc katerc kwriterc okularrc gwenviewrc arkrc spectaclerc systemsettingsrc; do
   v=$(kreadconfig6 --file "$rc" --group UiSettings --key ColorScheme 2>/dev/null)
   if [ -n "$v" ]; then ko "$rc forces its own app color scheme '$v' (unreadable text with the theme)"; [ $FIX = 1 ] && kwriteconfig6 --file "$rc" --group UiSettings --key ColorScheme --delete; fi

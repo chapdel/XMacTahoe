@@ -11,6 +11,9 @@ jobs:
         with: { node-version: '20' }
       - run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
       - name: shellcheck
-        run: shellcheck -S warning install.sh uninstall.sh extra/xmactahoe-round-corners extra/xmactahoe-sync-variant extra/xmactahoe-boot-install extra/xmactahoe-accent extra/xmactahoe-system-install || true
+        run: |
+          files=$(for f in install.sh uninstall.sh bin/* extra/xmactahoe-* tools/*.sh; do head -1 "$f" | grep -q bash && echo "$f"; done)
+          echo "$files"
+          shellcheck -S warning $files
       - name: package consistency
         run: python3 tools/check-package.py

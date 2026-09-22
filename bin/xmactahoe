@@ -8,6 +8,7 @@
 #   dynamic on|off|now      eight-slot dynamic wallpaper following the sun
 #   dock autohide|dodge|always|status   dock visibility (autohide = macOS auto-hide)
 #   wallpaper NAME          XMacTahoe | XMacTahoe-Liuice
+#   logo tahoe|apple|status menu-bar and splash logo (apple = downloaded Apple logo, personal use)
 #   firefox | flatpak       apply the Firefox theme / Flatpak overrides
 #   ghostty [--remove]      Ghostty: theme title bar, XMacTahoe palettes, tabs only when needed
 #   chrome [--classic]      Chrome in GTK mode: MacTahoe traffic lights in the tab strip (quit Chrome first)
@@ -34,6 +35,7 @@ case "$cmd" in
               off) systemctl --user disable --now xmactahoe-wallpaper.timer 2>/dev/null; plasma-apply-wallpaperimage "$HOME/.local/share/wallpapers/XMacTahoe" >/dev/null 2>&1; echo "dynamic wallpaper off" ;;
               now) "$E/xmactahoe-dynamic-wallpaper" ;; esac ;;
   dock)     "$E/xmactahoe-dock" "$@" ;;
+  logo)     "$E/xmactahoe-logo" "${1:-status}" ;;
   wallpaper) plasma-apply-wallpaperimage "$HOME/.local/share/wallpapers/${1:-XMacTahoe}" ;;
   firefox)  "$E/xmactahoe-firefox" ;;
   chrome)   "$E/xmactahoe-chrome" "$@" ;;
@@ -46,5 +48,5 @@ case "$cmd" in
   restore)  "$PKG/uninstall.sh" --restore ;;
   uninstall) "$PKG/uninstall.sh" "$@" ;;
   version)  cat "$PKG/VERSION" ;;
-  *) sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//' ;;
 esac

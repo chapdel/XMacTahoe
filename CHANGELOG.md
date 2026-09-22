@@ -1,3 +1,21 @@
+## 2.0.0 — 2026-09-22
+
+Audit release: safer install, update and uninstall, clean licensing.
+
+- **Neutral logo by default.** The menu bar, splash and boot screen now show a neutral glyph (a peak over a lake) instead of the Apple logo, a trademark. `xmactahoe logo apple` downloads the Apple logo on your machine for personal use; updates keep your choice.
+- **Verified updates.** `xmactahoe update` checks the archive against the release's `SHA256SUMS` (and a GPG signature when one is published) and refuses an unverified archive. AppGrid now comes from its COPR (`scujas/plasma-applet-appgrid`) instead of a bundled RPM.
+- **Durable package copy.** The installer keeps what the helpers need in `~/.local/share/xmactahoe/package`, so `glass`, `accent`, `dynamic`, `doctor --fix` and `update` keep working after the extracted folder (or the `/tmp` folder of an update) is gone.
+- **Uninstall that leaves nothing broken.** Breeze Dark with a fresh panel layout (no more panels pointing at removed widgets), stock blur back on, and removal of the KWin effects and scripts, every user timer, the Ghostty block, the Firefox theme (your own `chrome/` folder is put back), Flatpak overrides, Kate/KWrite and Konsole choices, Quick Look and the dock launcher. `--restore` puts back the saved configuration without overwriting it, and falls back to Breeze when the restore point was taken with XMacTahoe already active.
+- **No hidden changes.** `--no-apply` only copies files. GTK `settings.ini` is edited key by key instead of being replaced. Plasma's own light/dark pair now points at XMacTahoe.
+- **Control Center buttons** no longer carry the maintainer's home path; existing installs are repaired.
+- **Auto appearance**: fixed a crash when reading `kwinrc` (keys such as `InputMethod[$d]`), which also affected the dynamic wallpaper; a sunrise or sunset missed during sleep is now caught up; `doctor` warns when no location is set.
+- **Accent and glass** no longer undo each other: the accent is remembered and re-applied, and stays opaque with glass off.
+- Re-installs keep your glass mode and accent without asking again. The installer waits for plasmashell before the steps that need it.
+- Licenses: `THIRD_PARTY.md`, SIL OFL texts for Inter and JetBrains Mono, MIT/LGPL/GPL-2.0 texts for the bundled components.
+- Tooling: shellcheck on every bash script in CI (a warning fails the build), the package checker finds scripts by shebang and rejects personal paths and bundled binaries, `tools/release.sh` refuses to reuse a published tag. `kde-desktop-repair` speaks English and `doctor` uses its exit code. Quick Look opens DjVu in Okular. Fewer Fedora-only paths.
+
+Upgrading: `xmactahoe update`. If you want the Apple logo back: `xmactahoe logo apple`.
+
 ## 1.9.3 — 2026-09-22
 
 - **Dock no longer stays stuck on screen** when an app requests attention (Telegram with unread messages, a finished download...). Plasma kept the auto-hidden dock visible until that app was opened; the new `xmactahoe-attention` KWin script shows it for about 5 seconds and lets it hide again, like the macOS bounce. Unread badges stay on the icons. Delay: `kwinrc [Script-xmactahoe-attention] RevealSeconds`.

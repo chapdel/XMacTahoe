@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+"""Menu-bar logo of XMacTahoe (start-here icons, splash, boot splash image).
+  tahoe  neutral glyph (a peak over a lake) — what the public package ships
+  apple  Apple logo, downloaded at run time from the MacTahoe icon theme by vinceliuice (not redistributed here)
+  status print the current choice
+Usage: xmactahoe-logo tahoe|apple|status [--icons DIR] [--splash FILE] [--quiet]
+Without --icons/--splash it updates the installed copies (~/.local/share) and remembers the choice.
+"""
+import os, re, sys, glob, subprocess, urllib.request
+HOME = os.path.expanduser('~')
+STATE = f'{HOME}/.config/xmactahoe/logo'
+UPSTREAM = 'https://raw.githubusercontent.com/vinceliuice/MacTahoe-icon-theme/839848b9/src/places/scalable/start-here-symbolic.svg'
+TAHOE = ('0 0 16 16', '<path d="M1.2 12.6 5.6 5.2 8.1 9.1 10.2 6.3 14.8 12.6Z"/>'
+                      '<rect x="2.6" y="13.6" width="10.8" height="1.3" rx=".65"/>')
+
+def apple():
+    try: svg = urllib.request.urlopen(UPSTREAM, timeout=20).read().decode()
+    except OSError as e: sys.exit(f'cannot download the Apple logo ({e}); nothing changed')
+    vb = re.search(r'viewBox="([^"]+)"', svg)
+    w = re.search(r'\bwidth="([\d.]+)', svg); h = re.search(r'\bheight="([\d.]+)', svg)
+    vb = vb.group(1) if vb else f'0 0 {w.group(1) if w else 16} {h.group(1) if h else 16}'
+    paths = re.findall(r'<path\b[^>]*\bd="[^"]+"[^>]*/?>', svg)
+    paths = [re.sub(r'\s(style|fill|class|id)="[^"]*"', '', p) for p in paths]
+    return vb, ''.join(p if p.endswith('/>') else p + '</path>' for p in paths)
+
+def target_files(root):
+    out = []
+    for f in glob.glob(f'{root}/**/start-here*.svg', recursive=True):
+        if os.path.islink(f) or 'kde-plasma' in os.path.basename(f) or 'manjaro' in os.path.basename(f): continue
+        out.append(f)
+    return out
+
+def rewrite(f, glyph):
+    s = open(f).read()
+    w = re.search(r'<svg[^>]*\bwidth="([\d.]+)', s); h = re.search(r'<svg[^>]*\bheight="([\d.]+)', s)
+    vb = re.search(r'<svg[^>]*\bviewBox="([^"]+)"', s)  # first <svg> is the outer one
+    if vb: x0, y0, vw, vh = [float(v) for v in vb.group(1).split()]
+    else: x0, y0, vw, vh = 0, 0, float(w.group(1)) if w else 16, float(h.group(1)) if h else 16
+    col = re.search(r'#[0-9a-fA-F]{6}\b', s) or re.search(r'#[0-9a-fA-F]{3}\b', s)
+    col = col.group(0) if col else ('#dedede' if '-Night' in f else '#363636')
+    gvb, body = glyph
+    gx, gy, gw, gh = [float(v) for v in gvb.split()]
+    m = min(vw, vh) * 0.08; tw, th = vw - 2 * m, vh - 2 * m
+    k = min(tw / gw, th / gh); tx = x0 + m + (tw - gw * k) / 2 - gx * k; ty = y0 + m + (th - gh * k) / 2 - gy * k
+    # Qt's SVG renderer (KDE icons) does not support nested <svg>: map the glyph with a transform instead
+    out = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w.group(1) if w else int(vw)}" height="{h.group(1) if h else int(vh)}" '
+           f'viewBox="{x0:g} {y0:g} {vw:g} {vh:g}">\n'
+           f'<defs><style id="current-color-scheme" type="text/css">.ColorScheme-Text{{color:{col};}}</style></defs>\n'
+           f'<g class="ColorScheme-Text" fill="currentColor" transform="translate({tx:.4f} {ty:.4f}) scale({k:.5f})">{body}</g>\n</svg>\n')
+    open(f, 'w').write(out)
+
+def splash_png(dest, glyph, size=150):
+    gvb, body = glyph
+    tmp = dest + '.svg'
+    open(tmp, 'w').write(f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="{gvb}"><g fill="#ffffff">{body}</g></svg>')
+    subprocess.run(['ksvgtopng', str(size), str(size), tmp, dest], capture_output=True); os.remove(tmp)
+
+def main():
+    a = sys.argv[1:]; mode = a[0] if a else 'status'
+    if mode == 'status':
+        print(open(STATE).read().strip() if os.path.exists(STATE) else 'tahoe'); return
+    if mode not in ('tahoe', 'apple'): print(__doc__); sys.exit(1)
+    icons = a[a.index('--icons')+1] if '--icons' in a else None
+    splash = a[a.index('--splash')+1] if '--splash' in a else None
+    glyph = TAHOE if mode == 'tahoe' else apple()
+    roots = [icons] if icons else [f'{HOME}/.local/share/icons/{p}' for p in ('XMacTahoe', 'XMacTahoe-Night', 'XMacTahoe-Day')]
+    n = 0
+    for r in roots:
+        for f in target_files(r): rewrite(f, glyph); n += 1
+    splashes = [splash] if splash else [f'{HOME}/.local/share/plasma/look-and-feel/XMacTahoe.Splash/contents/splash/images/logo.png',
+                                        f'{HOME}/.local/share/xmactahoe/package/extra/plymouth/xmactahoe/header-image.png']  # used by boot-install
+    for s in splashes:
+        if os.path.isdir(os.path.dirname(s)): splash_png(s, glyph)
+    if not icons:
+        os.makedirs(os.path.dirname(STATE), exist_ok=True); open(STATE, 'w').write(mode + '\n')
+        for c in (f'{HOME}/.cache/icon-cache.kcache',):
+            if os.path.exists(c): os.remove(c)
+    if '--quiet' not in a:
+        print(f'✓ logo: {mode} ({n} icon files{", splash" if splashes else ""})'
+              + ('' if icons else '; restart plasmashell or log out to see it. Boot splash: sudo ~/.local/share/xmactahoe/package/extra/xmactahoe-boot-install'))
+
+main()

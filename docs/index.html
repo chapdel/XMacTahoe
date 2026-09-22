@@ -5,19 +5,19 @@
 <a class="btn" href="https://github.com/chapdel/XMacTahoe/releases/latest">Download the latest release</a> <a class="btn" style="background:#2a2a32" href="https://github.com/chapdel/XMacTahoe">GitHub</a>
 <p><img src="preview-dark.png" alt="XMacTahoe dark desktop"></p>
 <div class="grid">
-<div class="card"><h3>Glass menu bar and dock</h3><p>Nearly transparent 24 px bar with blur and contrast, floating dock, SF Symbols-style tray glyphs.</p></div>
-<div class="card"><h3>Rounded corners everywhere</h3><p>Every window, maximized ones included, through the KDE Rounded Corners effect.</p></div>
-<div class="card"><h3>Real light/dark switching</h3><p>Plasma, Kvantum, GTK, libadwaita, icons and terminal follow one toggle. Optional sunrise/sunset mode and eight-slot dynamic wallpaper.</p></div>
-<div class="card"><h3>Whole desktop</h3><p>Apple menu, control center, Tahoe lock screen, splash and Plymouth boot, Finder-like Dolphin, Terminal.app-like Konsole, Xcode-like Kate, Firefox theme, Flatpak overrides.</p></div>
-<div class="card"><h3>Safe to try</h3><p>Restore point before install, <code>xmactahoe doctor</code>, package checker with CI, full uninstaller.</p></div>
-<div class="card"><h3>Configurable</h3><p>Accent colors, alternative wallpapers, glass and motion toggles, <code>--update</code>.</p></div>
+<div class="card"><h3>Frosted or liquid glass</h3><p>A nearly transparent 24 px menu bar, glass popups and translucent windows. Frosted uses KWin blur; liquid adds refraction and edge lighting, closer to Tahoe. Off gives opaque panels for modest GPUs.</p></div>
+<div class="card"><h3>A dock that behaves like macOS</h3><p>Floating and auto-hiding: it shows when the pointer touches the bottom edge. An app asking for attention makes it show briefly, then it hides again.</p></div>
+<div class="card"><h3>Tahoe Control Center</h3><p>Connectivity card, Focus, Appearance, brightness and sound, Now Playing, then Night Shift, Glass, Auto appearance and Reduce motion toggles on glass tiles.</p></div>
+<div class="card"><h3>Real light/dark switching</h3><p>Plasma, Kvantum, GTK, libadwaita, icons, Konsole, Kate and Ghostty follow one toggle. Optional sunrise/sunset mode, caught up after sleep, and an eight-slot dynamic wallpaper.</p></div>
+<div class="card"><h3>Whole desktop</h3><p>Rounded corners on every window, menu-bar menu, lock screen, splash and Plymouth boot, Finder-like Dolphin with Quick Look, Firefox theme, Flatpak overrides, Do Not Disturb schedule.</p></div>
+<div class="card"><h3>Safe to try</h3><p>Restore point before install, <code>xmactahoe doctor</code>, checksum-verified updates, a package checker with CI, and an uninstaller that resets the panels and every setting it changed.</p></div>
 </div>
 <p><img src="light-dark.gif" alt="Light and dark variants"></p>
 <h2>Install (Fedora 44 / Plasma 6.7)</h2>
 <pre>tar -xzf XMacTahoe-vX.Y.Z.tar.gz &amp;&amp; cd XMacTahoe
 ./install.sh --layout        # everything, panels included
 ./install.sh --root          # optional: all users, login screen, Plymouth</pre>
-<p>Everyday: <code>xmactahoe light|dark|accent purple|glass off|auto on|dynamic on|doctor|update|restore</code></p>
+<p>Everyday: <code>xmactahoe light|dark|accent purple|glass liquid|dock autohide|auto on|dynamic on|dnd on 18:00|logo tahoe|doctor|update|restore</code></p>
 <p><img src="preview-light.png" alt="XMacTahoe light desktop"></p>
-<footer>Built on Apple Tahoe / Mkos Big Sur (zayronxio), MacTahoe / WhiteSur (vinceliuice), KDE Rounded Corners (matinlotfali), AppGrid (Scujas). GPL-3.0.</footer>
+<footer>Built on Apple Tahoe / Mkos Big Sur (zayronxio), MacTahoe / MacSequoia / WhiteSur (vinceliuice), KDE Rounded Corners (matinlotfali), Glass (4v3ngR), AppGrid (Scujas). Scripts GPL-3.0; bundled components keep their own licenses (<a href="https://github.com/chapdel/XMacTahoe/blob/main/THIRD_PARTY.md">THIRD_PARTY.md</a>). Apple, macOS and Tahoe are trademarks of Apple Inc.; this project is not affiliated with Apple.</footer>
 </main></body></html>

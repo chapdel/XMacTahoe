@@ -9,12 +9,12 @@
 D="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 PKG=$(cat "$HOME/.config/xmactahoe/package-dir" 2>/dev/null); [ -d "${PKG:-/nonexistent}/extra" ] && D="$PKG"
 LS="$HOME/.local/share/plasma/desktoptheme"; ST="$HOME/.config/xmactahoe"; mkdir -p "$ST"
-GLASS_SO=/usr/lib64/qt6/plugins/kwin/effects/plugins/glass.so
+GLASS_SO=$(ls /usr/lib64/qt6/plugins/kwin/effects/plugins/glass.so /usr/lib/qt6/plugins/kwin/effects/plugins/glass.so /usr/lib/*/qt6/plugins/kwin/effects/plugins/glass.so 2>/dev/null | head -1)
 CUR=$(cat "$ST/glass" 2>/dev/null || echo frosted); LAST=$(cat "$ST/glass-last" 2>/dev/null || echo frosted)
 MODE="${1:-status}"
 [ "$MODE" = status ] && { echo "$CUR"; exit 0; }
 [ "$MODE" = toggle ] && { [ "$CUR" = off ] && MODE="$LAST" || MODE=off; }
-if [ "$MODE" = liquid ] && [ ! -f "$GLASS_SO" ]; then
+if [ "$MODE" = liquid ] && [ -z "$GLASS_SO" ]; then
   echo "⚠ Liquid glass needs the kwin-effects-glass package:"; echo "   sudo dnf copr enable ama1470/kwin-effects-glass && sudo dnf install kwin-effects-glass"; echo "→ Using frosted glass instead."; MODE=frosted
 fi
 dbus_fx(){ gdbus call --session --dest org.kde.KWin --object-path /Effects --method "org.kde.kwin.Effects.$1" "$2" >/dev/null 2>&1; }
@@ -24,7 +24,9 @@ case "$MODE" in
   frosted|liquid)
     if [ "$CUR" = off ]; then   # restore the translucent theme files and panels
       cp -a "$D/Kvantum/XMacTahoe/." "$HOME/.config/Kvantum/XMacTahoe/"
-      for t in XMacTahoe-Dark XMacTahoe-Light; do rm -rf "$LS/$t"; cp -a "$D/plasma/desktoptheme/$t" "$LS/"; done
+      for t in XMacTahoe-Dark XMacTahoe-Light; do rm -rf "${LS:?}/$t"; cp -a "$D/plasma/desktoptheme/$t" "$LS/"; done
+      A=$(cat "$ST/accent" 2>/dev/null); X="$(dirname "$(readlink -f "$0")")/xmactahoe-accent"
+      if [ -n "$A" ] && [ "$A" != blue ] && [ -x "$X" ]; then "$X" "$A" >/dev/null; fi   # the package copy of Kvantum is blue
       RESTART=1
     fi
     panels translucent

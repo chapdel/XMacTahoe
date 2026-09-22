@@ -13,22 +13,25 @@ tar -xzf XMacTahoe-vX.Y.Z.tar.gz && cd XMacTahoe
 ./install.sh              # install everything and apply the dark variant
 ./install.sh --layout     # same, plus recreate the top bar and the dock (use on a fresh machine)
 ./install.sh --light      # apply the light variant
-./install.sh --no-apply   # copy the files without changing the active theme
+./install.sh --no-apply   # copy the files only: no setting, theme or package is changed
 ./install.sh --no-round-corners   # skip the KWin rounded-corners effect
 ./install.sh --accent purple      # accent color: blue purple pink red orange yellow green graphite
 ./install.sh --wallpaper XMacTahoe-Liuice   # alternative day/night wallpaper by vinceliuice
 ./install.sh --root               # also run the root steps (system-wide copy + login screen, Plymouth)
 ./install.sh --auto-appearance    # light after sunrise, dark after sunset (like macOS "Auto")
 ./install.sh --glass liquid       # liquid glass (refraction + edge lighting); frosted (default) or off
-./install.sh --update             # fetch the latest release and re-run the installer
-./uninstall.sh                    # back to Breeze Dark, remove everything (--keep-files keeps the files)
+./install.sh --update             # fetch the latest release, check it against SHA256SUMS, re-run the installer
+./uninstall.sh                    # back to Breeze Dark with fresh panels, remove everything (--keep-files keeps the files)
+./uninstall.sh --restore          # put back the Plasma configuration saved before the first install
 ```
 
-System dependency (Fedora): `kvantum` (dnf). `plasma-applet-appgrid` ships as an RPM in `extra/rpm/` (COPR `scujas/plasma-applet-appgrid` repo file included) and is installed by the script when missing.
+System dependencies (Fedora): `kvantum` (dnf) and `plasma-applet-appgrid`, which the installer takes from COPR `scujas/plasma-applet-appgrid` when missing (asks for sudo). On other distributions the theme files, settings and scripts install the same way; the package steps (AppGrid, rounded corners, liquid glass) are skipped with a message, so install those from your distribution.
+
+The installer keeps a copy of what the helpers need (scripts, Kvantum and Plasma themes, dynamic wallpaper) in `~/.local/share/xmactahoe/package`, so the extracted folder can be deleted after installing.
 
 Two optional steps need root and are printed at the end of the install:
 
-- **Boot splash (Plymouth)**: `sudo extra/xmactahoe-boot-install` installs the `xmactahoe` theme (Apple-style logo, spinner, black background) and rebuilds the initramfs.
+- **Boot splash (Plymouth)**: `sudo extra/xmactahoe-boot-install` installs the `xmactahoe` theme (the menu-bar logo, spinner, black background) and rebuilds the initramfs. Run the copy in `~/.local/share/xmactahoe/package/extra` to get the logo chosen with `xmactahoe logo`.
 - **Login screen and all users**: `sudo extra/xmactahoe-system-install` copies the themes into `/usr/share`, makes XMacTahoe.Dark the system default (`/etc/xdg`) and points the Plasma Login Manager wallpaper to XMacTahoe. `./install.sh --root` runs both root steps.
 
 ## What you get
@@ -44,11 +47,13 @@ Two optional steps need root and are printed at the end of the install:
 | Window decorations | Aurorae: XMacTahoe-Night, XMacTahoe (based on MacSequoia by vinceliuice: traffic lights, symbols on hover, clean shadow) |
 | Wallpapers | XMacTahoe (dynamic day/night, zayronxio), XMacTahoe-Liuice (day/night, vinceliuice) |
 | GTK | MacTahoe-Dark, MacTahoe-Light, libadwaita included; GTK 3/4 settings |
-| Widgets | kppleMenu (Apple menu), Window Title Fork, Flex Hub (control center), Command Output, Simple Separator, AppGrid (RPM) |
-| Fonts | Inter Variable, JetBrains Mono |
+| Widgets | kppleMenu (menu-bar menu), Window Title Fork, Flex Hub (control center), Command Output, Simple Separator, AppGrid (COPR) |
+| Fonts | Inter Variable, JetBrains Mono (SIL OFL 1.1, license texts in `fonts/`) |
 | Apps | Dolphin (Finder-like defaults), Konsole (macOS profile + `XMacTahoe` Terminal.app-like palette) |
 
-Based on Apple Tahoe / AppleDark-ALL / Mkos Big Sur (zayronxio) and MacTahoe / MacSequoia / WhiteSur (vinceliuice). GPL-3.0.
+Based on Apple Tahoe / AppleDark-ALL / Mkos Big Sur (zayronxio) and MacTahoe / MacSequoia / WhiteSur (vinceliuice). The scripts and global themes are GPL-3.0; bundled components keep their own licenses (GPL, LGPL, MIT, CC BY-SA 4.0, SIL OFL), listed in [THIRD_PARTY.md](THIRD_PARTY.md).
+
+Apple, macOS and Tahoe are trademarks of Apple Inc.; XMacTahoe is not affiliated with Apple.
 
 ## Desktop layout
 
@@ -98,13 +103,13 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 ## Everyday command
 
-`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `firefox`, `flatpak`, `rules` (removes old forced title-bar rules), `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
+`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `dock autohide|dodge|always`, `logo tahoe|apple`, `dnd on|off|schedule`, `firefox`, `flatpak`, `ghostty`, `chrome`, `rules` (removes old forced title-bar rules), `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
 
-`xmactahoe doctor` checks the whole installation (theme layers, Kvantum/GTK alignment, files, units, rounded corners, shortcuts) and `--fix` repairs what it can. The installer saves a restore point of your Plasma configuration before its first run; `xmactahoe restore` (or `./uninstall.sh --restore`) puts it back exactly.
+`xmactahoe doctor` checks the whole installation (theme layers, Kvantum/GTK alignment, files, units, rounded corners, shortcuts) and `--fix` repairs what it can. The installer saves a restore point of your Plasma configuration (panels, themes, Kvantum, GTK, Kate) before its first run; `xmactahoe restore` (or `./uninstall.sh --restore`) puts it back as it was. If that restore point was taken while XMacTahoe was already active, it falls back to Breeze Dark.
 
 ## Applications that draw their own frames
 
-- **Firefox**: vinceliuice's MacTahoe userChrome theme is applied to every profile (`xmactahoe firefox`; a default profile is created if Firefox was never started).
+- **Firefox**: vinceliuice's MacTahoe userChrome theme is applied to every profile (`xmactahoe firefox`; a default profile is created if Firefox was never started). A `chrome/` folder of your own is kept aside and restored by the uninstaller.
 - **Flatpak**: user overrides expose the GTK theme, icons, cursors and libadwaita config to sandboxed apps (`xmactahoe flatpak`, updated on each light/dark switch). No Kvantum runtime exists yet for the KDE 6.10/6.11 platforms, so Qt Flatpaks keep their own style.
 - **Title bars**: every app chooses its own decoration. Apps that draw their own title bar (Chrome, VS Code, Spotify...) keep it; the others get the theme's traffic lights. Versions 1.6.0-1.8.1 forced the theme's title bar on Electron apps, which doubled the bar on Chrome; `xmactahoe rules` (run by the installer and `xmactahoe doctor --fix`) removes those rules. For MacTahoe traffic lights in Chrome's tab strip, set Chrome's theme to **GTK** in `chrome://settings/appearance`; Chrome then also follows the light/dark variant. On a profile that is not signed in, `xmactahoe chrome` can set it for you (quit Chrome with Ctrl+Shift+Q first); a signed-in profile restores the theme from sync at startup, so there the setting must be made in Chrome.
 
@@ -114,7 +119,7 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 ## Automatic appearance
 
-`./install.sh --auto-appearance` enables a user timer that switches to XMacTahoe.Light after sunrise and back to XMacTahoe.Dark after sunset, like the macOS "Auto" setting. The location comes from `~/.config/xmactahoe/location` (`latitude longitude`) or, failing that, from KWin Night Light's auto-detected coordinates. Only the ten minutes after each event trigger a switch, so a manual toggle in Flex Hub is respected until the next sunrise or sunset. `extra/xmactahoe-auto-appearance --now` applies the expected variant immediately.
+`./install.sh --auto-appearance` enables a user timer that switches to XMacTahoe.Light after sunrise and back to XMacTahoe.Dark after sunset, like the macOS "Auto" setting. The location comes from `~/.config/xmactahoe/location` (`latitude longitude`) or, failing that, from KWin Night Light's auto-detected coordinates. It switches once per sunrise and sunset: a manual toggle in Flex Hub is respected until the next event, and an event missed while the machine was asleep or off is applied on the next check after waking up. `extra/xmactahoe-auto-appearance --now` applies the expected variant immediately.
 
 ## Frosted or liquid glass
 
@@ -142,24 +147,32 @@ Right-click a file in Dolphin → **Quick Look** opens it in a lightweight viewe
 
 Konsole ships a `macOS` profile with the `XMacTahoe` (dark) and `XMacTahoe-Light` Terminal.app-like palettes; the light/dark sync switches the profile palette for new windows. Kate and KWrite get the Xcode-like **XMacTahoe Dark** and **XMacTahoe Light** color themes, also switched by the sync for new windows.
 
+## Logo
+
+The menu bar, the splash screen and the boot screen use a neutral glyph (a peak over a lake). `xmactahoe logo apple` swaps in the Apple logo, downloaded from vinceliuice's MacTahoe icon theme on your machine for personal use (it is not shipped in this repository); `xmactahoe logo tahoe` goes back. Updates keep your choice.
+
 ## Splash screen
 
-`XMacTahoe.Splash` continues the Plymouth boot screen: black background, white logo and a thin progress bar.
+`XMacTahoe.Splash` continues the Plymouth boot screen: black background, the white menu-bar logo and a thin progress bar.
 
 ## Accent color
 
-`extra/xmactahoe-accent <name>` (or `./install.sh --accent <name>`) applies one of the macOS accents — blue, purple, pink, red, orange, yellow, green, graphite — to the Plasma accent color, both XMacTahoe color schemes (selection, focus, hover) and Kvantum (highlight and accent paths). Files are regenerated from `extra/pristine`, so the accent can be changed at will. GTK and folder icons keep the MacTahoe blue.
+`extra/xmactahoe-accent <name>` (or `./install.sh --accent <name>`) applies one of the macOS accents — blue, purple, pink, red, orange, yellow, green, graphite — to the Plasma accent color, both XMacTahoe color schemes (selection, focus, hover) and Kvantum (highlight and accent paths). Files are regenerated from `extra/pristine`, so the accent can be changed at will. The choice is remembered: switching glass modes keeps it, and with glass off the regenerated Kvantum theme stays opaque. GTK and folder icons keep the MacTahoe blue.
+
+## Uninstall
+
+`./uninstall.sh` (or `xmactahoe uninstall`) applies Breeze Dark with a fresh Breeze panel layout, so no panel is left pointing at removed widgets. It turns the stock blur back on and removes everything XMacTahoe set: KWin effects and scripts, user timers (auto appearance, dynamic wallpaper, Do Not Disturb, variant sync), the Ghostty block, the Firefox theme (your own `chrome/` folder is put back), Flatpak overrides, the Kate/KWrite and Konsole color choices, the Quick Look entry, then the files. `--restore` puts back your pre-install configuration instead of Breeze. System packages (rounded corners, Glass, AppGrid), the fonts and root-installed parts are left in place and listed at the end with the commands to remove them. Chrome's GTK theme is a Chrome setting: switch it back to Classic in `chrome://settings/appearance`.
 
 ## Checks and CI
 
-`tools/check-package.py` validates the package: shell and Python syntax, every `defaults` entry pointing to a bundled component, Aurorae rc names, Kvantum pairs, all Plasma theme SVGs parsing with the color stylesheet inside `<defs>`, layouts parsing as JavaScript and only referencing bundled widgets, and a dry run of the glyph generator. It runs on every push through GitHub Actions (`.github/workflows/check.yml`). `tools/fix-svg-stylesheets.py` repairs third-party Plasma themes whose color stylesheet is misplaced (the root cause of the "light bar" bug). `tools/export-layout.py` re-exports the live panel layout into the package, normalized to a single screen so it applies to any monitor count.
+`tools/check-package.py` validates the package: shell and Python syntax of every script, no personal path, no bundled binary package, license files present, every `defaults` entry pointing to a bundled component, Aurorae rc names, Kvantum pairs, all Plasma theme SVGs parsing with the color stylesheet inside `<defs>`, layouts parsing as JavaScript and only referencing bundled widgets, and a dry run of the glyph generator. It runs on every push through GitHub Actions (`.github/workflows/check.yml`), together with shellcheck on every bash script (a warning fails the build). `tools/fix-svg-stylesheets.py` repairs third-party Plasma themes whose color stylesheet is misplaced (the root cause of the "light bar" bug). `tools/export-layout.py` re-exports the live panel layout into the package, normalized to a single screen so it applies to any monitor count.
 
 ## Maintenance
 
 - Edit inside this folder, then re-run `./install.sh`.
 - After changing a Plasma theme SVG: `rm ~/.cache/plasma_theme_XMacTahoe-*.kcache ~/.cache/ksvg-elements && systemctl --user restart plasma-plasmashell`.
 - After changing rounded-corners settings: `extra/xmactahoe-round-corners` (a plain KWin reconfigure does not reload that effect's config).
-- Release: `git tag vX.Y.Z && tar --exclude='XMacTahoe/.git' -czf ../XMacTahoe-vX.Y.Z.tar.gz XMacTahoe && gh release create vX.Y.Z ../XMacTahoe-vX.Y.Z.tar.gz`.
+- Release: `tools/release.sh X.Y.Z "notes" [--sign]`. It refuses a version whose tag already exists: a published archive is never rebuilt.
 
 ## Changelog
 

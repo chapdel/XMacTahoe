@@ -2,19 +2,22 @@
 """macOS-like "Auto" appearance: light after sunrise, dark after sunset.
 Location: ~/.config/xmactahoe/location (two numbers: latitude longitude), otherwise KWin Night Light's
 auto-detected coordinates (kwinrc [NightColor] LatitudeAuto/LongitudeAuto), otherwise nothing happens.
-Run by xmactahoe-appearance.timer every 10 minutes; only switches inside the 10 minutes following an
-event, so a manual toggle in Flex Hub is respected until the next sunrise/sunset.
+Run by xmactahoe-appearance.timer every 10 minutes. It switches once per sunrise/sunset: the last event
+applied is kept in ~/.config/xmactahoe/appearance-event, so a manual toggle in Flex Hub is respected until
+the next event, and an event missed while the machine was asleep or off is caught up on the next run.
 Usage: xmactahoe-auto-appearance [--now]   (--now applies the expected variant immediately)
 """
-import math, os, sys, subprocess, datetime, configparser
+import math, os, sys, subprocess, datetime
 def location():
     p = os.path.expanduser('~/.config/xmactahoe/location')
     if os.path.exists(p):
         a, b = open(p).read().split()[:2]; return float(a), float(b)
-    cp = configparser.ConfigParser(strict=False, interpolation=None); cp.read(os.path.expanduser('~/.config/kwinrc'))
-    if cp.has_section('NightColor') and cp.has_option('NightColor', 'LatitudeAuto'):
-        return float(cp.get('NightColor', 'LatitudeAuto')), float(cp.get('NightColor', 'LongitudeAuto'))
-    return None
+    # kreadconfig6, not configparser: KDE files hold keys like "InputMethod[$d]" that configparser rejects
+    def k(key):
+        r = subprocess.run(['kreadconfig6', '--file', 'kwinrc', '--group', 'NightColor', '--key', key], capture_output=True, text=True)
+        return r.stdout.strip()
+    try: return float(k('LatitudeAuto')), float(k('LongitudeAuto'))
+    except (ValueError, OSError): return None
 def sun_events(lat, lon, day):
     """NOAA approximation: returns (sunrise, sunset) as aware local datetimes."""
     n = day.timetuple().tm_yday
@@ -39,10 +42,21 @@ def apply(v):
     if current() != v:
         subprocess.run(['plasma-apply-lookandfeel', '-a', v], capture_output=True); print('switched to', v)
 loc = location()
-if not loc: sys.exit(0)
-now = datetime.datetime.now().astimezone(); rise, set_ = sun_events(*loc, now.date())
-if not rise or not set_: sys.exit(0)
-expected = 'XMacTahoe.Light' if rise <= now < set_ else 'XMacTahoe.Dark'
-if '--now' in sys.argv: apply(expected); sys.exit(0)
-window = datetime.timedelta(minutes=10)
-if rise <= now < rise + window or set_ <= now < set_ + window: apply(expected)
+if not loc:
+    print('no location: write "LATITUDE LONGITUDE" to ~/.config/xmactahoe/location (or enable automatic Night Light location)', file=sys.stderr)
+    sys.exit(0)
+now = datetime.datetime.now().astimezone()
+# most recent sunrise/sunset not after now (today, else yesterday; polar day/night: no event, nothing to do)
+events = []
+for day in (now.date() - datetime.timedelta(days=1), now.date()):
+    rise, set_ = sun_events(*loc, day)
+    events += [(t, v) for t, v in ((rise, 'XMacTahoe.Light'), (set_, 'XMacTahoe.Dark')) if t and t <= now]
+if not events: sys.exit(0)
+when, expected = max(events)
+state = os.path.expanduser('~/.config/xmactahoe/appearance-event'); event_id = when.strftime('%Y-%m-%dT%H:%M')
+try: last = open(state).read().strip()
+except OSError: last = None   # first run (e.g. after an upgrade): remember the event, keep the current variant
+if '--now' in sys.argv or (last is not None and last != event_id): apply(expected)
+if last != event_id:
+    os.makedirs(os.path.dirname(state), exist_ok=True)
+    with open(state, 'w') as f: f.write(event_id + '\n')
