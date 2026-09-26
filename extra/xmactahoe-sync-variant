@@ -4,10 +4,15 @@
 # xmactahoe-variant.path whenever ~/.config/kdedefaults/package changes.
 PKG=$(cat "$HOME/.config/kdedefaults/package" 2>/dev/null)
 case "$PKG" in
-  XMacTahoe.Light) KV=XMacTahoe;     GTKDARK=false; GS=prefer-light; GTKTHEME=MacTahoe-Light; ICONS=XMacTahoe-Day ;;
-  XMacTahoe.Dark)  KV=XMacTahoeDark; GTKDARK=true;  GS=prefer-dark;  GTKTHEME=MacTahoe-Dark;  ICONS=XMacTahoe-Night ;;
+  XMacTahoe.Light) KV=XMacTahoe;     GTKDARK=false; GS=prefer-light; GTKTHEME=MacTahoe-Light; ICONS=XMacTahoe-Day; CARD="#000000"; CARDOP=8 ;;
+  XMacTahoe.Dark)  KV=XMacTahoeDark; GTKDARK=true;  GS=prefer-dark;  GTKTHEME=MacTahoe-Dark;  ICONS=XMacTahoe-Night; CARD="#ffffff"; CARDOP=14 ;;
   *) exit 0 ;;
 esac
+# Control Center cards: white on dark, a light shade of black on light (a fixed white washes out the light variant)
+gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript \
+  "for (var i=0;i<panelIds.length;i++){ var ws=panelById(panelIds[i]).widgets(); for (var j=0;j<ws.length;j++){ var w=ws[j];
+     if (w.type!='Plasma.Flex.Hub') continue; w.currentConfigGroup=['General'];
+     if (w.readConfig('customCardColor')+'' != '$CARD') { w.writeConfig('customCardColor','$CARD'); w.writeConfig('opacityCardCustom','$CARDOP'); w.reloadConfig(); } }}" >/dev/null 2>&1
 CUR=$(sed -n 's/^theme=//p' "$HOME/.config/Kvantum/kvantum.kvconfig" 2>/dev/null)
 if [ "$CUR" != "$KV" ]; then
   printf '[General]\ntheme=%s\n' "$KV" > "$HOME/.config/Kvantum/kvantum.kvconfig"

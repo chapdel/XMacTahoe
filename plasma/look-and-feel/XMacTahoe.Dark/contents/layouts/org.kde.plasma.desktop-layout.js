@@ -84,6 +84,7 @@ var layout = {
                 {
                     "config": {
                         "/General": {
+                            "extraItems": "org.kde.plasma.clipboard,org.kde.plasma.notifications,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.networkmanagement,org.kde.plasma.bluetooth,org.kde.plasma.volume,org.kde.plasma.mediacontroller,org.kde.plasma.devicenotifier,org.kde.plasma.printmanager,org.kde.plasma.keyboardlayout,org.kde.plasma.keyboardindicator,org.kde.plasma.cameraindicator,org.kde.plasma.manage-inputmethod",
                             "iconSpacing": "3",
                             "scaleIconsToFit": "false"
                         }

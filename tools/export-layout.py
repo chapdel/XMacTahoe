@@ -30,7 +30,8 @@ for p in layout['panels']:
     p['hiding'] = 'autohide' if p.get('location') == 'bottom' else 'normal'
     for a in p['applets']:
         if a['plugin'] == 'org.kde.plasma.systemtray':
-            a['config'] = {'/General': {'iconSpacing': '3', 'scaleIconsToFit': 'false'}}
+            # a macOS-like tray: no vaults, weather, KDE Connect or display widget cluttering the popup
+            a['config'] = {'/General': {'extraItems': 'org.kde.plasma.clipboard,org.kde.plasma.notifications,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.networkmanagement,org.kde.plasma.bluetooth,org.kde.plasma.volume,org.kde.plasma.mediacontroller,org.kde.plasma.devicenotifier,org.kde.plasma.printmanager,org.kde.plasma.keyboardlayout,org.kde.plasma.keyboardindicator,org.kde.plasma.cameraindicator,org.kde.plasma.manage-inputmethod', 'iconSpacing': '3', 'scaleIconsToFit': 'false'}}
         for grp in list(a.get('config', {}).values()):
             for k in ('knownApps','launchCounts','favoritesPortedToKAstats','headerActionsMigrated','iconMigratedFrom17','powerButtonsMigrated'):
                 grp.pop(k, None)

@@ -9,9 +9,12 @@ This runs by itself: the user unit `xmactahoe-panels.path` watches KWin's output
 a screen plugged in gets its panels a few seconds later. Unplugging needs nothing: Plasma keeps the
 panels in its configuration and brings them back when the screen returns.
 
-Usage: xmactahoe-panels [status|clone] [--dry-run] [--quiet]
+Usage: xmactahoe-panels [status|clone|swap OLD NEW] [--location bottom] [--dry-run] [--quiet]
   status  list the panels of each screen
   clone   give every screen without panels its own copy
+  swap    rebuild the panels, replacing widget OLD with widget NEW and keeping every setting
+  magnify dock icon magnification under the pointer: on, off, a percentage (110-200), or status.
+          `on` swaps Plasma's task widget for the theme's dock widget, `off` puts it back.
 
 The AppGrid widget is not copied: the Meta shortcut needs a single live widget.
 `install.sh --layout` already creates the panels on every screen connected at the time.
@@ -95,8 +98,8 @@ def applets_of(containment):
     return out
 
 
-def clone_js(source, screen, width):
-    """JavaScript that recreates `source` (a live panel dict) on `screen`."""
+def clone_js(source, screen, width, swap=None):
+    """JavaScript that recreates `source` (a live panel dict) on `screen`, optionally swapping plugins."""
     js = ['var p = new Panel("org.kde.panel");']
     for prop in PANEL_PROPS:
         v = source.get(prop)
@@ -105,6 +108,7 @@ def clone_js(source, screen, width):
         js.append(f'p.{prop} = ' + (v if v in ('true', 'false') or re.fullmatch(r'-?\d+', v) else json.dumps(v)) + ';')
     js.append(f'p.screen = {screen};')
     for plugin, groups, root in applets_of(source['id']):
+        plugin = (swap or {}).get(plugin, plugin)
         js.append(f'var w = p.addWidget({json.dumps(plugin)});')
         for key, val in root.items():
             js.append(f'w.currentConfigGroup = []; w.writeConfig({json.dumps(key)}, {json.dumps(val)});')
@@ -116,15 +120,79 @@ def clone_js(source, screen, width):
     return '\n'.join(js)
 
 
+DOCK_WIDGET = 'org.xmactahoe.dock'
+STOCK_WIDGET = 'org.kde.plasma.icontasks'
+DOCK_THICKNESS = {True: 84, False: 66}   # magnified icons need room above the row
+
+
+def dock_widgets_js(body):
+    return ('var out=[]; for (var i=0;i<panelIds.length;i++){ var p=panelById(panelIds[i]);'
+            ' if (p.location!="bottom") continue; var ws=p.widgets();'
+            ' for (var j=0;j<ws.length;j++){ var w=ws[j]; if (w.type!="%s") continue;'
+            ' w.currentConfigGroup=["General"]; %s } } print(out.join(","));' % (DOCK_WIDGET, body))
+
+
+def magnify(arg, args):
+    if arg == 'status':
+        out = pscript(dock_widgets_js('var m=w.readConfig("magnification")+""; var f=w.readConfig("magnificationFactor")+"";'
+                                      ' out.push(m=="false" ? "off" : ((f||"135")+" %"));'))
+        states = [x for x in re.findall(r'off|\d+ %', out)]
+        print(states[0] if states else 'off (Plasma\'s own task widget is in the dock)')
+        return
+    if arg in ('on', 'off'):
+        old, new = (STOCK_WIDGET, DOCK_WIDGET) if arg == 'on' else (DOCK_WIDGET, STOCK_WIDGET)
+        sys.argv = ['x', 'swap', old, new, '--location', 'bottom'] + (['--quiet'] if QUIET else [])
+        widths, panels = live()
+        for src in [p for p in panels if p['location'] == 'bottom']:
+            if not any(plug == old for plug, _, _ in applets_of(src['id'])): continue
+            out = pscript(clone_js(src, src['screen'], widths.get(src['screen']), {old: new}))
+            m = re.search(r'PANEL (\d+)', out)
+            if not m: print(f'⚠ panel {src["id"]}: {out.strip()[:160]}', file=sys.stderr); continue
+            pscript(f'panelById({src["id"]}).remove(); panelById({m.group(1)}).height = {DOCK_THICKNESS[arg == "on"]}; print("ok");')
+            say(f'✓ screen {src["screen"]}: dock rebuilt with {new}')
+        if arg == 'on': pscript(dock_widgets_js('w.writeConfig("magnification","true"); w.reloadConfig();'))
+        say(f'dock magnification: {arg}')
+        return
+    if re.fullmatch(r'\d+', arg):
+        factor = max(100, min(200, int(arg)))
+        pscript(dock_widgets_js(f'w.writeConfig("magnification","true"); w.writeConfig("magnificationFactor","{factor}"); w.reloadConfig();'))
+        say(f'dock magnification: {factor} %')
+        return
+    print(__doc__); sys.exit(1)
+
+
 def main():
     global QUIET
     args = sys.argv[1:]
     QUIET = '--quiet' in args
     mode = next((a for a in args if not a.startswith('-')), 'status')
-    if mode not in ('status', 'clone'): print(__doc__); sys.exit(1)
+    if mode not in ('status', 'clone', 'swap', 'magnify'): print(__doc__); sys.exit(1)
     widths, panels = live()
     if panels is None:
         say('plasmashell does not answer on D-Bus'); sys.exit(0 if QUIET else 1)
+    if mode == 'magnify':
+        rest = [a for a in args if not a.startswith('-')][1:]
+        magnify(rest[0] if rest else 'status', args); return
+    if mode == 'swap':
+        skip = args.index('--location') + 1 if '--location' in args else -1
+        rest = [a for i, a in enumerate(args) if not a.startswith('-') and i != skip][1:]
+        if len(rest) != 2: print(__doc__); sys.exit(1)
+        old, new = rest
+        where = args[args.index('--location') + 1] if '--location' in args else None
+        targets = [p for p in panels if (not where or p['location'] == where)]
+        for src in targets:
+            if not any(plug == old for plug, _, _ in applets_of(src['id'])):
+                continue
+            js = clone_js(src, src['screen'], widths.get(src['screen']), {old: new})
+            if '--dry-run' in args:
+                print(f'--- panel {src["id"]} (screen {src["screen"]}, {src["location"]}) rebuilt with {new}'); continue
+            out = pscript(js)
+            m = re.search(r'PANEL (\d+)', out)
+            if not m:
+                print(f'⚠ panel {src["id"]}: rebuild failed: {out.strip()[:200]}', file=sys.stderr); continue
+            pscript(f'panelById({src["id"]}).remove(); print("REMOVED");')
+            say(f'✓ screen {src["screen"]}: {src["location"]} panel rebuilt as {m.group(1)} with {new}')
+        return
     by_screen = {}
     for p in panels: by_screen.setdefault(p['screen'], []).append(p)
     if mode == 'status':

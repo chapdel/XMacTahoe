@@ -1,3 +1,12 @@
+## 2.1.1 — 2026-09-26
+
+Control Center readable in both variants, a tidier system tray, and panel rebuilding.
+
+- **Control Center**: the card colour is fixed to white no longer. It follows the variant (white on dark, a light shade of black on light), applied on every light/dark switch, so the light variant stays readable. The coloured tiles take the Plasma accent, which `xmactahoe accent NAME` sets.
+- **System tray**: the packaged layout ships a macOS-like set of items and disables Vaults, Weather, KDE Connect and the display-configuration widget, which kept the "Status and Notifications" popup long. Tray icons in the bar are unaffected.
+- **`xmactahoe panels swap OLD NEW`** rebuilds the panels with one widget replaced, keeping every setting, live and without restarting plasmashell.
+- `xmactahoe dock status` no longer repeats itself once there is a dock per screen.
+
 ## 2.1.0 — 2026-09-26
 
 Menu bar and dock on every screen, and a screen plugged in later gets them by itself.

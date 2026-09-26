@@ -82,7 +82,13 @@ Both shortcuts are wired by `extra/kde-desktop-repair`, copied to `~/.local/bin`
 
 Plasma only rounds the top of windows. The package installs and configures the KWin effect **KDE Rounded Corners** (matinlotfali, COPR `matinlotfali/KDE-Rounded-Corners`, package `kwin-effect-roundcorners`): 18 px radius on every window including maximized ones, a subtle white outline, no rounding in full screen. Settings live in `extra/kwinrc-round-corners.conf`, applied by `extra/xmactahoe-round-corners` (can be re-run alone). GUI: System Settings → Desktop Effects → Rounded Corners.
 
+## System tray
+
+The packaged layout keeps a macOS-like set of tray items (network, sound, Bluetooth, battery, brightness, clipboard, notifications, media, removable devices, printers, keyboard): Vaults, Weather, KDE Connect and the display-configuration widget are disabled, so the "Status and Notifications" popup stays short. System Settings → Quick Settings, or the tray's own settings, bring any of them back. Entries that come from applications (Xwayland Video Bridge, portals) are not widgets: they leave the popup when their application stops.
+
 ## Light / dark switching
+
+The Control Center card colour follows the variant (white on dark, a light shade of black on light); a fixed white made the light variant unreadable.
 
 The light/dark toggle in the Flex Hub widget (or `plasma-apply-lookandfeel -a XMacTahoe.Light|Dark`) changes the global theme. Since Plasma does not drive Kvantum or GTK, `extra/xmactahoe-sync-variant` (triggered by the user systemd unit `xmactahoe-variant.path`) immediately aligns Kvantum, the GTK theme, libadwaita and the icon theme with the active variant. Qt applications that are already open pick up the new style when relaunched.
 
