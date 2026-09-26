@@ -33,7 +33,8 @@ for rc in katerc kwriterc; do k --file "$rc" --group "KTextEditor Renderer" --ke
 [ "$(kreadconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile 2>/dev/null)" = macOS.profile ] && k --file konsolerc --group "Desktop Entry" --key DefaultProfile --delete
 # KWin: stock blur back, theme effects and scripts off, theme settings removed
 k --file kwinrc --group Plugins --key glassEnabled false; k --file kwinrc --group Plugins --key blurEnabled true; k --file kwinrc --group Plugins --key contrastEnabled true
-k --file kwinrc --group Plugins --key kwin4_effect_shapecornersEnabled false; k --file kwinrc --group Plugins --key xmactahoe-attentionEnabled --delete
+k --file kwinrc --group Plugins --key kwin4_effect_shapecornersEnabled false; k --file kwinrc --group Plugins --key diminactiveEnabled false
+for s in "$LS"/kwin/scripts/xmactahoe-*; do [ -d "$s" ] && k --file kwinrc --group Plugins --key "$(basename "$s")Enabled" --delete; done
 k --file kwinrc --group Plugins --key magiclampEnabled --delete; k --file kwinrc --group ElectricBorders --key TopRight --delete
 fx unloadEffect glass; fx unloadEffect kwin4_effect_shapecorners; fx loadEffect blur
 python3 - "$CFG/kwinrc" <<'PY'
@@ -41,7 +42,7 @@ import re, sys
 p = sys.argv[1]
 try: s = open(p).read()
 except OSError: raise SystemExit
-s = re.sub(r'(?ms)^\[(Effect-blurplus|Round-Corners|Script-xmactahoe-attention)\]\n.*?(?=^\[|\Z)', '', s)
+s = re.sub(r'(?ms)^\[(Effect-blurplus|Effect-diminactive|Round-Corners|Script-xmactahoe-[a-z]+)\]\n.*?(?=^\[|\Z)', '', s)
 open(p, 'w').write(s)
 PY
 [ -x "$BIN/xmactahoe-window-rules" ] && "$BIN/xmactahoe-window-rules" >/dev/null 2>&1
@@ -79,7 +80,7 @@ if [ "$KEEP" = 0 ]; then
          "$LS"/aurorae/themes/XMacTahoe "$LS"/aurorae/themes/XMacTahoe-Night "$LS"/wallpapers/XMacTahoe "$LS"/wallpapers/XMacTahoe-Liuice "$LS"/wallpapers/XMacTahoe-Dynamic \
          "$CFG/Kvantum/XMacTahoe" "$HOME/.themes/MacTahoe-Dark" "$HOME/.themes/MacTahoe-Light" "$LS"/konsole/XMacTahoe*.colorscheme \
          "$LS"/org.kde.syntax-highlighting/themes/XMacTahoe-*.theme "$LS/konsole/macOS.profile" "$LS"/icons/hicolor/scalable/apps/xmactahoe-transparent.svg \
-         "$LS/kwin/scripts/xmactahoe-attention" "$LS/xmactahoe/package"
+         "$LS"/kwin/scripts/xmactahoe-* "$LS/xmactahoe/package"
   [ "$RESTORE" = 1 ] || for p in org.kpple.kppleMenu org.kde.windowtitle.Fork Plasma.Flex.Hub com.github.zren.commandoutput zayron.simple.separator; do rm -rf "${LS:?}/plasma/plasmoids/$p"; done
   rm -f "$HOME/.cache"/plasma_theme_XMacTahoe-*.kcache "$HOME/.cache/icon-cache.kcache"
   find "$CFG/xmactahoe" -mindepth 1 ! -name location -delete 2>/dev/null; rmdir "$CFG/xmactahoe" 2>/dev/null   # state files; your location stays

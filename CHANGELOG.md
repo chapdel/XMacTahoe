@@ -1,3 +1,15 @@
+## 2.2.0 — 2026-09-26
+
+macOS 27 (Golden Gate) traits, as a preset you can take or leave.
+
+- **`xmactahoe goldengate on|off|status`** adopts what macOS 27 changed about Tahoe: glass tinted rather than fully transparent, one corner radius for every window and a squarer 12 px, inactive windows dimmed slightly so the active one stands out, crisper glass edges, and traffic lights with Liquid Glass shading. `off` puts the Tahoe values back, down to the flat traffic lights.
+- **`xmactahoe glass level 0..100`**, the equivalent of the Liquid Glass slider: 100 is the theme's own translucency, 0 opaque panels, popups and Qt windows, anything between tints the glass. Panel and popup backgrounds are rewritten from the pristine copies in the package, Kvantum's window and menu opacity follow, and the level is remembered when the glass mode changes.
+- **Windows return to the screen they came from.** The `xmactahoe-screens` KWin script keeps, for each set of connected screens, where every window sits, and restores it when that set comes back — Golden Gate's consistent multi-display positioning. Session memory only, nothing written to disk. Settings: `kwinrc [Script-xmactahoe-screens] SaveSeconds`, `RestoreDelay`.
+- `tools/gloss-buttons.py` adds or removes the glass shading of the traffic lights in any Aurorae theme, by gradient only: the drawings are untouched, and an inactive window keeps flat grey buttons, as on macOS.
+- `xmactahoe doctor` checks the screen-memory script; `xmactahoe-round-corners RADIUS` takes a radius; the uninstaller cleans up every KWin script and effect the theme enabled.
+
+Upgrading: `xmactahoe update`, then `xmactahoe goldengate on` if you want the macOS 27 look.
+
 ## 2.1.1 — 2026-09-26
 
 Control Center readable in both variants, a tidier system tray, and panel rebuilding.

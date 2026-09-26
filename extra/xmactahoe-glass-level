@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+"""Transparency level of the glass, like the Liquid Glass slider of macOS Golden Gate.
+
+100 = the theme's own translucency (most transparent), 0 = opaque panels, popups and windows.
+Everything in between tints the glass: the backgrounds of the panels, the popups and the Qt windows
+move toward opaque together, so the desktop stays consistent.
+
+The panel and popup backgrounds are rewritten from the pristine copies in the package, so any level
+can be set any number of times. Kvantum's window and menu opacity follow the same level.
+
+Usage: xmactahoe-glass-level [LEVEL] [--quiet]   (no LEVEL prints the current one)
+"""
+import gzip, os, re, subprocess, sys
+
+HOME = os.path.expanduser('~')
+STATE = f'{HOME}/.config/xmactahoe/glass-level'
+THEMES = f'{HOME}/.local/share/plasma/desktoptheme'
+KV = f'{HOME}/.config/Kvantum/XMacTahoe'
+# the backgrounds that make the glass; highlights and shadows are left alone
+FILLS = r'(?:1a1a1a|1c1c1e|242424|ffffff|141417|1a191b|f5f5f5)'
+PRISTINE_KV = {'reduce_window_opacity': 35, 'reduce_menu_opacity': 30}
+
+
+def package():
+    try:
+        p = open(f'{HOME}/.config/xmactahoe/package-dir').read().strip()
+    except OSError:
+        p = ''
+    return p if os.path.isdir(f'{p}/plasma/desktoptheme') else os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
+
+def tint(value, level):
+    """Move an opacity toward 1 as the level drops (level 100 keeps the theme's own value)."""
+    return round(value + (1 - value) * (1 - level / 100), 4)
+
+
+def rewrite(path, level):
+    data = gzip.open(path, 'rb').read().decode()
+    out = re.sub(rf'opacity:(0\.[0-9]+)(;fill:#{FILLS})', lambda m: f'opacity:{tint(float(m.group(1)), level)}{m.group(2)}', data)
+    out = re.sub(rf'(fill:#{FILLS};opacity:)(0\.[0-9]+)', lambda m: f'{m.group(1)}{tint(float(m.group(2)), level)}', out)
+    if out != data:
+        with gzip.open(path, 'wb') as f:
+            f.write(out.encode())
+    return out != data
+
+
+def main():
+    args = sys.argv[1:]
+    quiet = '--quiet' in args
+    values = [a for a in args if not a.startswith('-')]
+    if not values:
+        print(open(STATE).read().strip() if os.path.exists(STATE) else '100')
+        return
+    try:
+        level = max(0, min(100, int(values[0])))
+    except ValueError:
+        print(__doc__); sys.exit(1)
+
+    pkg = package()
+    src = f'{pkg}/plasma/desktoptheme'
+    if not os.path.isdir(src):
+        print('the package copy is missing: re-run install.sh or xmactahoe update', file=sys.stderr); sys.exit(1)
+
+    changed = 0
+    for theme in ('XMacTahoe-Dark', 'XMacTahoe-Light'):
+        for rel in ('widgets/panel-background.svgz', 'dialogs/background.svgz'):
+            source, dest = f'{src}/{theme}/{rel}', f'{THEMES}/{theme}/{rel}'
+            if not (os.path.exists(source) and os.path.isdir(os.path.dirname(dest))):
+                continue
+            with open(source, 'rb') as a, open(dest, 'wb') as b:   # always start from the pristine file
+                b.write(a.read())
+            changed += rewrite(dest, level)
+
+    # Kvantum: same level for windows and menus (0 turns translucency off altogether)
+    for name in ('XMacTahoe', 'XMacTahoeDark'):
+        conf = f'{KV}/{name}.kvconfig'
+        if not os.path.exists(conf):
+            continue
+        text = open(conf).read()
+        on = 'true' if level > 0 else 'false'
+        for key in ('translucent_windows', 'blurring', 'popup_blurring'):
+            text = re.sub(rf'^{key}=.*$', f'{key}={on}', text, flags=re.M)
+        for key, pristine in PRISTINE_KV.items():
+            text = re.sub(rf'^{key}=.*$', f'{key}={round(pristine * level / 100)}', text, flags=re.M)
+        open(conf, 'w').write(text)
+
+    os.makedirs(os.path.dirname(STATE), exist_ok=True)
+    open(STATE, 'w').write(f'{level}\n')
+    for cache in ('ksvg-elements',):
+        c = f'{HOME}/.cache/{cache}'
+        if os.path.exists(c):
+            os.remove(c)
+    for c in os.listdir(f'{HOME}/.cache'):
+        if c.startswith('plasma_theme_XMacTahoe-'):
+            os.remove(f'{HOME}/.cache/{c}')
+    if not os.environ.get('XMT_NO_RESTART'):
+        subprocess.run(['systemctl', '--user', 'restart', 'plasma-plasmashell.service'], capture_output=True)
+    if not quiet:
+        print(f'glass level: {level} % ({changed} background files rewritten; relaunch Qt apps for the window opacity)')
+
+
+main()

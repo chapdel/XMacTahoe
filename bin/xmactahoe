@@ -3,6 +3,8 @@
 #   light | dark            switch the global theme variant
 #   accent NAME             blue purple pink red orange yellow green graphite
 #   glass frosted|liquid|off|toggle|status   frosted blur, liquid glass (kwin-effects-glass) or opaque
+#   glass level N           glass transparency, 0 (opaque) to 100 (full), like the macOS slider
+#   goldengate on|off|status  macOS 27 traits: tinted glass, squarer corners, dimmed inactive windows
 #   motion on|off|toggle    animations (off = instant, for modest machines / accessibility)
 #   auto on|off|now|toggle  automatic light/dark appearance (sunrise/sunset)
 #   dynamic on|off|now      eight-slot dynamic wallpaper following the sun
@@ -24,8 +26,9 @@ E="$PKG/extra"; cmd="${1:-help}"; shift || true
 case "$cmd" in
   light|dark) plasma-apply-lookandfeel -a "XMacTahoe.$( [ "$cmd" = light ] && echo Light || echo Dark )" ;;
   accent)   "$E/xmactahoe-accent" "${1:-blue}" ;;
-  glass)    a="${1:-status}"; [ "$a" = on ] && a=$(cat "$HOME/.config/xmactahoe/glass-last" 2>/dev/null || echo frosted); "$E/xmactahoe-glass" "$a" ;;
+  glass)    a="${1:-status}"; [ "$a" = on ] && a=$(cat "$HOME/.config/xmactahoe/glass-last" 2>/dev/null || echo frosted); "$E/xmactahoe-glass" "$a" "${2:-}" ;;
   motion)   "$E/xmactahoe-motion" "${1:-toggle}" ;;
+  goldengate) "$E/xmactahoe-goldengate" "${1:-status}" ;;
   auto)     a="${1:-toggle}"; case "$a" in
               on)  cp "$E"/systemd/xmactahoe-appearance.* "$HOME/.config/systemd/user/"; systemctl --user daemon-reload; systemctl --user enable --now xmactahoe-appearance.timer; "$E/xmactahoe-auto-appearance" --now; echo "auto appearance on" ;;
               off) systemctl --user disable --now xmactahoe-appearance.timer 2>/dev/null; echo "auto appearance off" ;;
@@ -50,5 +53,5 @@ case "$cmd" in
   restore)  "$PKG/uninstall.sh" --restore ;;
   uninstall) "$PKG/uninstall.sh" "$@" ;;
   version)  cat "$PKG/VERSION" ;;
-  *) sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//' ;;
 esac

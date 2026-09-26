@@ -1,0 +1,14 @@
+{
+    "KPlugin": {
+        "Id": "xmactahoe-screens",
+        "Name": "XMacTahoe screen memory",
+        "Description": "Remembers where windows sit for each set of connected screens, and puts them back when a screen returns",
+        "Authors": [ { "Name": "Chapdel" } ],
+        "License": "GPL-3.0",
+        "Version": "1.0",
+        "EnabledByDefault": false
+    },
+    "KPackageStructure": "KWin/Script",
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}

@@ -78,6 +78,14 @@ The AppGrid widget lives **invisibly** (transparent icon) at the right end of th
 
 Both shortcuts are wired by `extra/kde-desktop-repair`, copied to `~/.local/bin`. If they ever stop responding (widget recreated, theme re-applied), run `kde-desktop-repair` (`--check` only diagnoses).
 
+## macOS Golden Gate traits
+
+macOS 27 (Golden Gate) walks back some of Tahoe's excesses, and those changes are available here as a preset: `xmactahoe goldengate on` tints the glass (level 55 instead of full translucency), takes the corner radius from 18 px down to 12, dims inactive windows slightly so the active one stands out, sharpens the glass edges, and gives the traffic lights Liquid Glass shading. `xmactahoe goldengate off` restores the Tahoe values, and `status` prints them.
+
+The glass level is available on its own: `xmactahoe glass level 0..100`, the equivalent of the Liquid Glass slider in System Settings — 100 is the theme's own translucency, 0 opaque panels, popups and Qt windows. It is remembered and re-applied when the glass mode changes.
+
+`xmactahoe-screens` (KWin script) keeps, for each set of connected screens, where every window sits, and puts them back when that set returns — the Golden Gate "consistent window positioning across displays". It holds the arrangement in KWin's memory for the session; nothing is written to disk. Settings: `kwinrc [Script-xmactahoe-screens] SaveSeconds`, `RestoreDelay`.
+
 ## Rounded corners (Tahoe-style)
 
 Plasma only rounds the top of windows. The package installs and configures the KWin effect **KDE Rounded Corners** (matinlotfali, COPR `matinlotfali/KDE-Rounded-Corners`, package `kwin-effect-roundcorners`): 18 px radius on every window including maximized ones, a subtle white outline, no rounding in full screen. Settings live in `extra/kwinrc-round-corners.conf`, applied by `extra/xmactahoe-round-corners` (can be re-run alone). GUI: System Settings → Desktop Effects → Rounded Corners.
@@ -115,7 +123,7 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 ## Everyday command
 
-`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `dock autohide|dodge|always`, `panels [status|clone]`, `logo tahoe|apple`, `dnd on|off|schedule`, `firefox`, `flatpak`, `ghostty`, `chrome`, `rules` (removes old forced title-bar rules), `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
+`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `dock autohide|dodge|always`, `panels [status|clone]`, `goldengate on|off`, `glass level N`, `logo tahoe|apple`, `dnd on|off|schedule`, `firefox`, `flatpak`, `ghostty`, `chrome`, `rules` (removes old forced title-bar rules), `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
 
 `xmactahoe doctor` checks the whole installation (theme layers, Kvantum/GTK alignment, files, units, rounded corners, shortcuts) and `--fix` repairs what it can. The installer saves a restore point of your Plasma configuration (panels, themes, Kvantum, GTK, Kate) before its first run; `xmactahoe restore` (or `./uninstall.sh --restore`) puts it back as it was. If that restore point was taken while XMacTahoe was already active, it falls back to Breeze Dark.
 

@@ -4,15 +4,19 @@
 #   liquid   kwin-effects-glass: refraction + edge lighting, closer to macOS Tahoe Liquid Glass (heavier)
 #   off      opaque panels, popups and windows, no blur
 #   toggle   off <-> last glass mode (used by the Control Center button)
-#   status   print the current mode
-# Usage: xmactahoe-glass frosted|liquid|off|toggle|status
+#   level N  transparency of the glass, 0 (opaque) to 100 (the theme's own), like the macOS slider
+#   status   print the current mode and level
+# Usage: xmactahoe-glass frosted|liquid|off|toggle|level N|status
 D="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 PKG=$(cat "$HOME/.config/xmactahoe/package-dir" 2>/dev/null); [ -d "${PKG:-/nonexistent}/extra" ] && D="$PKG"
 LS="$HOME/.local/share/plasma/desktoptheme"; ST="$HOME/.config/xmactahoe"; mkdir -p "$ST"
 GLASS_SO=$(ls /usr/lib64/qt6/plugins/kwin/effects/plugins/glass.so /usr/lib/qt6/plugins/kwin/effects/plugins/glass.so /usr/lib/*/qt6/plugins/kwin/effects/plugins/glass.so 2>/dev/null | head -1)
 CUR=$(cat "$ST/glass" 2>/dev/null || echo frosted); LAST=$(cat "$ST/glass-last" 2>/dev/null || echo frosted)
 MODE="${1:-status}"
-[ "$MODE" = status ] && { echo "$CUR"; exit 0; }
+[ "$MODE" = status ] && { echo "$CUR $(cat "$ST/glass-level" 2>/dev/null || echo 100)%"; exit 0; }
+if [ "$MODE" = level ]; then   # macOS Golden Gate's Liquid Glass slider: 0 = opaque, 100 = the theme's own glass
+  "$(dirname "$(readlink -f "$0")")/xmactahoe-glass-level" "${2:-}"; exit $?
+fi
 [ "$MODE" = toggle ] && { [ "$CUR" = off ] && MODE="$LAST" || MODE=off; }
 if [ "$MODE" = liquid ] && [ -z "$GLASS_SO" ]; then
   echo "⚠ Liquid glass needs the kwin-effects-glass package:"; echo "   sudo dnf copr enable ama1470/kwin-effects-glass && sudo dnf install kwin-effects-glass"; echo "→ Using frosted glass instead."; MODE=frosted
@@ -25,6 +29,7 @@ case "$MODE" in
     if [ "$CUR" = off ]; then   # restore the translucent theme files and panels
       cp -a "$D/Kvantum/XMacTahoe/." "$HOME/.config/Kvantum/XMacTahoe/"
       for t in XMacTahoe-Dark XMacTahoe-Light; do rm -rf "${LS:?}/$t"; cp -a "$D/plasma/desktoptheme/$t" "$LS/"; done
+      L=$(cat "$ST/glass-level" 2>/dev/null); [ -n "$L" ] && [ "$L" != 100 ] && XMT_NO_RESTART=1 "$(dirname "$(readlink -f "$0")")/xmactahoe-glass-level" "$L" --quiet
       A=$(cat "$ST/accent" 2>/dev/null); X="$(dirname "$(readlink -f "$0")")/xmactahoe-accent"
       if [ -n "$A" ] && [ "$A" != blue ] && [ -x "$X" ]; then "$X" "$A" >/dev/null; fi   # the package copy of Kvantum is blue
       RESTART=1
@@ -58,7 +63,7 @@ for f in glob.glob(f'{sys.argv[1]}/XMacTahoe-*/**/*.svgz', recursive=True):
 PY
     panels opaque; [ "$CUR" != off ] && echo "$CUR" > "$ST/glass-last"; echo off > "$ST/glass"; RESTART=1
     echo "glass: off (opaque, no blur)" ;;
-  *) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac
 gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
 if [ "$RESTART" = 1 ] && [ -z "${XMT_NO_RESTART:-}" ]; then rm -f "$HOME/.cache"/plasma_theme_XMacTahoe-*.kcache "$HOME/.cache/ksvg-elements"; systemctl --user restart plasma-plasmashell.service 2>/dev/null; fi

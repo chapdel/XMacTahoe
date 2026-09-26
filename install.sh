@@ -96,7 +96,7 @@ chmod +x "$HOME/.local/bin/xmactahoe" "$HOME/.local/bin"/xmactahoe-* "$HOME/.loc
 RT="$LS/xmactahoe/package"
 if [ "$D" != "$RT" ]; then
   rm -rf "$RT"; mkdir -p "$RT/plasma" "$RT/wallpapers"
-  cp -a "$D/install.sh" "$D/uninstall.sh" "$D/VERSION" "$D/bin" "$D/extra" "$D/Kvantum" "$RT/"
+  cp -a "$D/install.sh" "$D/uninstall.sh" "$D/VERSION" "$D/bin" "$D/extra" "$D/Kvantum" "$D/tools" "$RT/"
   cp -a "$D/plasma/desktoptheme" "$RT/plasma/"; cp -a "$D/wallpapers/XMacTahoe-Dynamic" "$RT/wallpapers/"
 fi
 mkdir -p "$HOME/.config/xmactahoe"; echo "$RT" > "$HOME/.config/xmactahoe/package-dir"
