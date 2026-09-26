@@ -1,0 +1,35 @@
+#!/bin/bash
+# Style of the window buttons (the traffic lights), your choice, independent of any preset.
+#   glass  Liquid Glass shading of macOS 27: gradient and specular highlight, pressed state darkened
+#   flat   the flat discs of macOS Tahoe, what the theme ships
+#   auto   let the preset decide again (glass with goldengate, flat with tahoe)
+#   status print the current style
+# Usage: xmactahoe-buttons glass|flat|auto|status
+# An inactive window keeps flat grey buttons either way, as on macOS.
+# Once you choose here, `xmactahoe goldengate` leaves the buttons alone.
+set -uo pipefail
+ST="$HOME/.config/xmactahoe"; mkdir -p "$ST"
+PKG=$(cat "$ST/package-dir" 2>/dev/null); TOOL="$PKG/tools/gloss-buttons.py"
+THEMES=("$HOME/.local/share/aurorae/themes/XMacTahoe" "$HOME/.local/share/aurorae/themes/XMacTahoe-Night")
+current() { grep -ql "xmt-gloss" "${THEMES[0]}/close.svg" 2>/dev/null && echo glass || echo flat; }
+
+case "${1:-status}" in
+  glass|flat)
+    [ -f "$TOOL" ] || { echo "⚠ the package copy is missing: run xmactahoe update"; exit 1; }
+    for t in "${THEMES[@]}"; do
+      [ -d "$t" ] || continue
+      if [ "$1" = glass ]; then python3 "$TOOL" "$t" >/dev/null; else python3 "$TOOL" --revert "$t" >/dev/null; fi
+    done
+    # KWin keeps the old images until the decoration theme key is written again
+    kwriteconfig6 --file kwinrc --group org.kde.kdecoration2 --key theme "$(kreadconfig6 --file kwinrc --group org.kde.kdecoration2 --key theme)" 2>/dev/null
+    gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
+    [ "${2:-}" = --preset ] || echo "$1" > "$ST/buttons"   # --preset: applied by a preset, not a choice
+    echo "window buttons: $1" ;;
+  auto)
+    rm -f "$ST/buttons"
+    [ "$(cat "$ST/preset" 2>/dev/null)" = goldengate ] && want=glass || want=flat
+    "$0" "$want" --preset ;;
+  status)
+    c=$(current); echo "$c$( [ -f "$ST/buttons" ] && echo " (your choice)" || echo " (follows the preset)")" ;;
+  *) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac

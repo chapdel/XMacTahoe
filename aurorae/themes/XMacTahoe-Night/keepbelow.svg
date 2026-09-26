@@ -16,15 +16,6 @@
    version="1.1"
    inkscape:version="0.92.4 5da689c313, 2019-01-14"
    sodipodi:docname="keepbelow.svg">
-<defs id="xmt-gloss">
-<linearGradient id="xmtg-6881a2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#899db6"/><stop offset="0.55" stop-color="#6881a2"/><stop offset="1" stop-color="#556a85"/></linearGradient>
-<linearGradient id="xmtp-6881a2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#51657e"/><stop offset="1" stop-color="#637b9a"/></linearGradient>
-<linearGradient id="xmtg-7d96b7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aadc7"/><stop offset="0.55" stop-color="#7d96b7"/><stop offset="1" stop-color="#667b96"/></linearGradient>
-<linearGradient id="xmtp-7d96b7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#62758f"/><stop offset="1" stop-color="#778eae"/></linearGradient>
-<linearGradient id="xmtg-a1bbde" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b6cae5"/><stop offset="0.55" stop-color="#a1bbde"/><stop offset="1" stop-color="#8499b6"/></linearGradient>
-<linearGradient id="xmtp-a1bbde" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7e92ad"/><stop offset="1" stop-color="#99b2d3"/></linearGradient>
-<radialGradient id="xmtgloss" cx="0.5" cy="0.24" r="0.62"><stop offset="0" stop-color="#ffffff" stop-opacity="0.45"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
-</defs>
   <defs
      id="defs4430">
     <linearGradient
@@ -437,13 +428,8 @@
       <path
          inkscape:connector-curvature="0"
          d="m 458.87706,93.349705 c 204.58563,0 370.43752,165.849295 370.43752,370.437775 0,204.58091 -165.85189,370.42995 -370.43752,370.42995 -204.58467,0 -370.437464,-165.84904 -370.437464,-370.42995 0,-204.58848 165.852794,-370.437774 370.437464,-370.437774"
-         style="fill:url(#xmtg-a1bbde);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.34456921;enable-background:new"
+         style="fill:#a1bbde;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.34456921;enable-background:new"
          id="path16" />
-<path
-         inkscape:connector-curvature="0"
-         d="m 458.87706,93.349705 c 204.58563,0 370.43752,165.849295 370.43752,370.437775 0,204.58091 -165.85189,370.42995 -370.43752,370.42995 -204.58467,0 -370.437464,-165.84904 -370.437464,-370.42995 0,-204.58848 165.852794,-370.437774 370.437464,-370.437774"
-         style="fill:url(#xmtgloss);fill-opacity:0.9;stroke:none"
-         id="xmt-gloss-active-center" />
     </g>
     <g
        id="hover-center"
@@ -467,14 +453,8 @@
       <path
          inkscape:connector-curvature="0"
          d="m 210.73721,382.46225 202.32908,202.32896 c 26.83838,26.8384 70.74931,26.8383 97.58706,6e-4 l 202.33081,-202.33078 -502.24695,0.001"
-         style="fill:url(#xmtg-7d96b7);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.34457219;enable-background:new"
+         style="fill:#7d96b7;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.34457219;enable-background:new"
          id="path18-6"
-         sodipodi:nodetypes="csscc" />
-<path
-         inkscape:connector-curvature="0"
-         d="m 210.73721,382.46225 202.32908,202.32896 c 26.83838,26.8384 70.74931,26.8383 97.58706,6e-4 l 202.33081,-202.33078 -502.24695,0.001"
-         style="fill:url(#xmtgloss);fill-opacity:0.9;stroke:none"
-         id="xmt-gloss-hover-center"
          sodipodi:nodetypes="csscc" />
     </g>
     <g
@@ -499,14 +479,8 @@
       <path
          inkscape:connector-curvature="0"
          d="m 210.73724,387.97912 202.3291,202.32797 c 26.8383,26.8383 70.7492,26.8382 97.58706,6e-4 l 202.3308,-202.32987 -502.24696,10e-4"
-         style="fill:url(#xmtp-6881a2);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.34456933;enable-background:new"
+         style="fill:#6881a2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.34456933;enable-background:new"
          id="path18-6-3"
-         sodipodi:nodetypes="csscc" />
-<path
-         inkscape:connector-curvature="0"
-         d="m 210.73724,387.97912 202.3291,202.32797 c 26.8383,26.8383 70.7492,26.8382 97.58706,6e-4 l 202.3308,-202.32987 -502.24696,10e-4"
-         style="fill:url(#xmtgloss);fill-opacity:0.35;stroke:none"
-         id="xmt-gloss-pressed-center"
          sodipodi:nodetypes="csscc" />
     </g>
     <g

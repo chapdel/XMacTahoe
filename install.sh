@@ -101,6 +101,7 @@ if [ "$D" != "$RT" ]; then
 fi
 mkdir -p "$HOME/.config/xmactahoe"; echo "$RT" > "$HOME/.config/xmactahoe/package-dir"
 # the icons just copied carry the neutral logo: keep the user's earlier choice (xmactahoe logo apple)
+[ "$(cat "$HOME/.config/xmactahoe/buttons" 2>/dev/null)" = glass ] && "$HOME/.local/bin/xmactahoe-buttons" glass >/dev/null   # the package ships flat buttons
 if [ "$(cat "$HOME/.config/xmactahoe/logo" 2>/dev/null)" = apple ]; then "$HOME/.local/bin/xmactahoe-logo" apple --quiet || echo "⚠ could not fetch the Apple logo: run xmactahoe logo apple later"; fi
 fc-cache -f >/dev/null 2>&1 || true
 kbuildsycoca6 --noincremental >/dev/null 2>&1 || true

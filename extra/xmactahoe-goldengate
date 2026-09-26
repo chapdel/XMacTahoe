@@ -4,7 +4,7 @@
 #   - one corner radius for every window, a little squarer: 12 px instead of 18
 #   - the active window stands out: inactive ones are dimmed slightly
 #   - crisper glass edges: more contrast, more saturation, brighter edge lighting
-#   - traffic lights with Liquid Glass shading (flat again when off)
+#   - window buttons in Liquid Glass, unless you set them yourself with `xmactahoe buttons`
 # Usage: xmactahoe-goldengate on|off|status      (off restores the Tahoe values)
 set -uo pipefail
 D="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
@@ -12,14 +12,9 @@ ST="$HOME/.config/xmactahoe"; mkdir -p "$ST"
 k() { kwriteconfig6 --file kwinrc "$@" 2>/dev/null; }
 kwin_reconfigure() { gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1; }
 fx() { gdbus call --session --dest org.kde.KWin --object-path /Effects --method "org.kde.kwin.Effects.$1" "$2" >/dev/null 2>&1; }
-buttons() {   # the decoration files are static: the tool adds or removes the glass shading in place
-  PKG=$(cat "$ST/package-dir" 2>/dev/null); T="$PKG/tools/gloss-buttons.py"
-  [ -f "$T" ] || return 0
-  for theme in "$HOME/.local/share/aurorae/themes/XMacTahoe" "$HOME/.local/share/aurorae/themes/XMacTahoe-Night"; do
-    [ -d "$theme" ] && python3 "$T" ${1:+"$1"} "$theme" >/dev/null 2>&1
-  done
-  # KWin keeps the old images until the decoration theme key is written again
-  kwriteconfig6 --file kwinrc --group org.kde.kdecoration2 --key theme "$(kreadconfig6 --file kwinrc --group org.kde.kdecoration2 --key theme)" 2>/dev/null
+buttons() {   # the window buttons are a choice of their own: a preset only sets them by default
+  [ -f "$ST/buttons" ] && return 0
+  "$D/xmactahoe-buttons" "$1" --preset >/dev/null 2>&1
 }
 
 case "${1:-status}" in
@@ -32,7 +27,7 @@ case "${1:-status}" in
     k --group Effect-blurplus --key Contrast 1.08
     k --group Effect-blurplus --key Saturation 1.4
     k --group Effect-blurplus --key GlowColor "#E6FFFFFF"
-    buttons ""                       # glassy traffic lights
+    buttons glass                    # unless you chose otherwise with: xmactahoe buttons
     kwin_reconfigure; fx loadEffect diminactive
     echo goldengate > "$ST/preset"
     echo "✓ Golden Gate: glass 55 %, corners 12 px, inactive windows dimmed, crisper glass edges"
@@ -45,7 +40,7 @@ case "${1:-status}" in
     k --group Effect-blurplus --key Contrast 1.0
     k --group Effect-blurplus --key Saturation 1.3
     k --group Effect-blurplus --key GlowColor "#B3FFFFFF"
-    buttons --revert                 # flat traffic lights
+    buttons flat                     # unless you chose otherwise with: xmactahoe buttons
     kwin_reconfigure; fx unloadEffect diminactive
     echo tahoe > "$ST/preset"
     echo "✓ Tahoe: glass 100 %, corners 18 px, no dimming" ;;
@@ -54,6 +49,6 @@ case "${1:-status}" in
     echo "glass level: $("$D/xmactahoe-glass-level")%"
     echo "corner radius: $(kreadconfig6 --file kwinrc --group Round-Corners --key Size) px"
     echo "dim inactive: $(kreadconfig6 --file kwinrc --group Plugins --key diminactiveEnabled 2>/dev/null || echo false)"
-    grep -ql "xmt-gloss" "$HOME/.local/share/aurorae/themes/XMacTahoe/close.svg" 2>/dev/null && echo "traffic lights: glass" || echo "traffic lights: flat" ;;
+    echo "window buttons: $("$D/xmactahoe-buttons" status)" ;;
   *) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

@@ -1,3 +1,10 @@
+## 2.2.1 — 2026-09-26
+
+The window buttons are now your choice, not the preset's.
+
+- **`xmactahoe buttons glass|flat|auto|status`**: `glass` gives the traffic lights the Liquid Glass shading of macOS 27, `flat` the flat discs of Tahoe, `auto` hands the decision back to the preset. Once you pick one, `xmactahoe goldengate` leaves the buttons alone and only changes glass, corners, dimming and edges.
+- The package ships the flat Tahoe buttons again; the glass version is applied on request, and an install or update re-applies your choice.
+
 ## 2.2.0 — 2026-09-26
 
 macOS 27 (Golden Gate) traits, as a preset you can take or leave.
