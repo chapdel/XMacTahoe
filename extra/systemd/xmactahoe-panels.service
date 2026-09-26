@@ -1,0 +1,7 @@
+[Unit]
+Description=XMacTahoe: give a newly connected screen its menu bar and dock
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/sleep 5
+ExecStart=%h/.local/bin/xmactahoe-panels clone --quiet

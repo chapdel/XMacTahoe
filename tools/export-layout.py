@@ -22,6 +22,8 @@ for d in layout['desktops']:
     d['config']['/']['lastScreen'] = '0'
     for k in ('ItemGeometries-1920x1080','ItemGeometriesHorizontal'):
         d['config']['/'].pop(k, None)
+# panels of the first screen only: the layout script recreates them on every screen at install time
+layout['panels'] = [p for p in layout['panels'] if p.get('config', {}).get('/', {}).get('lastScreen', '0') == '0']
 for p in layout['panels']:
     p['config'].setdefault('/', {})['lastScreen'] = '0'
     # the live state can be transient (dock forced visible during screenshots): pin the intended modes
@@ -33,7 +35,9 @@ for p in layout['panels']:
             for k in ('knownApps','launchCounts','favoritesPortedToKAstats','headerActionsMigrated','iconMigratedFrom17','powerButtonsMigrated'):
                 grp.pop(k, None)
 layout_txt = json.dumps(layout, indent=4, ensure_ascii=False).replace(os.path.expanduser('~/.local/bin'), '@XMT_BIN@')
-out = head + 'var layout = ' + layout_txt + '\n;\n\nplasma.loadSerializedLayout(layout);\n'
+MULTISCREEN = '\n// XMacTahoe: Plasma pins a panel to one screen, so give every screen its own menu bar and dock.\n// The AppGrid widget stays on the first screen only: the Meta shortcut needs a single live widget.\nif (screenCount > 1) {\n    var tpl = layout.panels, all = [];\n    for (var s = 0; s < screenCount; s++) {\n        for (var t = 0; t < tpl.length; t++) {\n            var p = JSON.parse(JSON.stringify(tpl[t]));\n            if (s > 0 && p.applets) {\n                var keep = [];\n                for (var a = 0; a < p.applets.length; a++) {\n                    if (p.applets[a].plugin != "dev.xarbit.appgrid") keep.push(p.applets[a]);\n                }\n                p.applets = keep;\n            }\n            all.push(p);\n        }\n    }\n    layout.panels = all;\n}\n\nplasma.loadSerializedLayout(layout);\n\n// give the copies their screen (loadSerializedLayout puts everything on the first one)\nif (screenCount > 1) {\n    var ids = panelIds.slice(0).sort(function (a, b) { return a - b; });\n    var per = ids.length / screenCount;\n    for (var i = 0; i < ids.length; i++) { panelById(ids[i]).screen = Math.floor(i / per); }\n}\n'
+
+out = head + 'var layout = ' + layout_txt + '\n;\n' + MULTISCREEN
 out += '''
 // XMacTahoe: Meta shortcut (full grid) on the AppGrid widget (invisible, top bar)
 for (var i = 0; i < panelIds.length; i++) {

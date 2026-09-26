@@ -283,7 +283,34 @@ var layout = {
 }
 ;
 
+// XMacTahoe: Plasma pins a panel to one screen, so give every screen its own menu bar and dock.
+// The AppGrid widget stays on the first screen only: the Meta shortcut needs a single live widget.
+if (screenCount > 1) {
+    var tpl = layout.panels, all = [];
+    for (var s = 0; s < screenCount; s++) {
+        for (var t = 0; t < tpl.length; t++) {
+            var p = JSON.parse(JSON.stringify(tpl[t]));
+            if (s > 0 && p.applets) {
+                var keep = [];
+                for (var a = 0; a < p.applets.length; a++) {
+                    if (p.applets[a].plugin != "dev.xarbit.appgrid") keep.push(p.applets[a]);
+                }
+                p.applets = keep;
+            }
+            all.push(p);
+        }
+    }
+    layout.panels = all;
+}
+
 plasma.loadSerializedLayout(layout);
+
+// give the copies their screen (loadSerializedLayout puts everything on the first one)
+if (screenCount > 1) {
+    var ids = panelIds.slice(0).sort(function (a, b) { return a - b; });
+    var per = ids.length / screenCount;
+    for (var i = 0; i < ids.length; i++) { panelById(ids[i]).screen = Math.floor(i / per); }
+}
 
 // XMacTahoe: Meta shortcut (full grid) on the AppGrid widget (invisible, top bar)
 for (var i = 0; i < panelIds.length; i++) {

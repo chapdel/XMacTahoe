@@ -1,0 +1,9 @@
+[Unit]
+Description=XMacTahoe: watch the screen setup (KWin output configuration)
+
+[Path]
+PathModified=%h/.config/kwinoutputconfig.json
+PathChanged=%h/.config/kwinoutputconfig.json
+
+[Install]
+WantedBy=paths.target

@@ -61,6 +61,12 @@ Apple, macOS and Tahoe are trademarks of Apple Inc.; XMacTahoe is not affiliated
 - **Dock** (floating, auto-hides like macOS "Automatically hide and show the Dock": it appears when the pointer touches the bottom edge): Applications launcher, pinned apps, calculator, trash. `xmactahoe dock autohide|dodge|always` changes it; `dodge` keeps it visible whenever no window overlaps it. When an app requests attention (Telegram with unread messages...), Plasma would keep the hidden dock on screen until that app is opened; the `xmactahoe-attention` KWin script makes it show for about 5 seconds and hide again, like the macOS bounce (`kwinrc [Script-xmactahoe-attention] RevealSeconds`). Unread badges stay on the icons.
 - **Panels** run in "translucent" mode so blur is always applied.
 
+## Several screens
+
+Plasma pins a panel to one screen and cannot duplicate or move it by itself, so each screen gets its own menu bar and dock: `install.sh --layout` creates them on every screen connected at the time, and the user unit `xmactahoe-panels.path` watches KWin's output configuration, so **a screen plugged in later gets its bar and dock a few seconds later, with no command to type**. Unplugging needs nothing: Plasma keeps the panels and brings them back when the screen returns; a panel it pushed onto another screen meanwhile is moved back.
+
+The copy carries the widgets and their settings, minus the AppGrid widget and any global shortcut, which belong to a single widget. `xmactahoe panels` lists the panels of each screen and `xmactahoe panels clone` does the copy by hand (live, without restarting plasmashell).
+
 ## Keyboard shortcuts (AppGrid launcher)
 
 | Key | Action |
@@ -103,7 +109,7 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 ## Everyday command
 
-`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `dock autohide|dodge|always`, `logo tahoe|apple`, `dnd on|off|schedule`, `firefox`, `flatpak`, `ghostty`, `chrome`, `rules` (removes old forced title-bar rules), `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
+`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `dock autohide|dodge|always`, `panels [status|clone]`, `logo tahoe|apple`, `dnd on|off|schedule`, `firefox`, `flatpak`, `ghostty`, `chrome`, `rules` (removes old forced title-bar rules), `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
 
 `xmactahoe doctor` checks the whole installation (theme layers, Kvantum/GTK alignment, files, units, rounded corners, shortcuts) and `--fix` repairs what it can. The installer saves a restore point of your Plasma configuration (panels, themes, Kvantum, GTK, Kate) before its first run; `xmactahoe restore` (or `./uninstall.sh --restore`) puts it back as it was. If that restore point was taken while XMacTahoe was already active, it falls back to Breeze Dark.
 

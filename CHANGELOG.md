@@ -1,3 +1,15 @@
+## 2.1.0 — 2026-09-26
+
+Menu bar and dock on every screen, and a screen plugged in later gets them by itself.
+
+- **Every screen gets its own bar and dock.** Plasma pins a panel to one screen and cannot duplicate or move it, so a second screen used to stay bare. `install.sh --layout` now creates the panels on every connected screen.
+- **Hotplug is handled with no command to type.** The new user unit `xmactahoe-panels.path` watches KWin's output configuration: a screen plugged in gets its bar and dock a few seconds later. Unplugging needs nothing — Plasma keeps the panels and brings them back with the screen; a panel it pushed onto another screen meanwhile is moved back instead of a new one being created.
+- **`xmactahoe panels`** lists the panels of each screen, and `xmactahoe panels clone` copies them by hand. The copy is made live, without restarting plasmashell, and carries every widget setting (checked key by key), minus the AppGrid widget and any global shortcut, which belong to a single widget.
+- `xmactahoe doctor` checks the hotplug unit and reports a screen without panels; `--fix` copies them.
+- `kde-desktop-repair` now checks the top bar of every screen, not just the first one.
+
+Upgrading: `xmactahoe update`, then `xmactahoe panels clone` once for the screens that have none (or just plug a screen back in).
+
 ## 2.0.0 — 2026-09-22
 
 Audit release: safer install, update and uninstall, clean licensing.

@@ -9,7 +9,7 @@
    widget, since the plugin registers its action when it is instantiated.
    Removes orphaned "activate widget N" entries.
 
-2. Top bar
+2. Top bars (one per screen)
      full width, edge to edge (floating=0, lengthMode=fill, offset=0)
 
 Both settings are lost together when a global theme is applied with
@@ -199,51 +199,45 @@ else:
 # ===========================================================================
 # 2. TOP BAR
 # ===========================================================================
-step("[2/2] Top bar (full width)")
-js_panel = '''
+step("[2/2] Top bars (full width)")
+js_panels = """
+var s = [];
 var ps = panels();
 for (var i = 0; i < ps.length; i++) {
-  if (ps[i].location === "top") {
-    var p = ps[i];
-    print("TOP id=" + p.id + " floating=" + p.floating +
-          " lengthMode=" + p.lengthMode + " offset=" + p.offset +
-          " min=" + p.minimumLength + " max=" + p.maximumLength);
-    break;
-  }
+  var p = ps[i];
+  if (p.location !== "top") continue;
+  s.push("TOP id=" + p.id + " screen=" + p.screen + " floating=" + p.floating +
+         " lengthMode=" + p.lengthMode + " offset=" + p.offset);
 }
-'''
-m = re.search(r'TOP id=(\d+) floating=(\w+) lengthMode=(\w+) offset=(-?\d+)'
-              r' min=(\d+) max=(\d+)', pscript(js_panel))
-if not m:
-    warn("no panel at the top of the screen -- nothing to check")
+print(s.join(" ;; "));
+"""
+js_fix = """
+var ps = panels();
+for (var i = 0; i < ps.length; i++) {
+  if (ps[i].location === "top") { ps[i].floating = false; ps[i].lengthMode = "fill"; ps[i].offset = 0; }
+}
+"""
+tops = re.findall(r'TOP id=(\d+) screen=(-?\d+) floating=(\w+) lengthMode=(\w+) offset=(-?\d+)', pscript(js_panels))
+if not tops:
+    warn("no panel at the top of any screen -- nothing to check")
 else:
-    pid, floating, lmode, offset = int(m.group(1)), m.group(2), m.group(3), int(m.group(4))
-    bad_geo = (floating != "false" or lmode != "fill" or offset != 0)
-    if not bad_geo:
-        ok(f"panel {pid}: floating={floating} lengthMode={lmode} offset={offset}")
+    broken = [t for t in tops if t[2] != "false" or t[3] != "fill" or t[4] != "0"]
+    if not broken:
+        for pid, scr, fl, lm, off in tops:
+            ok(f"panel {pid} (screen {scr}): floating={fl} lengthMode={lm} offset={off}")
     elif CHECK:
-        warn(f"panel {pid} needs fixing: floating={floating} "
-             f"lengthMode={lmode} offset={offset}")
+        for pid, scr, fl, lm, off in broken:
+            warn(f"panel {pid} (screen {scr}) needs fixing: floating={fl} lengthMode={lm} offset={off}")
         rc = 1
     else:
-        pscript('''
-          var ps = panels();
-          for (var i = 0; i < ps.length; i++) {
-            if (ps[i].location === "top") {
-              ps[i].floating = false;
-              ps[i].lengthMode = "fill";
-              ps[i].offset = 0;
-              break;
-            }
-          }
-        ''')
-        m2 = re.search(r'floating=(\w+) lengthMode=(\w+) offset=(-?\d+)',
-                       pscript(js_panel))
-        if m2 and m2.group(1) == "false" and m2.group(2) == "fill" and m2.group(3) == "0":
-            ok(f"panel {pid} set back to full width (edge to edge)")
-        else:
-            bad(f"panel {pid}: fix not applied")
+        pscript(js_fix)
+        again = re.findall(r'TOP id=(\d+) screen=(-?\d+) floating=(\w+) lengthMode=(\w+) offset=(-?\d+)', pscript(js_panels))
+        still = [t for t in again if t[2] != "false" or t[3] != "fill" or t[4] != "0"]
+        if still:
+            for pid, scr, fl, lm, off in still: bad(f"panel {pid} (screen {scr}): fix not applied")
             rc = 1
+        else:
+            ok(f"{len(broken)} top bar(s) set back to full width (edge to edge)")
 
 print()
 if CHECK:

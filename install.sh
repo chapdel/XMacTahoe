@@ -130,8 +130,10 @@ if [ "$APPLY" = 1 ]; then
     ini_set "$HOME/.config/$v/settings.ini" gtk-cursor-theme-name XMacTahoe-cursors
     ini_set "$HOME/.config/$v/settings.ini" gtk-decoration-layout "close,maximize,minimize:"
   done
-  mkdir -p "$HOME/.config/systemd/user"; cp "$D"/extra/systemd/xmactahoe-variant.* "$HOME/.config/systemd/user/"
+  mkdir -p "$HOME/.config/systemd/user"; cp "$D"/extra/systemd/xmactahoe-variant.* "$D"/extra/systemd/xmactahoe-panels.* "$HOME/.config/systemd/user/"
   systemctl --user daemon-reload 2>/dev/null || true; systemctl --user enable --now xmactahoe-variant.path 2>/dev/null || true
+  # a screen plugged in later gets its own bar and dock (KWin rewrites kwinoutputconfig.json on every change)
+  systemctl --user enable --now xmactahoe-panels.path 2>/dev/null || true
   for k in "$D"/extra/kwin-scripts/*/; do kwriteconfig6 --file kwinrc --group Plugins --key "$(basename "$k")Enabled" true; done
   # Plasma's own light/dark pair (System Settings toggle and automatic switching)
   kwriteconfig6 --file kdeglobals --group KDE --key DefaultDarkLookAndFeel XMacTahoe.Dark
@@ -170,6 +172,7 @@ if [ "$APPLY" = 1 ]; then
   if [ -n "$WALL" ]; then plasma-apply-wallpaperimage "$LS/wallpapers/$WALL" >/dev/null 2>&1 || true; kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image "$WALL"; fi
   gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1 || true
   if [ "$ROUND" = 1 ] && [ "$FEDORA" = 1 ]; then echo "→ Rounded window corners (KWin effect) ..."; "$HOME/.local/bin/xmactahoe-round-corners" || true; fi
+  "$HOME/.local/bin/xmactahoe-panels" clone --quiet || true   # a screen connected after the layout was exported
   echo "→ Firefox and Ghostty themes, Flatpak overrides, Control Center buttons, old title-bar rules ..."
   for s in firefox ghostty flatpak window-rules flexhub-controls; do "$HOME/.local/bin/xmactahoe-$s" >/dev/null 2>&1 || echo "⚠ xmactahoe-$s failed (run it again later)"; done
   echo "→ AppGrid shortcuts (Meta = grid, Alt+Space = compact) ..."

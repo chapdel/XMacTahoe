@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+"""Menu bar and dock on every screen.
+
+Plasma pins a panel to one screen and cannot duplicate or move it by itself, so plugging a second
+screen in leaves it bare. `clone` copies the bar and the dock of a screen that has them - widgets,
+settings and all - onto the screens that have none, live, without restarting plasmashell.
+
+This runs by itself: the user unit `xmactahoe-panels.path` watches KWin's output configuration, so
+a screen plugged in gets its panels a few seconds later. Unplugging needs nothing: Plasma keeps the
+panels in its configuration and brings them back when the screen returns.
+
+Usage: xmactahoe-panels [status|clone] [--dry-run] [--quiet]
+  status  list the panels of each screen
+  clone   give every screen without panels its own copy
+
+The AppGrid widget is not copied: the Meta shortcut needs a single live widget.
+`install.sh --layout` already creates the panels on every screen connected at the time.
+"""
+import json, os, re, subprocess, sys
+
+CFG = os.path.expanduser('~/.config')
+APPLETS = f'{CFG}/plasma-org.kde.plasma.desktop-appletsrc'
+SKIP_PLUGINS = {'dev.xarbit.appgrid'}
+# written by the panel itself, not by its applets
+APPLET_SKIP_KEYS = {'activityId', 'formfactor', 'immutability', 'lastScreen', 'location', 'plugin', 'wallpaperplugin'}
+PANEL_PROPS = ['location', 'alignment', 'hiding', 'lengthMode', 'opacity', 'floating', 'height', 'offset',
+               'minimumLength', 'maximumLength']
+QUIET = False
+
+
+def say(*a):
+    if not QUIET: print(*a)
+
+
+def pscript(js):
+    # gdbus parses the argument as GVariant text, so hand it a quoted GVariant string, not raw JavaScript
+    arg = '"' + js.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n') + '"'
+    r = subprocess.run(['gdbus', 'call', '--session', '--dest', 'org.kde.plasmashell',
+                        '--object-path', '/PlasmaShell', '--method',
+                        'org.kde.PlasmaShell.evaluateScript', arg], capture_output=True, text=True)
+    return r.stdout + r.stderr
+
+
+def live():
+    """(screen widths, panels) as plasmashell sees them, or (None, None) when it does not answer."""
+    props = ' '.join(f'+" {p}="+p.{p}' for p in PANEL_PROPS)
+    out = pscript('var s=[]; for (var i=0;i<screenCount;i++){ var g=screenGeometry(i); s.push("S "+i+" "+g.width); }'
+                  ' var ps=panels(); for (var i=0;i<ps.length;i++){ var p=ps[i]; s.push("P id="+p.id+" screen="+p.screen'
+                  + props + '); } print(s.join(" ;; "));')
+    if ' ;; ' not in out and 'S ' not in out: return None, None
+    widths, panels = {}, []
+    for part in out.split(' ;; '):
+        part = part.strip(" ('),\n")
+        f = part.split()
+        if len(f) == 3 and f[0] == 'S':
+            widths[int(f[1])] = int(f[2])
+        elif f and f[0] == 'P':
+            d = dict(kv.split('=', 1) for kv in f[1:] if '=' in kv)
+            d['id'], d['screen'] = int(d['id']), int(d['screen'])
+            panels.append(d)
+    return widths, panels
+
+
+def applets_of(containment):
+    """[(plugin, {group tuple: {key: value}}, {root key: value})] in panel order, from the config file."""
+    blocks, cur = {}, None
+    for line in open(APPLETS):
+        line = line.rstrip('\n')
+        if line.startswith('['):
+            cur = blocks.setdefault(line, [])
+        elif cur is not None and '=' in line:
+            cur.append(line.split('=', 1))
+    order = dict(blocks.get(f'[Containments][{containment}][General]', [])).get('AppletOrder', '')
+    out = []
+    for aid in [a for a in order.split(';') if a]:
+        base = f'[Containments][{containment}][Applets][{aid}]'
+        root = dict(blocks.get(base, []))
+        plugin = root.pop('plugin', None)
+        if not plugin or plugin in SKIP_PLUGINS: continue
+        root = {k: v for k, v in root.items() if k not in APPLET_SKIP_KEYS}
+        # (a containment-like applet keeps these at its base, a plain one under [Configuration])
+        groups = {}
+        for head, pairs in blocks.items():
+            m = re.fullmatch(re.escape(base) + r'((?:\[[^\]]+\])+)', head)
+            if not m: continue
+            path = re.findall(r'\[([^\]]+)\]', m.group(1))
+            # a plain applet keeps its settings under [Configuration]; a containment-like one
+            # (the system tray) keeps them directly, and its nested applets are not ours to copy
+            if path[0] == 'Applets': continue
+            if path[0] == 'Shortcuts': continue      # a global shortcut belongs to one widget, not to its copies
+            if path[0] == 'Configuration': path = path[1:]
+            if path: groups[tuple(path)] = dict(pairs)
+            else: root.update(pairs)                 # keys right under [Configuration] (popup size...)
+        out.append((plugin, groups, root))
+    return out
+
+
+def clone_js(source, screen, width):
+    """JavaScript that recreates `source` (a live panel dict) on `screen`."""
+    js = ['var p = new Panel("org.kde.panel");']
+    for prop in PANEL_PROPS:
+        v = source.get(prop)
+        if v is None: continue
+        if prop in ('minimumLength', 'maximumLength') and width: v = str(width)
+        js.append(f'p.{prop} = ' + (v if v in ('true', 'false') or re.fullmatch(r'-?\d+', v) else json.dumps(v)) + ';')
+    js.append(f'p.screen = {screen};')
+    for plugin, groups, root in applets_of(source['id']):
+        js.append(f'var w = p.addWidget({json.dumps(plugin)});')
+        for key, val in root.items():
+            js.append(f'w.currentConfigGroup = []; w.writeConfig({json.dumps(key)}, {json.dumps(val)});')
+        for group, pairs in groups.items():
+            js.append('w.currentConfigGroup = ' + json.dumps(list(group)) + ';')
+            for key, val in pairs.items():
+                js.append(f'w.writeConfig({json.dumps(key)}, {json.dumps(val)});')
+    js.append('print("PANEL " + p.id);')
+    return '\n'.join(js)
+
+
+def main():
+    global QUIET
+    args = sys.argv[1:]
+    QUIET = '--quiet' in args
+    mode = next((a for a in args if not a.startswith('-')), 'status')
+    if mode not in ('status', 'clone'): print(__doc__); sys.exit(1)
+    widths, panels = live()
+    if panels is None:
+        say('plasmashell does not answer on D-Bus'); sys.exit(0 if QUIET else 1)
+    by_screen = {}
+    for p in panels: by_screen.setdefault(p['screen'], []).append(p)
+    if mode == 'status':
+        for s in sorted(widths):
+            got = by_screen.get(s, [])
+            print(f'  screen {s} ({widths[s]}px): ' + (', '.join(f"{p['location']} panel {p['id']}" for p in got) or 'no panel'))
+        if [s for s in widths if s not in by_screen]: print('  → give them a bar and a dock with: xmactahoe panels clone')
+        return
+    missing = [s for s in sorted(widths) if not by_screen.get(s)]
+    if not missing:
+        say('every screen already has its panels'); return
+    full = [s for s in sorted(by_screen) if {p['location'] for p in by_screen[s]} >= {'top', 'bottom'}]
+    if not full:
+        say('no screen has both a bar and a dock to copy from (install.sh --layout creates them)'); sys.exit(1)
+    dry = '--dry-run' in args
+    for screen in missing:
+        for location in ('top', 'bottom'):
+            # a panel Plasma pushed onto another screen when its own went away: move it back
+            spare = next((p for s in sorted(by_screen)
+                          for p in by_screen[s][1:] if p['location'] == location
+                          and len([q for q in by_screen[s] if q['location'] == location]) > 1), None)
+            if spare:
+                say(f'→ screen {screen}: moving the spare {location} panel {spare["id"]} back')
+                if not dry:
+                    pscript(f'panelById({spare["id"]}).screen = {screen}; print("MOVED");')
+                    by_screen[spare['screen']].remove(spare); spare['screen'] = screen
+                    by_screen.setdefault(screen, []).append(spare)
+                continue
+            src = next(p for p in by_screen[full[0]] if p['location'] == location)
+            js = clone_js(src, screen, widths.get(screen))
+            if dry:
+                print(f'--- screen {screen}, copy of panel {src["id"]} ({location}), {js.count("addWidget")} widgets')
+                continue
+            out = pscript(js)
+            m = re.search(r'PANEL (\d+)', out)
+            if m: say(f'✓ screen {screen}: {location} panel {m.group(1)} created from {src["id"]}')
+            else: print(f'⚠ screen {screen}: could not create the {location} panel: {out.strip()[:200]}', file=sys.stderr)
+
+
+main()
