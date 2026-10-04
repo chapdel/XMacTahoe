@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="timeFormat" type="String">
+      <label>Qt date format shown in the menu bar.</label>
+      <default>ddd d MMM  h:mm AP</default>
+    </entry>
+    <entry name="notificationLimit" type="Int">
+      <label>How many notifications the panel keeps.</label>
+      <default>20</default>
+    </entry>
+    <entry name="showCalendar" type="Bool">
+      <label>Show the month below the notifications.</label>
+      <default>true</default>
+    </entry>
+    <entry name="showWeather" type="Bool">
+      <label>Show the weather of the location in ~/.config/xmactahoe/location.</label>
+      <default>true</default>
+    </entry>
+    <entry name="latitude" type="String">
+      <label>Latitude for the weather; `xmactahoe center on` fills it from ~/.config/xmactahoe/location.</label>
+      <default></default>
+    </entry>
+    <entry name="longitude" type="String">
+      <label>Longitude for the weather.</label>
+      <default></default>
+    </entry>
+  </group>
+</kcfg>

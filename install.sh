@@ -104,6 +104,7 @@ mkdir -p "$HOME/.config/xmactahoe"; echo "$RT" > "$HOME/.config/xmactahoe/packag
 [ "$(cat "$HOME/.config/xmactahoe/buttons" 2>/dev/null)" = glass ] && "$HOME/.local/bin/xmactahoe-buttons" glass >/dev/null   # the package ships flat buttons
 [ -f "$LS/xmactahoe/user-places.xbel.bak" ] && "$HOME/.local/bin/xmactahoe-finder" on >/dev/null   # Finder sidebar and tags were enabled
 if [ "$(cat "$HOME/.config/xmactahoe/logo" 2>/dev/null)" = apple ]; then "$HOME/.local/bin/xmactahoe-logo" apple --quiet || echo "⚠ could not fetch the Apple logo: run xmactahoe logo apple later"; fi
+rm -rf "$HOME/.cache/plasmashell/qmlcache"   # Plasma caches widget QML: an update would not show otherwise
 fc-cache -f >/dev/null 2>&1 || true
 kbuildsycoca6 --noincremental >/dev/null 2>&1 || true
 
@@ -175,6 +176,7 @@ if [ "$APPLY" = 1 ]; then
   gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1 || true
   if [ "$ROUND" = 1 ] && [ "$FEDORA" = 1 ]; then echo "→ Rounded window corners (KWin effect) ..."; "$HOME/.local/bin/xmactahoe-round-corners" || true; fi
   "$HOME/.local/bin/xmactahoe-panels" clone --quiet || true   # a screen connected after the layout was exported
+  [ "$(cat "$HOME/.config/xmactahoe/center" 2>/dev/null)" = on ] && "$HOME/.local/bin/xmactahoe-center" on >/dev/null
   echo "→ Firefox and Ghostty themes, Flatpak overrides, Control Center buttons, old title-bar rules ..."
   for s in firefox ghostty flatpak window-rules flexhub-controls; do "$HOME/.local/bin/xmactahoe-$s" >/dev/null 2>&1 || echo "⚠ xmactahoe-$s failed (run it again later)"; done
   echo "→ AppGrid shortcuts (Meta = grid, Alt+Space = compact) ..."

@@ -1,3 +1,18 @@
+## 2.4.0 — 2026-10-04
+
+A Notification Center of our own, in the menu bar.
+
+- **`xmactahoe center on|off|status`** puts the **XMacTahoe Notification Center** in the menu bar in place of Plasma's clock. It shows the time - and the date, unless the packaged date widget is already there - and opens one panel with:
+  - the **notifications**, from Plasma's own notification service: your real history, each with its application, time, title and text, dismissible one by one or all at once, and clicking one runs its default action;
+  - the **month**, with today circled in the accent colour;
+  - the **weather**, from Open-Meteo for the location in `~/.config/xmactahoe/location`, the one the automatic appearance already uses - no account and no key, and the card says so when there is no location.
+- The cards follow the light or dark variant, like the Control Center tiles.
+- `off` puts Plasma's clock back; the widget keeps its settings (time format, how many notifications, whether to show the month and the weather).
+- Installing or updating now clears Plasma's QML cache, without which a new version of a widget shipped by the theme would not show.
+- Rebuilding a panel in place (what `center` and `dock magnify` do) keeps every widget, including the invisible AppGrid one that carries the Meta shortcut.
+
+Upgrading: `xmactahoe update`, then `xmactahoe center on`.
+
 ## 2.3.0 — 2026-10-04
 
 macOS shortcuts, Finder touches, and screens that look after themselves.

@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [ { "Name": "Chapdel" } ],
+        "Category": "Date and Time",
+        "Description": "Date and time in the menu bar; notifications, calendar and weather in one panel, like the macOS Notification Center",
+        "EnabledByDefault": true,
+        "Icon": "preferences-desktop-notification",
+        "Id": "org.xmactahoe.center",
+        "License": "GPL-3.0",
+        "Name": "XMacTahoe Notification Center",
+        "Version": "1.0",
+        "Website": "https://github.com/chapdel/XMacTahoe"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

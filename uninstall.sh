@@ -83,7 +83,7 @@ if [ "$KEEP" = 0 ]; then
          "$CFG/Kvantum/XMacTahoe" "$HOME/.themes/MacTahoe-Dark" "$HOME/.themes/MacTahoe-Light" "$LS"/konsole/XMacTahoe*.colorscheme \
          "$LS"/org.kde.syntax-highlighting/themes/XMacTahoe-*.theme "$LS/konsole/macOS.profile" "$LS"/icons/hicolor/scalable/apps/xmactahoe-transparent.svg \
          "$LS"/kwin/scripts/xmactahoe-* "$LS/xmactahoe/package"
-  [ "$RESTORE" = 1 ] || for p in org.kpple.kppleMenu org.kde.windowtitle.Fork Plasma.Flex.Hub com.github.zren.commandoutput zayron.simple.separator; do rm -rf "${LS:?}/plasma/plasmoids/$p"; done
+  [ "$RESTORE" = 1 ] || for p in org.kpple.kppleMenu org.kde.windowtitle.Fork Plasma.Flex.Hub com.github.zren.commandoutput zayron.simple.separator org.xmactahoe.center; do rm -rf "${LS:?}/plasma/plasmoids/$p"; done
   rm -f "$HOME/.cache"/plasma_theme_XMacTahoe-*.kcache "$HOME/.cache/icon-cache.kcache"
   find "$CFG/xmactahoe" -mindepth 1 ! -name location -delete 2>/dev/null; rmdir "$CFG/xmactahoe" 2>/dev/null   # state files; your location stays
 fi

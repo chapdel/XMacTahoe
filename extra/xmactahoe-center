@@ -1,0 +1,44 @@
+#!/bin/bash
+# Notification Center in the menu bar: date and time, and one panel with the notifications, the
+# month and the weather, like macOS.
+#   on      put it in every menu bar, in place of Plasma's clock
+#   off     put Plasma's clock back
+#   status  which one is in the bars
+# Usage: xmactahoe-center on|off|status
+# The weather uses the location of ~/.config/xmactahoe/location, the one the automatic appearance
+# uses; without it the card says so and the rest works.
+set -uo pipefail
+ST="$HOME/.config/xmactahoe"; mkdir -p "$ST"
+PANELS="$HOME/.local/bin/xmactahoe-panels"
+CLOCK=org.kde.plasma.digitalclock
+CENTER=org.xmactahoe.center
+present() {   # ask plasmashell, the configuration file lags behind
+  gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript \
+    "\"var n=0; for (var i=0;i<panelIds.length;i++){ var ws=panelById(panelIds[i]).widgets(); for (var j=0;j<ws.length;j++) if (ws[j].type=='$1') n++; } print(n);\"" 2>/dev/null | grep -qE "[1-9]"
+}
+
+case "${1:-status}" in
+  on|off)
+    [ -x "$PANELS" ] || { echo "⚠ xmactahoe-panels is missing: run xmactahoe update"; exit 1; }
+    if [ "$1" = on ]; then from=$CLOCK; to=$CENTER; else from=$CENTER; to=$CLOCK; fi
+    "$PANELS" swap "$from" "$to" --location top || exit 1
+    if [ "$1" = on ]; then
+      lat=""; lon=""
+      [ -s "$ST/location" ] && read -r lat lon _ < "$ST/location"    # the weather uses the same location as the appearance
+      # the packaged menu bar already shows the date through a command widget: then show only the time
+      fmt="ddd d MMM  h:mm AP"
+      present com.github.zren.commandoutput && fmt="h:mm AP"
+      gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell \
+        --method org.kde.PlasmaShell.evaluateScript \
+        "\"for (var i=0;i<panelIds.length;i++){ var ws=panelById(panelIds[i]).widgets(); for (var j=0;j<ws.length;j++){ var w=ws[j];
+            if (w.type!='$CENTER') continue; w.currentConfigGroup=['General']; w.writeConfig('timeFormat','$fmt');
+            if ('$lat') { w.writeConfig('latitude','$lat'); w.writeConfig('longitude','$lon'); } w.reloadConfig(); } } print('ok');\"" >/dev/null 2>&1
+    fi
+    echo "$1" > "$ST/center"
+    echo "✓ notification center: $1"
+    [ "$1" = on ] && echo "  click the date in the menu bar to open it" ;;
+  status)
+    if present "$CENTER"; then echo "on (XMacTahoe Notification Center in the menu bar)"
+    else echo "off (Plasma's clock in the menu bar)"; fi ;;
+  *) sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac
