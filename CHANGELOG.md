@@ -1,3 +1,11 @@
+## 2.2.2 — 2026-10-04
+
+Fix: a screen coming back could end up with two bars and two docks.
+
+- The hotplug service cloned panels onto a screen that had none *live*, but Plasma had its panels in the configuration and was simply a few seconds away from placing them. The result was a duplicate bar and dock. The service now checks what the configuration remembers for each screen and leaves those to Plasma, waits longer before deciding, and clears a twin it may still have raced into.
+- **`xmactahoe panels prune`** removes a duplicate bar or dock, keeping the one Plasma restored. A second panel whose widgets differ from the first is left alone, so a panel you built yourself is never removed.
+- `xmactahoe panels status` reports duplicates, and `xmactahoe doctor` checks for them (`--fix` prunes).
+
 ## 2.2.1 — 2026-09-26
 
 The window buttons are now your choice, not the preset's.

@@ -9,9 +9,10 @@ This runs by itself: the user unit `xmactahoe-panels.path` watches KWin's output
 a screen plugged in gets its panels a few seconds later. Unplugging needs nothing: Plasma keeps the
 panels in its configuration and brings them back when the screen returns.
 
-Usage: xmactahoe-panels [status|clone|swap OLD NEW] [--location bottom] [--dry-run] [--quiet]
+Usage: xmactahoe-panels [status|clone|prune|swap OLD NEW] [--location bottom] [--dry-run] [--quiet]
   status  list the panels of each screen
   clone   give every screen without panels its own copy
+  prune   remove duplicates: a screen keeps one bar and one dock, the oldest of each
   swap    rebuild the panels, replacing widget OLD with widget NEW and keeping every setting
   magnify dock icon magnification under the pointer: on, off, a percentage (110-200), or status.
           `on` swaps Plasma's task widget for the theme's dock widget, `off` puts it back.
@@ -62,6 +63,32 @@ def live():
             d['id'], d['screen'] = int(d['id']), int(d['screen'])
             panels.append(d)
     return widths, panels
+
+
+def remembered():
+    """{screen: {locations}} from the configuration file: panels Plasma knows about, placed or not.
+
+    A screen that comes back brings its panels with it, but Plasma can take a few seconds to put them
+    there. Without this, a clone right after a screen change would add a second bar and a second dock.
+    """
+    out, current, plugin, screen, location = {}, None, None, None, None
+    places = {'3': 'top', '4': 'bottom', '5': 'left', '6': 'right'}
+    def flush():
+        if plugin == 'org.kde.panel' and screen is not None and screen >= 0:
+            out.setdefault(screen, set()).add(places.get(location, location))
+    for line in open(APPLETS):
+        line = line.rstrip('\n')
+        if line.startswith('['):
+            flush()
+            current = re.fullmatch(r'\[Containments\]\[(\d+)\]', line)
+            plugin = screen = location = None
+        elif current and '=' in line:
+            key, value = line.split('=', 1)
+            if key == 'plugin': plugin = value
+            elif key == 'lastScreen': screen = int(value) if value.lstrip('-').isdigit() else None
+            elif key == 'location': location = value
+    flush()
+    return out
 
 
 def applets_of(containment):
@@ -166,7 +193,7 @@ def main():
     args = sys.argv[1:]
     QUIET = '--quiet' in args
     mode = next((a for a in args if not a.startswith('-')), 'status')
-    if mode not in ('status', 'clone', 'swap', 'magnify'): print(__doc__); sys.exit(1)
+    if mode not in ('status', 'clone', 'prune', 'swap', 'magnify'): print(__doc__); sys.exit(1)
     widths, panels = live()
     if panels is None:
         say('plasmashell does not answer on D-Bus'); sys.exit(0 if QUIET else 1)
@@ -195,13 +222,39 @@ def main():
         return
     by_screen = {}
     for p in panels: by_screen.setdefault(p['screen'], []).append(p)
+    if mode == 'prune':
+        extra = []
+        for screen, got in sorted(by_screen.items()):
+            for location in ('top', 'bottom'):
+                same = sorted((p for p in got if p['location'] == location), key=lambda p: p['id'])
+                if len(same) < 2: continue
+                kept = [plug for plug, _, _ in applets_of(same[0]['id'])]
+                for p in same[1:]:
+                    # a twin of the panel we keep, not a panel you built yourself
+                    if [plug for plug, _, _ in applets_of(p['id'])] == kept: extra.append((screen, p))
+                    else: say(f'  screen {screen}: second {location} panel {p["id"]} has different widgets, left alone')
+        if not extra:
+            say('no duplicate panel'); return
+        for screen, p in extra:
+            if '--dry-run' in args:
+                print(f'--- screen {screen}: would remove the extra {p["location"]} panel {p["id"]}'); continue
+            pscript(f'panelById({p["id"]}).remove(); print("REMOVED");')
+            say(f'✓ screen {screen}: extra {p["location"]} panel {p["id"]} removed')
+        return
     if mode == 'status':
         for s in sorted(widths):
             got = by_screen.get(s, [])
             print(f'  screen {s} ({widths[s]}px): ' + (', '.join(f"{p['location']} panel {p['id']}" for p in got) or 'no panel'))
         if [s for s in widths if s not in by_screen]: print('  → give them a bar and a dock with: xmactahoe panels clone')
+        twins = [s for s, got in by_screen.items()
+                 if any(len([p for p in got if p['location'] == loc]) > 1 for loc in ('top', 'bottom'))]
+        if twins: print(f'  → duplicate panels on screen(s) {", ".join(map(str, sorted(twins)))}: xmactahoe panels prune')
         return
-    missing = [s for s in sorted(widths) if not by_screen.get(s)]
+    known = remembered()
+    missing = [s for s in sorted(widths) if not by_screen.get(s) and not known.get(s)]
+    waiting = [s for s in sorted(widths) if not by_screen.get(s) and known.get(s)]
+    if waiting:
+        say(f'screen(s) {", ".join(map(str, waiting))}: panels remembered but not placed yet, leaving them to Plasma')
     if not missing:
         say('every screen already has its panels'); return
     full = [s for s in sorted(by_screen) if {p['location'] for p in by_screen[s]} >= {'top', 'bottom'}]
