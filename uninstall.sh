@@ -72,7 +72,9 @@ else
 fi
 gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1
 
-rm -f "$BIN"/xmactahoe "$BIN"/xmactahoe-* "$BIN/kde-desktop-repair" "$LS/applications/xmactahoe-appgrid.desktop" "$LS/kio/servicemenus/xmactahoe-quicklook.desktop"
+[ -x "$BIN/xmactahoe-finder" ] && "$BIN/xmactahoe-finder" off >/dev/null 2>&1
+[ -x "$BIN/xmactahoe-keys" ] && "$BIN/xmactahoe-keys" linux >/dev/null 2>&1
+rm -f "$BIN"/xmactahoe "$BIN"/xmactahoe-* "$BIN/kde-desktop-repair" "$LS/applications/xmactahoe-appgrid.desktop" "$LS"/kio/servicemenus/xmactahoe-*.desktop
 if [ "$KEEP" = 0 ]; then
   echo "→ Removing files ..."
   rm -rf "$LS"/plasma/look-and-feel/XMacTahoe.* "$LS"/plasma/desktoptheme/XMacTahoe-* "$LS"/color-schemes/XMacTahoe*.colors \

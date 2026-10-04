@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+"""macOS keyboard shortcuts for the desktop, with the Super key playing the part of Command.
+
+  mac    Spotlight on Meta+Space, Mission Control on Ctrl+Up, App Exposé on Ctrl+Down, screenshots
+         on Meta+Shift+3/4/5, hide on Meta+H, lock on Meta+Ctrl+Q, Force Quit on Meta+Alt+Esc,
+         Spaces on Ctrl+Left/Right, and a window switcher of large icons grouped by application
+  linux  the shortcuts that were in place before, and the stock switcher
+  status what is set right now
+
+Usage: xmactahoe-keys mac|linux|status
+
+The keys of your applications (Ctrl+C, Ctrl+S...) are not touched: only the desktop shortcuts are.
+What was replaced is kept in ~/.config/xmactahoe/keys-backup.json, so `linux` restores exactly it.
+"""
+import json, os, re, subprocess, sys
+
+STATE = os.path.expanduser('~/.config/xmactahoe')
+BACKUP = f'{STATE}/keys-backup.json'
+MODS = {'meta': 0x10000000, 'ctrl': 0x04000000, 'alt': 0x08000000, 'shift': 0x02000000}
+KEYS = {'space': 0x20, 'tab': 0x01000001, 'esc': 0x01000000, 'up': 0x01000013, 'down': 0x01000015,
+        'left': 0x01000012, 'right': 0x01000014, 'f4': 0x01000033}
+
+# action = (component, action id, friendly component, friendly action, macOS shortcut)
+MAC = [
+    # Spotlight: the search of the application grid, which already answers on Alt+Space here
+    ('dev.xarbit.appgrid', 'appgrid_open_compact', 'AppGrid Launcher Center', 'Open in Compact Mode',
+     'meta+space / alt+space'),
+    ('kwin', 'Overview', 'KWin', 'Toggle Overview', 'ctrl+up'),                           # Mission Control
+    ('kwin', 'ExposeClass', 'KWin', 'Toggle Present Windows (Window class)', 'ctrl+down'),  # App Exposé
+    ('kwin', 'Window Minimize', 'KWin', 'Minimize Window', 'meta+h'),                     # Hide
+    ('kwin', 'Kill Window', 'KWin', 'Kill Window', 'meta+alt+esc'),                       # Force Quit
+    ('kwin', 'Switch to Next Desktop', 'KWin', 'Switch to Next Desktop', 'ctrl+right'),   # Spaces
+    ('kwin', 'Switch to Previous Desktop', 'KWin', 'Switch to Previous Desktop', 'ctrl+left'),
+    ('ksmserver', 'Lock Session', 'Session Management', 'Lock Session', 'meta+ctrl+q'),
+    ('org.kde.spectacle.desktop', 'FullScreenScreenShot', 'Spectacle', 'Capture Entire Desktop', 'meta+shift+3'),
+    ('org.kde.spectacle.desktop', 'RectangularRegionScreenShot', 'Spectacle', 'Capture Rectangular Region', 'meta+shift+4'),
+    ('org.kde.spectacle.desktop', '_launch', 'Spectacle', 'Spectacle', 'meta+shift+5'),
+]
+SWITCHER = {'mac': {'LayoutName': 'big_icons', 'ApplicationsMode': '1', 'HighlightWindows': 'true'},
+            'linux': {'LayoutName': 'org.kde.breeze.desktop', 'ApplicationsMode': '0', 'HighlightWindows': 'true'}}
+
+
+def keycodes(combo):
+    return [keycode(c.strip()) for c in combo.split('/')]
+
+
+def keycode(combo):
+    value = 0
+    for part in combo.strip().lower().split('+'):
+        if part in MODS: value |= MODS[part]
+        elif part in KEYS: value |= KEYS[part]
+        elif len(part) == 1: value |= ord(part.upper())
+        else: raise ValueError(f'unknown key: {part}')
+    return value
+
+
+def accel(method, *args):
+    return subprocess.run(['busctl', '--user', 'call', 'org.kde.kglobalaccel', '/kglobalaccel',
+                           'org.kde.KGlobalAccel', method, *args], capture_output=True, text=True)
+
+
+def current(component, action):
+    """The key codes bound to an action right now, as a list of ints."""
+    out = accel('shortcut', 'as', '4', component, action, '', '').stdout
+    return [int(n) for n in re.findall(r'\b(\d{3,})\b', out)]
+
+
+def assign(component, action, friendly_component, friendly_action, codes):
+    accel('setForeignShortcut', 'asai', '4', component, action, friendly_component, friendly_action,
+          str(len(codes)), *[str(c) for c in codes])
+
+
+def kwin(group, key, value):
+    subprocess.run(['kwriteconfig6', '--file', 'kwinrc', '--group', group, '--key', key, value], capture_output=True)
+
+
+def reconfigure():
+    subprocess.run(['gdbus', 'call', '--session', '--dest', 'org.kde.KWin', '--object-path', '/KWin',
+                    '--method', 'org.kde.KWin.reconfigure'], capture_output=True)
+
+
+def apply_mac():
+    os.makedirs(STATE, exist_ok=True)
+    previous = {}
+    for component, action, fc, fa, combo in MAC:
+        previous[f'{component}|{action}'] = current(component, action)
+        assign(component, action, fc, fa, keycodes(combo))
+    json.dump(previous, open(BACKUP, 'w'), indent=1)
+    for key, value in SWITCHER['mac'].items(): kwin('TabBox', key, value)
+    reconfigure()
+    print('✓ macOS shortcuts:')
+    for component, action, _, fa, combo in MAC:
+        print(f'   {combo.replace("meta", "Meta").replace("ctrl", "Ctrl").replace("alt", "Alt").replace("shift", "Shift"):18s} {fa}')
+    print('   Meta+Tab           switch application (large icons, one entry per application)')
+    print('   Meta               the application grid, as before')
+
+
+def apply_linux():
+    previous = json.load(open(BACKUP)) if os.path.exists(BACKUP) else {}
+    for component, action, fc, fa, _ in MAC:
+        codes = previous.get(f'{component}|{action}', [])
+        assign(component, action, fc, fa, codes)
+    for key, value in SWITCHER['linux'].items(): kwin('TabBox', key, value)
+    reconfigure()
+    if os.path.exists(BACKUP): os.remove(BACKUP)
+    print('✓ previous shortcuts restored' + ('' if previous else ' (nothing was saved: only the switcher was reset)'))
+
+
+def status():
+    print('mode:', 'mac' if os.path.exists(BACKUP) else 'linux')
+    for component, action, _, fa, combo in MAC:
+        codes = current(component, action)
+        mark = '✓' if all(c in codes for c in keycodes(combo)) else ' '
+        print(f'  {mark} {fa:42s} {combo}')
+    out = subprocess.run(['kreadconfig6', '--file', 'kwinrc', '--group', 'TabBox', '--key', 'LayoutName'],
+                         capture_output=True, text=True).stdout.strip()
+    print(f'  switcher: {out or "org.kde.breeze.desktop"}')
+
+
+mode = sys.argv[1] if len(sys.argv) > 1 else 'status'
+if mode == 'mac': apply_mac()
+elif mode == 'linux': apply_linux()
+elif mode == 'status': status()
+else: print(__doc__); sys.exit(1)

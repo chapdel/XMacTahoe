@@ -83,7 +83,7 @@ cp -a "$D"/gtk/themes/.           "$HOME/.themes/"
 cp "$D"/extra/apps/macOS.profile "$D"/extra/apps/XMacTahoe.colorscheme "$D"/extra/apps/XMacTahoe-Light.colorscheme "$LS/konsole/"
 cp "$D"/extra/apps/kate-themes/*.theme "$LS/org.kde.syntax-highlighting/themes/"
 cp -a "$D"/extra/applications/.   "$LS/applications/"
-cp "$D/extra/servicemenus/xmactahoe-quicklook.desktop" "$LS/kio/servicemenus/"; chmod +x "$LS/kio/servicemenus/xmactahoe-quicklook.desktop"
+for m in "$D"/extra/servicemenus/*.desktop; do case "$m" in *xmactahoe-tags.desktop) continue;; esac; cp "$m" "$LS/kio/servicemenus/"; chmod +x "$LS/kio/servicemenus/$(basename "$m")"; done   # tags: added by `xmactahoe finder on`
 cp "$LS/icons/XMacTahoe-Night/apps/scalable/xmactahoe-transparent.svg" "$LS/icons/hicolor/scalable/apps/" 2>/dev/null || true
 for k in "$D"/extra/kwin-scripts/*/; do n=$(basename "$k"); rm -rf "${LS:?}/kwin/scripts/$n"; cp -a "$k" "$LS/kwin/scripts/$n"; done
 # the Control Center buttons call the xmactahoe command: point them at this user's ~/.local/bin
@@ -102,6 +102,7 @@ fi
 mkdir -p "$HOME/.config/xmactahoe"; echo "$RT" > "$HOME/.config/xmactahoe/package-dir"
 # the icons just copied carry the neutral logo: keep the user's earlier choice (xmactahoe logo apple)
 [ "$(cat "$HOME/.config/xmactahoe/buttons" 2>/dev/null)" = glass ] && "$HOME/.local/bin/xmactahoe-buttons" glass >/dev/null   # the package ships flat buttons
+[ -f "$LS/xmactahoe/user-places.xbel.bak" ] && "$HOME/.local/bin/xmactahoe-finder" on >/dev/null   # Finder sidebar and tags were enabled
 if [ "$(cat "$HOME/.config/xmactahoe/logo" 2>/dev/null)" = apple ]; then "$HOME/.local/bin/xmactahoe-logo" apple --quiet || echo "⚠ could not fetch the Apple logo: run xmactahoe logo apple later"; fi
 fc-cache -f >/dev/null 2>&1 || true
 kbuildsycoca6 --noincremental >/dev/null 2>&1 || true

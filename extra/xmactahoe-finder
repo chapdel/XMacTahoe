@@ -1,0 +1,107 @@
+#!/usr/bin/env python3
+"""Finder-like sidebar for Dolphin, and the colour tags menu.
+
+  on      put Recents and Applications at the top of the sidebar, as in the Finder, and install the
+          Tags entry in the context menu (Red, Orange, Yellow, Green, Blue, Purple, Grey)
+  off     restore the sidebar as it was and remove the Tags entry
+  status  what is in place
+
+Usage: xmactahoe-finder on|off|status
+
+Your own entries are never removed: `on` only adds what is missing and moves Recents and
+Applications to the top. The file is backed up first, and `off` puts that copy back.
+"""
+import os, re, shutil, subprocess, sys, time
+import xml.etree.ElementTree as ET
+
+PLACES = os.path.expanduser('~/.local/share/user-places.xbel')
+BACKUP = os.path.expanduser('~/.local/share/xmactahoe/user-places.xbel.bak')
+MENU = os.path.expanduser('~/.local/share/kio/servicemenus/xmactahoe-tags.desktop')
+# what the Finder shows at the top, in this order
+WANTED = [('recentlyused:/files', 'Recents', 'document-open-recent'),
+          ('applications:/', 'Applications', 'applications-all')]
+
+
+def package():
+    try:
+        p = open(os.path.expanduser('~/.config/xmactahoe/package-dir')).read().strip()
+    except OSError:
+        p = ''
+    return p if os.path.isdir(f'{p}/extra') else os.path.dirname(os.path.realpath(__file__))
+
+
+def bookmark(href, title, icon):
+    b = ET.Element('bookmark', {'href': href})
+    ET.SubElement(b, 'title').text = title
+    info = ET.SubElement(b, 'info')
+    fd = ET.SubElement(info, 'metadata', {'owner': 'http://freedesktop.org'})
+    ET.SubElement(fd, '{http://www.freedesktop.org/standards/desktop-bookmarks}icon', {'name': icon})
+    kde = ET.SubElement(info, 'metadata', {'owner': 'http://www.kde.org'})
+    ET.SubElement(kde, 'ID').text = f'{int(time.time() * 1000)}/{abs(hash(href)) % 1000}'
+    return b
+
+
+def sidebar_on():
+    ET.register_namespace('bookmark', 'http://www.freedesktop.org/standards/desktop-bookmarks')
+    ET.register_namespace('kdepriv', 'http://www.kde.org/kdepriv')
+    ET.register_namespace('mime', 'http://www.freedesktop.org/standards/shared-mime-info')
+    tree = ET.parse(PLACES)
+    root = tree.getroot()
+    os.makedirs(os.path.dirname(BACKUP), exist_ok=True)
+    if not os.path.exists(BACKUP):
+        shutil.copy2(PLACES, BACKUP)
+    existing = {b.get('href'): b for b in root.findall('bookmark')}
+    # the home folder stays first, the Finder entries come right after it
+    order = [b for b in root.findall('bookmark')]
+    home = next((b for b in order if b.get('href', '').startswith('file://') and b.get('href').count('/') == 3), None)
+    added, entries = [], []
+    for href, title, icon in WANTED:
+        b = existing.get(href)
+        if b is None:
+            b = bookmark(href, title, icon)
+            added.append(title)
+        elif b in list(root):
+            root.remove(b)              # lifted out, so it can go back right under Home
+        entries.append(b)
+    insert_at = list(root).index(home) + 1 if home is not None and home in list(root) else len(root.findall('info')) + 1
+    for offset, b in enumerate(entries):
+        root.insert(insert_at + offset, b)
+    tree.write(PLACES, encoding='UTF-8', xml_declaration=True)
+    return added
+
+
+def menu_on():
+    src = f'{package()}/extra/servicemenus/xmactahoe-tags.desktop'
+    if not os.path.exists(src):
+        return False
+    os.makedirs(os.path.dirname(MENU), exist_ok=True)
+    shutil.copy2(src, MENU)
+    os.chmod(MENU, 0o755)
+    subprocess.run(['kbuildsycoca6'], capture_output=True)
+    return True
+
+
+def main():
+    mode = sys.argv[1] if len(sys.argv) > 1 else 'status'
+    if mode == 'on':
+        added = sidebar_on()
+        print('✓ sidebar: Recents and Applications at the top' + (f' (added: {", ".join(added)})' if added else ''))
+        print('✓ Tags in the context menu' if menu_on() else '⚠ the package copy is missing: run xmactahoe update')
+        print('  Dolphin picks both up right away; tagged files appear under Tags in its sidebar.')
+    elif mode == 'off':
+        if os.path.exists(BACKUP):
+            shutil.copy2(BACKUP, PLACES); os.remove(BACKUP); print('✓ sidebar restored')
+        else:
+            print('  sidebar: nothing to restore')
+        if os.path.exists(MENU):
+            os.remove(MENU); subprocess.run(['kbuildsycoca6'], capture_output=True); print('✓ Tags entry removed')
+    elif mode == 'status':
+        places = open(PLACES).read() if os.path.exists(PLACES) else ''
+        for href, title, _ in WANTED:
+            print(f'  {"✓" if href in places else " "} {title} in the sidebar')
+        print(f'  {"✓" if os.path.exists(MENU) else " "} Tags in the context menu')
+    else:
+        print(__doc__); sys.exit(1)
+
+
+main()

@@ -1,0 +1,54 @@
+[Desktop Entry]
+Type=Service
+MimeType=all/all;
+Actions=tagRed;tagOrange;tagYellow;tagGreen;tagBlue;tagPurple;tagGrey;tagClear;
+X-KDE-Submenu=Tags
+X-KDE-Submenu[fr]=Étiquettes
+X-KDE-Priority=TopLevel
+
+[Desktop Action tagRed]
+Name=Red
+Name[fr]=Rouge
+Icon=im-ban-kick-user
+Exec=xmactahoe-tag Red %U
+
+[Desktop Action tagOrange]
+Name=Orange
+Icon=im-user-away
+Exec=xmactahoe-tag Orange %U
+
+[Desktop Action tagYellow]
+Name=Yellow
+Name[fr]=Jaune
+Icon=im-user-busy
+Exec=xmactahoe-tag Yellow %U
+
+[Desktop Action tagGreen]
+Name=Green
+Name[fr]=Vert
+Icon=im-user-online
+Exec=xmactahoe-tag Green %U
+
+[Desktop Action tagBlue]
+Name=Blue
+Name[fr]=Bleu
+Icon=im-user
+Exec=xmactahoe-tag Blue %U
+
+[Desktop Action tagPurple]
+Name=Purple
+Name[fr]=Violet
+Icon=im-irc
+Exec=xmactahoe-tag Purple %U
+
+[Desktop Action tagGrey]
+Name=Grey
+Name[fr]=Gris
+Icon=im-user-offline
+Exec=xmactahoe-tag Grey %U
+
+[Desktop Action tagClear]
+Name=Remove tags
+Name[fr]=Retirer les étiquettes
+Icon=edit-clear
+Exec=xmactahoe-tag --clear %U

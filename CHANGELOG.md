@@ -1,3 +1,14 @@
+## 2.3.0 — 2026-10-04
+
+macOS shortcuts, Finder touches, and screens that look after themselves.
+
+- **`xmactahoe keys mac|linux|status`** moves the desktop shortcuts to where a Mac user expects them, with Meta playing the part of Command: Meta+Space for the application search (Alt+Space keeps working), Ctrl+Up for Mission Control, Ctrl+Down for App Exposé, Meta+Shift+3/4/5 for the screenshots, Meta+H to hide, Meta+Ctrl+Q to lock, Meta+Alt+Esc for Force Quit, Ctrl+Left/Right for Spaces, and a window switcher of large icons grouped by application, like ⌘-Tab. The keys inside applications are untouched; what was replaced is saved and `linux` restores it exactly.
+- **`xmactahoe finder on|off|status`** puts Recents and Applications at the top of Dolphin's sidebar and adds a Tags submenu with the seven Finder colours, stored the way KDE stores tags so they show up under Tags and in `tags:/`. Your own entries are kept and the sidebar file is backed up.
+- **Screens**: the KWin script now tells the panels service itself that the screens changed, instead of waiting for a configuration file to be rewritten, and it matches windows on the identity KWin gives them rather than their title — a window whose title changed is recognised again, and a maximized window comes back maximized.
+- `kde-desktop-repair` no longer drops a second key bound to the application search.
+
+Upgrading: `xmactahoe update`, then `xmactahoe keys mac` and `xmactahoe finder on` if you want them.
+
 ## 2.2.2 — 2026-10-04
 
 Fix: a screen coming back could end up with two bars and two docks.

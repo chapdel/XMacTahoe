@@ -67,6 +67,14 @@ Plasma pins a panel to one screen and cannot duplicate or move it by itself, so 
 
 The copy carries the widgets and their settings, minus the AppGrid widget and any global shortcut, which belong to a single widget. `xmactahoe panels` lists the panels of each screen, `xmactahoe panels clone` does the copy by hand (live, without restarting plasmashell), and `xmactahoe panels prune` removes a duplicate bar or dock, keeping the one Plasma restored. A screen whose panels are in the configuration but not placed yet is left to Plasma rather than cloned, so a screen coming back never ends up with two docks.
 
+## macOS keyboard shortcuts
+
+`xmactahoe keys mac` moves the desktop shortcuts to where a Mac user expects them, with Meta playing the part of Command: **Meta+Space** opens the application search (Alt+Space keeps working), **Ctrl+Up** Mission Control (Overview), **Ctrl+Down** App Exposé (the windows of the current application), **Meta+Shift+3/4/5** the screenshots, **Meta+H** hide, **Meta+Ctrl+Q** lock, **Meta+Alt+Esc** Force Quit, **Ctrl+Left/Right** switch Spaces (virtual desktops), and the window switcher becomes large icons grouped by application, like ⌘-Tab. The keys inside applications (Ctrl+C, Ctrl+S) are untouched. What was replaced is saved, and `xmactahoe keys linux` puts it back exactly.
+
+## Finder touches
+
+`xmactahoe finder on` puts **Recents** and **Applications** at the top of Dolphin's sidebar, as in the Finder, and adds a **Tags** submenu to the context menu with the seven Finder colours. Tags are stored the way KDE stores them (the `user.xdg.tags` attribute), so tagged files show up under Tags in Dolphin's sidebar and in `tags:/` searches. Your own sidebar entries are kept, the file is backed up, and `off` restores it.
+
 ## Keyboard shortcuts (AppGrid launcher)
 
 | Key | Action |
@@ -86,7 +94,7 @@ The **window buttons are your own choice**, not part of the preset: `xmactahoe b
 
 The glass level is available on its own: `xmactahoe glass level 0..100`, the equivalent of the Liquid Glass slider in System Settings — 100 is the theme's own translucency, 0 opaque panels, popups and Qt windows. It is remembered and re-applied when the glass mode changes.
 
-`xmactahoe-screens` (KWin script) keeps, for each set of connected screens, where every window sits, and puts them back when that set returns — the Golden Gate "consistent window positioning across displays". It holds the arrangement in KWin's memory for the session; nothing is written to disk. Settings: `kwinrc [Script-xmactahoe-screens] SaveSeconds`, `RestoreDelay`.
+`xmactahoe-screens` (KWin script) keeps, for each set of connected screens, where every window sits — maximized ones included — and puts them back when that set returns, the Golden Gate "consistent window positioning across displays". Windows are matched on the identity KWin gives them, not on their title, so a window whose title changed is still recognised. The script also tells the panels service that the screens changed, so a new screen gets its bar and dock without waiting for a configuration file to be rewritten. It holds the arrangement in KWin's memory for the session; nothing is written to disk. Settings: `kwinrc [Script-xmactahoe-screens] SaveSeconds`, `RestoreDelay`, `StartPanels`.
 
 ## Rounded corners (Tahoe-style)
 
@@ -125,7 +133,7 @@ Applications that hand the tray a bitmap instead of an icon name (qBittorrent, W
 
 ## Everyday command
 
-`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `dock autohide|dodge|always`, `panels [status|clone|prune]`, `goldengate on|off`, `buttons glass|flat|auto`, `glass level N`, `logo tahoe|apple`, `dnd on|off|schedule`, `firefox`, `flatpak`, `ghostty`, `chrome`, `rules` (removes old forced title-bar rules), `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
+`xmactahoe` (installed in `~/.local/bin`) wraps every helper: `light` / `dark`, `accent NAME`, `glass on|off|toggle`, `motion on|off|toggle` (reduced animations), `auto on|off|now` (sunrise/sunset appearance), `dynamic on|off|now` (eight-slot wallpaper following the sun), `wallpaper NAME`, `dock autohide|dodge|always`, `panels [status|clone|prune]`, `goldengate on|off`, `buttons glass|flat|auto`, `glass level N`, `keys mac|linux`, `finder on|off`, `logo tahoe|apple`, `dnd on|off|schedule`, `firefox`, `flatpak`, `ghostty`, `chrome`, `rules` (removes old forced title-bar rules), `doctor [--fix]`, `update`, `restore`, `uninstall`. The Flex Hub control center is laid out like the Tahoe Control Center: connectivity card (Wi-Fi, Bluetooth, settings), Focus, Appearance and Screenshot, brightness and sound sliders, Now Playing, then a row of toggles (Night Shift, Glass, Auto appearance, Reduce motion), on glass tiles.
 
 `xmactahoe doctor` checks the whole installation (theme layers, Kvantum/GTK alignment, files, units, rounded corners, shortcuts) and `--fix` repairs what it can. The installer saves a restore point of your Plasma configuration (panels, themes, Kvantum, GTK, Kate) before its first run; `xmactahoe restore` (or `./uninstall.sh --restore`) puts it back as it was. If that restore point was taken while XMacTahoe was already active, it falls back to Breeze Dark.
 

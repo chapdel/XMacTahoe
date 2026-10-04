@@ -1,0 +1,15 @@
+#!/bin/bash
+# Finder-like colour tags. KDE stores tags in the extended attribute user.xdg.tags, the same place
+# Dolphin and Baloo read them from, so a tagged file shows up under Tags in Dolphin's sidebar.
+# Usage: xmactahoe-tag COLOUR FILE...   |   xmactahoe-tag --clear FILE...
+set -uo pipefail
+[ $# -ge 2 ] || { sed -n '2,5p' "$0" | sed 's/^# \{0,1\}//'; exit 1; }
+tag="$1"; shift
+for f in "$@"; do
+  f="${f#file://}"; f=$(printf '%b' "${f//%/\\x}")      # a service menu passes URLs, percent-encoded
+  [ -e "$f" ] || continue
+  if [ "$tag" = --clear ]; then setfattr -x user.xdg.tags "$f" 2>/dev/null; continue; fi
+  cur=$(getfattr --only-values -n user.xdg.tags "$f" 2>/dev/null)
+  case ",$cur," in *",$tag,"*) continue ;; esac
+  setfattr -n user.xdg.tags -v "${cur:+$cur,}$tag" "$f" 2>/dev/null
+done

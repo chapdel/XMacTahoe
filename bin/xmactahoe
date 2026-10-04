@@ -6,6 +6,8 @@
 #   glass level N           glass transparency, 0 (opaque) to 100 (full), like the macOS slider
 #   goldengate on|off|status  macOS 27 traits: tinted glass, squarer corners, dimmed inactive windows
 #   buttons glass|flat|auto   window buttons: Liquid Glass shading, the flat Tahoe discs, or follow the preset
+#   keys mac|linux|status   macOS desktop shortcuts (Meta plays Command) and the macOS-like switcher
+#   finder on|off|status    Finder-like Dolphin sidebar and colour tags in the context menu
 #   motion on|off|toggle    animations (off = instant, for modest machines / accessibility)
 #   auto on|off|now|toggle  automatic light/dark appearance (sunrise/sunset)
 #   dynamic on|off|now      eight-slot dynamic wallpaper following the sun
@@ -31,6 +33,8 @@ case "$cmd" in
   motion)   "$E/xmactahoe-motion" "${1:-toggle}" ;;
   goldengate) "$E/xmactahoe-goldengate" "${1:-status}" ;;
   buttons)  "$E/xmactahoe-buttons" "${1:-status}" ;;
+  keys)     "$E/xmactahoe-keys" "${1:-status}" ;;
+  finder)   "$E/xmactahoe-finder" "${1:-status}" ;;
   auto)     a="${1:-toggle}"; case "$a" in
               on)  cp "$E"/systemd/xmactahoe-appearance.* "$HOME/.config/systemd/user/"; systemctl --user daemon-reload; systemctl --user enable --now xmactahoe-appearance.timer; "$E/xmactahoe-auto-appearance" --now; echo "auto appearance on" ;;
               off) systemctl --user disable --now xmactahoe-appearance.timer 2>/dev/null; echo "auto appearance off" ;;
@@ -55,5 +59,5 @@ case "$cmd" in
   restore)  "$PKG/uninstall.sh" --restore ;;
   uninstall) "$PKG/uninstall.sh" "$@" ;;
   version)  cat "$PKG/VERSION" ;;
-  *) sed -n '2,26p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) sed -n '2,28p' "$0" | sed 's/^# \{0,1\}//' ;;
 esac

@@ -175,7 +175,12 @@ else:
         ok(f"orphaned entry removed: activate widget {n}")
 
 if not CHECK and applet_id > 0:
-    kga("setForeignShortcut", "asai", "4", *COMPACT_ID, "1", str(ALT_SPACE))
+    # keep any other key bound to the compact mode (xmactahoe-keys adds Meta+Space), just make sure Alt+Space is there
+    out = kga("shortcut", "as", "4", *COMPACT_ID).stdout
+    keys = [int(n) for n in re.findall(r"\b(\d{3,})\b", out)]
+    if ALT_SPACE not in keys:
+        keys.append(ALT_SPACE)
+    kga("setForeignShortcut", "asai", "4", *COMPACT_ID, str(len(keys)), *[str(k) for k in keys])
     pscript('''
       var cs = desktops().concat(panels());
       for (var i = 0; i < cs.length; i++) {
